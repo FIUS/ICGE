@@ -9,6 +9,8 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 
 import java.util.concurrent.Semaphore;
 
+import javax.print.event.PrintEvent;
+
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.TickEvent;
@@ -102,6 +104,88 @@ public abstract class Entity {
         this._delayTicks = this.getStandardDelayTicks();
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * 
+     * @param message
+     *      The message to print
+     */
+    public void print(String message) {
+        SimulationEvent ev = new MessageEvent(this.simulation(), this, message);
+        this.delayed(() -> {
+            if (!this.alive()) throw new EntityNotAlive();
+            EventDispatcher.raise(ev);
+        });
+    }
+
+    public void print(boolean message) {
+        this.print(String.valueOf(message));
+    }
+
+    public void print(byte message) {
+        this.print(String.valueOf(message));
+    }
+
+    public void print(short message) {
+        this.print(String.valueOf(message));
+    }
+
+    public void print(int message) {
+        this.print(String.valueOf(message));
+    }
+
+    public void print(long message) {
+        this.print(String.valueOf(message));
+    }
+
+    public void print(float message) {
+        this.print(String.valueOf(message));
+    }
+
+    public void print(double message) {
+        this.print(String.valueOf(message));
+    }
+
+
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * Adds a newline Character to the end of the message.
+     * 
+     * @param message
+     *      The message to print
+     */
+    public void printLn(String message) {
+        this.print(message + "\n");
+    }
+
+    public void printLn(boolean message) {
+        this.printLn(String.valueOf(message));
+    }
+
+    public void printLn(byte message) {
+        this.printLn(String.valueOf(message));
+    }
+
+    public void printLn(short message) {
+        this.printLn(String.valueOf(message));
+    }
+
+    public void printLn(int message) {
+        this.printLn(String.valueOf(message));
+    }
+
+    public void printLn(long message) {
+        this.printLn(String.valueOf(message));
+    }
+
+    public void printLn(float message) {
+        this.printLn(String.valueOf(message));
+    }
+
+    public void printLn(double message) {
+        this.printLn(String.valueOf(message));
+    }
+
     // protected
 
     protected void spawnInternal(int column, int row, Direction direction) throws EntityAlreadyAlive {
@@ -182,6 +266,18 @@ public abstract class Entity {
             this.entity = entity;
         }
     }
+    
+    public static class MessageEvent extends EntityEvent {
+        
+        public final String message;
+        
+        MessageEvent(Simulation sim, Entity entity, String message) {
+            super(sim, entity);
+            this.message = message;
+        }
+
+    }
+
     
     public static class SpawnEvent extends EntityEvent {
         

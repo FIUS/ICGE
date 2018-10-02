@@ -11,6 +11,7 @@ import de.unistuttgart.informatik.fius.icge.event.Event;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.DespawnEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.MessageEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.SpawnEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.MovableEntity.MoveEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.MovableEntity.TurnLeftEvent;
@@ -111,6 +112,10 @@ public class Workbench {
             this._view.println("Simulation :: pause()");
         } else if (ev instanceof ResumeEvent) {
             this._view.println("Simulation :: resume()");
+        } else if (ev instanceof MessageEvent) {
+            MessageEvent mev = (MessageEvent) ev;
+            this._view.println(mev.entity.getClass().getSimpleName() + " :: print");
+            this._view.print(" > " + mev.message);
         } else {
             this._view.println("- unknown -");
         }
