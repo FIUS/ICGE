@@ -38,7 +38,10 @@ public class AnimationInterpreter {
         this._row = wob.row;
         Animation animation = this._animated.animation(wob);
         if (animation != null) {
-            if ((currentTick < animation.begin) || (currentTick > animation.end)) throw new IllegalArgumentException();
+            if ((currentTick < animation.begin)) throw new IllegalArgumentException();
+            if (currentTick > animation.end) {
+                currentTick = animation.end;
+            }
             float undone = (animation.end - currentTick) / (float) (animation.end - animation.begin);
             float progress = 1 - undone;
             this._image = _animatedImages.get(animation.type).get(wob.sprite, wob.direction, progress);
