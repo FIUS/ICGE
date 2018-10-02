@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.uni-stuttgart.informatik.fius</groupId>
 	<artifactId>ICGE</artifactId>
-	<version>0.2.0</version>
+	<version>0.3.0-Snapshot</version>
 	<name>Introduction Course Game Engine</name>
 	<description>The game engine for the java intoduction course of FIUS</description>
 	<url>https://github.com/neumantm/MarioSimulator</url>
