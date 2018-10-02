@@ -9,10 +9,13 @@ package de.unistuttgart.informatik.fius.icge;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 import de.unistuttgart.informatik.fius.icge.course.TaskTemplate;
@@ -31,20 +34,36 @@ public class SolutionLoader {
     public static void loadSolutions(Consumer<Class<? extends TaskTemplate>> registration) throws IOException {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         Enumeration<URL> urls = loader.getResources("");
+        List<Class<? extends TaskTemplate>> solutions = new ArrayList<>();
         try {
             File rootDir = new File(urls.nextElement().toURI());
-            loadSolutionInFile(rootDir, registration, loader, rootDir.getPath());
+            loadSolutionInFile(rootDir, solutions, loader, rootDir.getPath());
         } catch (URISyntaxException | ClassNotFoundException e) {
             throw new IOException(e);
         }
+        solutions.sort((cls1, cls2) -> {
+            try {
+                Integer nr1 = (Integer) cls1.getMethod("taskNumber").invoke(null);
+                Integer nr2 = (Integer) cls2.getMethod("taskNumber").invoke(null);
+                if (nr1 < nr2) {
+                    return -1;
+                }
+                if (nr1 > nr2) {
+                    return 1;
+                }
+            } catch (NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {}
+            return 0;
+        });
+        solutions.forEach(registration);
     }
     
-    private static void loadSolutionInFile(File file, Consumer<Class<? extends TaskTemplate>> registration, ClassLoader loader,
+    @SuppressWarnings("unchecked")
+    private static void loadSolutionInFile(File file, List<Class<? extends TaskTemplate>> solutions, ClassLoader loader,
             String rootDir) throws ClassNotFoundException {
         if (!file.exists()) throw new IllegalArgumentException("File does not exist.");
         if (file.isDirectory()) {
             for (File f : file.listFiles()) {
-                loadSolutionInFile(f, registration, loader, rootDir);
+                loadSolutionInFile(f, solutions, loader, rootDir);
             }
         } else {
             String path = file.getPath();
@@ -53,7 +72,7 @@ public class SolutionLoader {
                 className = className.substring(0, className.length() - 6);
                 Class<?> cls = loader.loadClass(className);
                 if (isValidSolutionClass(cls)) {
-                    doRegistration(cls, registration);
+                    solutions.add((Class<? extends TaskTemplate>) cls);
                 }
             }
         }
@@ -61,11 +80,6 @@ public class SolutionLoader {
     
     private static boolean isValidSolutionClass(Class<?> cls) {
         return (TaskTemplate.class.isAssignableFrom(cls) && !Modifier.isAbstract(cls.getModifiers()));
-    }
-    
-    @SuppressWarnings("unchecked")
-    private static void doRegistration(Class<?> cls, Consumer<Class<? extends TaskTemplate>> registration) {
-        registration.accept((Class<? extends TaskTemplate>) cls);
     }
     
     private static String convertPathToClassName(String path, String rootDir) {
