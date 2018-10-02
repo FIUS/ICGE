@@ -7,6 +7,7 @@
 
 package de.unistuttgart.informatik.fius.icge.workbench.swing;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -19,16 +20,14 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import de.unistuttgart.informatik.fius.icge.animations.AnimatedTerritory;
-import de.unistuttgart.informatik.fius.icge.simulation.Entity;
-import de.unistuttgart.informatik.fius.icge.simulation.Mario;
 import de.unistuttgart.informatik.fius.icge.territory.Territory;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
-import de.unistuttgart.informatik.fius.icge.workbench.swing.Settings.State;
+import de.unistuttgart.informatik.fius.icge.workbench.tools.ToolHandler;
 
-class SimPanel extends JPanel {
+public class SimPanel extends JPanel {
     private static final long serialVersionUID = 8651840223154690457L;
-
+    
     private final SwingView _view;
     private Graphics _g;
     private Settings _s;
@@ -39,13 +38,15 @@ class SimPanel extends JPanel {
     private boolean _mouseDown = false;
     private boolean _mouseInside = false;
     private AnimatedTerritory _animated;
-
-    public SimPanel(SwingView view) {
+    private ToolHandler _toolHandler;
+    
+    public SimPanel(SwingView view, ToolHandler th) {
+        this._toolHandler = th;
         this._view = view;
         this.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {}
-
+            
             @Override
             public void mousePressed(MouseEvent e) {
                 SimPanel.this._mouseDown = true;
@@ -55,7 +56,7 @@ class SimPanel extends JPanel {
                 }
                 SimPanel.this._view.update();
             }
-
+            
             @Override
             public void mouseReleased(MouseEvent e) {
                 SimPanel.this._mouseDown = false;
@@ -65,13 +66,13 @@ class SimPanel extends JPanel {
                 }
                 SimPanel.this._view.update();
             }
-
+            
             @Override
             public void mouseEntered(MouseEvent e) {
                 SimPanel.this._mouseInside = true;
                 SimPanel.this._view.update();
             }
-
+            
             @Override
             public void mouseExited(MouseEvent e) {
                 SimPanel.this._mouseInside = false;
@@ -85,7 +86,7 @@ class SimPanel extends JPanel {
                 SimPanel.this._currentY = e.getY();
                 SimPanel.this._view.update();
             }
-
+            
             @Override
             public void mouseMoved(MouseEvent e) {
                 SimPanel.this._currentX = SimPanel.this._pressX = e.getX();
@@ -94,7 +95,7 @@ class SimPanel extends JPanel {
             }
         });
     }
-
+    
     @Override
     public void paint(Graphics g) {
         this._g = g;
@@ -103,13 +104,14 @@ class SimPanel extends JPanel {
         if (this._s.animator != null) {
             this.drawGrid();
             this.drawWorldObjects();
+            this.drawMouseOverlay();
         }
     }
-
+    
     private void updateSettings() {
         this._s = this._view.settings();
     }
-
+    
     private void updateExtents() {
         this._bounds = this._g.getClipBounds();
         this._x0 = (0.5 * this._bounds.width) - (this._s.centeredCol * this._s.scale);
@@ -120,15 +122,15 @@ class SimPanel extends JPanel {
         this._endRow = this.convertToRow(Math.max(this._pressY, this._currentY));
         this._animated = this._s.animator == null ? null : this._s.animator.animated();
     }
-
+    
     private int convertToColumn(int x) {
         return (int) Math.round((x - this._x0) / this._s.scale);
     }
-
+    
     private int convertToRow(int y) {
         return (int) Math.round((y - this._y0) / this._s.scale);
     }
-
+    
     private Territory addConstruction(Territory tty) {
         for (int y = this._startRow; y <= this._endRow; ++y) {
             for (int x = this._startCol; x <= this._endCol; ++x) {
@@ -140,7 +142,7 @@ class SimPanel extends JPanel {
         }
         return tty;
     }
-
+    
     private Territory addDemolishing(Territory tty) {
         Image img = Images.image("cross.png");
         for (int y = this._startRow; y <= this._endRow; ++y) {
@@ -155,7 +157,27 @@ class SimPanel extends JPanel {
         }
         return tty;
     }
-
+    
+    private void drawMouseOverlay() {
+        int startRow = this._startRow;
+        int startCol = this._startCol;
+        if (!this._toolHandler.isCurrentToolArea()) {
+            startRow = this._endRow;
+            startCol = this._endCol;
+        }
+        for (int row = startRow; row <= this._endRow; ++row) {
+            for (int col = startCol; col <= this._endCol; ++col) {
+                int l = (int) (this._x0 + (this._s.scale * (col - 0.5f)));
+                int r = (int) (this._x0 + (this._s.scale * (col + 0.5f)));
+                int t = (int) (this._y0 + (this._s.scale * (row - 0.5f)));
+                int b = (int) (this._y0 + (this._s.scale * (row + 0.5f)));
+                
+                this._g.setColor(new Color(0, 40, 120, 50));
+                this._g.fillRect(l, t, r - l, b - t);
+            }
+        }
+    }
+    
     private void drawGrid() {
         double firstX = remainder(this._x0 - (0.5 * this._s.scale), this._s.scale);
         double firstY = remainder(this._y0 - (0.5 * this._s.scale), this._s.scale);
@@ -168,24 +190,13 @@ class SimPanel extends JPanel {
             this._g.drawLine(0, iy, this._bounds.width, iy);
         }
     }
-
+    
     private static double remainder(double a, double b) {
         double q = a / b;
         return b * (q - Math.floor(q));
     }
-
+    
     private void drawWorldObjects() {
-        if (this._mouseInside || this._mouseDown) {
-            switch (this._s.state) {
-                case CONSTRUCT:
-                    this._animated = this._animated.setTerritory(this.addConstruction(this._animated.territory()));
-                break;
-                case DEMOLISH:
-                    this._animated = this._animated.setTerritory(this.addDemolishing(this._animated.territory()));
-                break;
-                default:
-            }
-        }
         ArrayList<WorldObject> wobs = this._animated.territory().worldObjects();
         WorldObject lastWob = null;
         int drawCount = 1;
@@ -205,7 +216,7 @@ class SimPanel extends JPanel {
             drawWorldObject(lastWob, drawCount);
         }
     }
-
+    
     private void drawWorldObject(WorldObject wob, int count) {
         AnimationInterpreter interpreter = new AnimationInterpreter(this._animated);
         interpreter.setObject(wob, this._s.animator.simulation().tickCount());
@@ -219,7 +230,7 @@ class SimPanel extends JPanel {
             this._g.drawString(String.valueOf(count), x, y);
         }
     }
-
+    
     private void drawImage(float col, float row, Image img) {
         int l = (int) (this._x0 + (this._s.scale * (col - 0.5f)));
         int r = (int) (this._x0 + (this._s.scale * (col + 0.5f)));
@@ -227,42 +238,13 @@ class SimPanel extends JPanel {
         int b = (int) (this._y0 + (this._s.scale * (row + 0.5f)));
         this._g.drawImage(img, l, t, r - l, b - t, null);
     }
-
+    
     private void handleMousePress() {
-        switch (this._s.state) {
-            case SPAWN_MARIO:
-                this._view.setState(State.DEFAULT);
-                new Mario(this._s.animator.simulation()).forceSpawn(this._startCol, this._startRow);
-            break;
-            case DESPAWN:
-                for (Entity ent : this._s.animator.simulation().entities()) {
-                    WorldObject wob = ent.worldObject();
-                    if ((wob.column == this._startCol) && (wob.row == this._startRow)) {
-                        ent.forceDespawn();
-                    }
-                }
-            break;
-            default:
-        }
+        this._toolHandler.onMousePressed(this._s.animator.simulation(), this._startRow, this._startCol);
     }
-
+    
     private void handleMouseRelease() {
-        switch (this._s.state) {
-            case CONSTRUCT:
-                synchronized (this._s.animator.simulation()) {
-                    Territory tty = this._s.animator.simulation().territory();
-                    tty = this.addConstruction(tty);
-                    this._s.animator.simulation().setTerritory(tty);
-                }
-            break;
-            case DEMOLISH:
-                synchronized (this._s.animator.simulation()) {
-                    Territory tty = this._s.animator.simulation().territory();
-                    tty = this.addDemolishing(tty);
-                    this._s.animator.simulation().setTerritory(tty);
-                }
-            break;
-            default:
-        }
+        this._toolHandler.onMouseRealeased(this._s.animator.simulation(), this._startRow, this._endRow, this._startCol,
+                this._endCol);
     }
 }

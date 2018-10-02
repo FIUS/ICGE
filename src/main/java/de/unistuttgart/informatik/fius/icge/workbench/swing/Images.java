@@ -14,15 +14,15 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-class Images {
-
+public class Images {
+    
     private static final HashMap<String, BufferedImage> _images = new HashMap<>();
-
+    
     public static BufferedImage image(String imgName) {
         BufferedImage img = _images.get(imgName);
         return img != null ? img : loadImage(imgName);
     }
-
+    
     private static BufferedImage loadImage(String imgName) {
         URL url = Images.class.getClassLoader().getResource(imgName);
         if (url != null) {
@@ -32,8 +32,7 @@ class Images {
                     _images.put(imgName, img);
                     return img;
                 }
-            } catch (IOException e) {
-            }
+            } catch (IOException e) {}
         }
         return null;
     }
