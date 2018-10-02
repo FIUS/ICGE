@@ -7,12 +7,20 @@
 
 package de.unistuttgart.informatik.fius.icge.event;
 
-import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 
 public class EventDispatcher {
     
-    private static ArrayList<Listening> _listenings = new ArrayList<>();
-    private static ArrayList<EventListener> _toRemove = new ArrayList<>();
+    private static Deque<Listening> _listenings = new ConcurrentLinkedDeque<>();
+    private static Executor _eventExecutor = new ThreadPoolExecutor(3, 5, 5, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
     
     public static synchronized EventListener addListener(Class<?> listensFor, EventListener listener) {
         if (!Event.class.isAssignableFrom(listensFor)) throw new IllegalArgumentException();
@@ -21,25 +29,22 @@ public class EventDispatcher {
     }
     
     public static synchronized boolean removeListener(EventListener listener) {
-        if (_listenings.stream().filter(entry -> entry.listener == listener).findFirst().isPresent()) {
-            _toRemove.add(listener);
-            return true;
-        } else
-            return false;
+        return _listenings.remove(listener);
     }
     
     public static synchronized void raise(Event e) {
-        for (EventListener listener : _toRemove) {
-            _listenings.removeIf(entry -> entry.listener == listener);
-        }
-        _toRemove.clear();
-        for (Listening entry : _listenings) {
-            if (entry.listensFor.isAssignableFrom(e.getClass())) {
-                if (!entry.listener.handle(e)) {
-                    removeListener(entry.listener);
+        Runnable fn = () -> {
+            Set<EventListener> toRemove = new HashSet();
+            for (Listening entry : EventDispatcher._listenings) {
+                if (entry.listensFor.isAssignableFrom(e.getClass())) {
+                    if (!entry.listener.handle(e)) {
+                        toRemove.add(entry.listener);
+                    }
                 }
             }
-        }
+            EventDispatcher._listenings.removeIf(entry -> toRemove.contains(entry.listener));
+        };
+        _eventExecutor.execute(fn);
     }
     
     private static class Listening {
