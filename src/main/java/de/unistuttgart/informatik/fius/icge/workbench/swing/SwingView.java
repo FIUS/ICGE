@@ -17,14 +17,16 @@ import javax.swing.*;
 import de.unistuttgart.informatik.fius.icge.animations.SimulationAnimator;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
-import de.unistuttgart.informatik.fius.icge.workbench.swing.Settings.State;
+import de.unistuttgart.informatik.fius.icge.workbench.tools.ToolHandler;
 
 public class SwingView implements WorkbenchView {
     
     private JFrame _frame;
     private JTextArea _logArea;
     private ToolBar _toolBar;
-    private Settings _settings = new Settings(true, State.DEFAULT, null, 60.f, 0, 0);
+    private ToolHandler _toolHandler;
+    private SimPanel _simPanel;
+    private Settings _settings = new Settings(true, null, 60.f, 0, 0);
     
     public SwingView(String name) {
         EventQueue.invokeLater(() -> this.initFrame(name));
@@ -130,11 +132,6 @@ public class SwingView implements WorkbenchView {
         return this._settings;
     }
     
-    void setState(State state) {
-        this._settings = this._settings.setState(state);
-        this.update();
-    }
-    
     // private
     
     private void initFrame(String name) {
@@ -149,6 +146,7 @@ public class SwingView implements WorkbenchView {
         });
         
         this.initToolBar(this._frame);
+        this.initToolHandler();
         this.initMainPanel(this._frame);
         
         this._frame.setVisible(true);
@@ -157,6 +155,10 @@ public class SwingView implements WorkbenchView {
     private void initToolBar(JFrame frame) {
         this._toolBar = new ToolBar(this);
         frame.getContentPane().add(BorderLayout.NORTH, this._toolBar);
+    }
+    
+    private void initToolHandler() {
+        this._toolHandler = new ToolHandler(this._toolBar);
     }
     
     private void initMainPanel(JFrame frame) {
@@ -168,8 +170,8 @@ public class SwingView implements WorkbenchView {
     }
     
     private void initSimPanel(JPanel main) {
-        JPanel simPanel = new SimPanel(this);
-        JScrollPane scrollPane = new JScrollPane(simPanel);
+        this._simPanel = new SimPanel(this, this._toolHandler);
+        JScrollPane scrollPane = new JScrollPane(this._simPanel);
         main.add(BorderLayout.CENTER, scrollPane);
     }
     

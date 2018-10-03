@@ -94,7 +94,8 @@ public class Workbench {
         if (this.simulation() != ((SimulationEvent) ev).simulation) return true;
         if (ev instanceof SpawnEvent) {
             WorldObject wob = ((SpawnEvent) ev).entity.worldObject();
-            this._view.println(((EntityEvent) ev).entity.getClass().getSimpleName() + " :: spawn(" + wob.column + ", " + wob.row + ", " + wob.direction + ");");
+            this._view.println(((EntityEvent) ev).entity.getClass().getSimpleName() + " :: spawn(" + wob.column + ", " + wob.row
+                    + ", " + wob.direction + ");");
         } else if (ev instanceof DespawnEvent) {
             this._view.println(((EntityEvent) ev).entity.getClass().getSimpleName() + " :: despawn();");
         } else if (ev instanceof MoveEvent) {
