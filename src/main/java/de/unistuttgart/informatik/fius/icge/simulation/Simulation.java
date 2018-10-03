@@ -238,7 +238,9 @@ public class Simulation {
     }
 
     private void stopTimer() {
-        this._timerTaskSem.acquireUninterruptibly();
+        if (this._timerTaskSem != null) {
+            this._timerTaskSem.acquireUninterruptibly();
+        }
         this._timerTaskSem = null;
         this._timerTask = null;
     }
