@@ -17,6 +17,7 @@ import javax.swing.*;
 import de.unistuttgart.informatik.fius.icge.animations.SimulationAnimator;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
+import de.unistuttgart.informatik.fius.icge.workbench.tools.SimulationController;
 import de.unistuttgart.informatik.fius.icge.workbench.tools.ToolHandler;
 
 public class SwingView implements WorkbenchView {
@@ -25,6 +26,7 @@ public class SwingView implements WorkbenchView {
     private JTextArea _logArea;
     private ToolBar _toolBar;
     private ToolHandler _toolHandler;
+    private SimulationController _simulationController;
     private SimPanel _simPanel;
     private Settings _settings = new Settings(true, null, 60.f, 0, 0);
     
@@ -147,6 +149,7 @@ public class SwingView implements WorkbenchView {
         
         this.initToolBar(this._frame);
         this.initToolHandler();
+        this.initSimulationController();
         this.initMainPanel(this._frame);
         
         this._frame.setVisible(true);
@@ -159,6 +162,10 @@ public class SwingView implements WorkbenchView {
     
     private void initToolHandler() {
         this._toolHandler = new ToolHandler(this._toolBar);
+    }
+    
+    private void initSimulationController() {
+        this._simulationController = new SimulationController(this._toolBar, this);
     }
     
     private void initMainPanel(JFrame frame) {
