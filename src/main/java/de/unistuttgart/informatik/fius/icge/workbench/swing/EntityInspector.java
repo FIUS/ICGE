@@ -100,7 +100,6 @@ public class EntityInspector {
      * @param ent
      */
     private void setEntity(Entity ent) {
-        this._entityChooser.setSelectedIndex(-1);
         this._selectedEntity = ent;
         EventDispatcher.addListener(EntityEvent.class, entity -> {
             if (entity == ent) {
