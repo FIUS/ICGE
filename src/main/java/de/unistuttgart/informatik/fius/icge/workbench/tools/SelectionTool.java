@@ -8,6 +8,7 @@
 package de.unistuttgart.informatik.fius.icge.workbench.tools;
 
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
+import de.unistuttgart.informatik.fius.icge.workbench.swing.EntityInspector;
 
 /**
  * A tool for selecting entities.
@@ -29,7 +30,8 @@ public class SelectionTool extends AbstractTool {
      */
     @Override
     public void apply(Simulation sim, int row, int column) {
-        //TODO: Implement
+        EntityInspector eInsp = new EntityInspector(sim, row, column);
+        eInsp.show();
     }
     
 }
