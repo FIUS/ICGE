@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.border.BevelBorder;
 
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.workbench.swing.ToolBar;
@@ -25,6 +26,8 @@ public class ToolHandler {
     
     private final List<Tool> tools = new ArrayList<>();
     
+    private final List<JButton> buttons = new ArrayList<>();
+    
     private int currentTool = 0;
     
     /**
@@ -35,20 +38,33 @@ public class ToolHandler {
      */
     public ToolHandler(ToolBar toolBar) {
         this.tb = toolBar;
-        addTool(new SelectionTool());
-        addTool(new SpawnMarioTool());
-        addTool(new SpawnCoinTool());
-        addTool(new DespawnTool());
-        addTool(new WallCreationTool());
-        addTool(new WallDemolishingTool());
+        this.addTool(new SelectionTool());
+        this.addTool(new SpawnMarioTool());
+        this.addTool(new SpawnCoinTool());
+        this.addTool(new DespawnTool());
+        this.addTool(new WallCreationTool());
+        this.addTool(new WallDemolishingTool());
+        resetButtonBorders();
+        this.buttons.get(0).setBorder(new BevelBorder(1));
     }
     
     private void addTool(Tool t) {
         final int index = this.tools.size();
         this.tools.add(t);
         JButton button = t.getToolBarButton();
-        button.addActionListener(e -> this.currentTool = index);
+        this.buttons.add(button);
+        button.addActionListener(e -> {
+            this.currentTool = index;
+            this.resetButtonBorders();
+            button.setBorder(new BevelBorder(1));
+        });
         this.tb.addButton(button, index);
+    }
+    
+    private void resetButtonBorders() {
+        for (JButton b : this.buttons) {
+            b.setBorder(new BevelBorder(0));
+        }
     }
     
     /**
