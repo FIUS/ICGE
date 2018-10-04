@@ -19,6 +19,9 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityEvent;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 
+/**
+ * Window to inspect and manipulate Entities.
+ */
 public class EntityInspector {
     
     private Simulation _simulation; 
@@ -29,20 +32,32 @@ public class EntityInspector {
 
     private Entity _selectedEntity;
     
+    /**
+     * Create new entity inspector which chooses from all available entities
+     * @param sim
+     */
     public EntityInspector(Simulation sim) {
         this._simulation = sim;
         this._entities = sim.entities();
     }
     
+    /**
+     * Create new entity inspector which chooses from all available entities in (row, column)
+     * @param sim
+     * @param row
+     * @param column
+     */
     public EntityInspector(Simulation sim, int row, int column) {
         this._simulation = sim;
         this._entities = sim.entitiesWith(row, column);
     }
     
+    /** Show the entity inspector window */
     public void show() {
         EventQueue.invokeLater(() -> this.initFrame());
     }
 
+    /** Build the main frame */
     private void initFrame() {
         this._frame = new JFrame("Entity Inspector");
         this._frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -55,6 +70,7 @@ public class EntityInspector {
         }
     }
 
+    /** Init entityChooser dropdown */
     private void startEntitySelection() {
         if (this._entities != null && this._entities.size() < 1) {
             this._frame.getContentPane().add(new JLabel("No Entities..."));
@@ -78,6 +94,11 @@ public class EntityInspector {
         this.setEntity(this._entities.get(0));
     }
 
+    /**
+     * Set the specific entity to inspect
+     * 
+     * @param ent
+     */
     private void setEntity(Entity ent) {
         this._entityChooser.setSelectedIndex(-1);
         this._selectedEntity = ent;
@@ -91,7 +112,95 @@ public class EntityInspector {
         this.updateEntityValues();
     }
 
+    /** Update UI on value changes in entity */
     private void updateEntityValues() {
         // TODO update UI to reflect changes of Entity
+    }
+
+    /**
+     * Open user input dialog
+     * 
+     * @param title title of dialog
+     * @param description description of dialog
+     * @return user input
+     */
+    private String getUserInput(String title, String description) {
+        String s = JOptionPane.showInputDialog(this._frame, description, title, JOptionPane.PLAIN_MESSAGE);
+        if (s != null) {
+            return s;
+        }
+        return "";
+    }
+
+    /**
+     * Open user input dialog
+     * 
+     * @param title title of dialog
+     * @param description description of dialog
+     * @return user input
+     */
+    private int getUserInt(String title, String description) {
+        String input = this.getUserInput(title, description);
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {}
+        return 0;
+    }
+
+    /**
+     * Open user input dialog
+     * 
+     * @param title title of dialog
+     * @param description description of dialog
+     * @return user input
+     */
+    private long getUserLong(String title, String description) {
+        String input = this.getUserInput(title, description);
+        try {
+            return Long.parseLong(input);
+        } catch (NumberFormatException e) {}
+        return 0;
+    }
+
+    /**
+     * Open user input dialog
+     * 
+     * @param title title of dialog
+     * @param description description of dialog
+     * @return user input
+     */
+    private float getUserFloat(String title, String description) {
+        String input = this.getUserInput(title, description);
+        try {
+            return Float.parseFloat(input);
+        } catch (NumberFormatException e) {}
+        return 0;
+    }
+
+    /**
+     * Open user input dialog
+     * 
+     * @param title title of dialog
+     * @param description description of dialog
+     * @return user input
+     */
+    private double getUserDouble(String title, String description) {
+        String input = this.getUserInput(title, description);
+        try {
+            return Double.parseDouble(input);
+        } catch (NumberFormatException e) {}
+        return 0;
+    }
+
+    /**
+     * Open user input dialog
+     * 
+     * @param title title of dialog
+     * @param description description of dialog
+     * @return user input
+     */
+    private boolean getUserBoolean(String title, String description) {
+        String input = this.getUserInput(title, description);
+        return input.equals("true");
     }
 }
