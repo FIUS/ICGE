@@ -7,7 +7,7 @@
 	<version>0.4.0-Snapshot</version>
 	<name>Introduction Course Game Engine</name>
 	<description>The game engine for the java intoduction course of FIUS</description>
-	<url>https://github.com/neumantm/MarioSimulator</url>
+	<url>https://github.com/FIUS/ICGE</url>
 	<properties>
 		<java.version>1.8</java.version>
 		<junit.jupiter.version>5.1.0</junit.jupiter.version>
