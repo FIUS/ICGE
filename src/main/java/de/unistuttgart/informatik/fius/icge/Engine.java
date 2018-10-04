@@ -51,10 +51,15 @@ public class Engine {
                     int yMax = Collections.max(wobs, compRow).row;
                     _workbench.setCenteredColumn(0.5f * (xMax + xMin));
                     _workbench.setCenteredRow(0.5f * (yMax + yMin));
-                    obj.test();
+                    try {
+                        obj.test();
+                    } catch (AssertionError e) {
+                        _workbench.println("Assertion error!");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        _workbench.println(e.toString());
+                    }
                     _workbench.println(name + " completed :-)");
-                } catch (AssertionError e) {
-                    _workbench.println("Assertion error!");
                 } catch (InstantiationException | IllegalAccessException e) {
                     _workbench.println("Internal error!");
                     e.printStackTrace();
