@@ -62,7 +62,7 @@ public abstract class Entity {
     }
     
     public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
-        this.spawnInternal(column, row, direction);
+        this.spawnInternal(column, row, direction, false);
     }
 
     /**
@@ -76,9 +76,7 @@ public abstract class Entity {
      * The spawn is performed without a delay, and even if the simulation is paused
      */
     public void forceSpawn(int column, int row, Direction direction) {
-        this.setDelay(0);
-        this.spawnInternal(column, row, direction);
-        this.resetDelay();
+        this.spawnInternal(column, row, direction, true);
     }
 
     public final void despawn() throws EntityNotAlive {
@@ -89,9 +87,7 @@ public abstract class Entity {
      * The despawn is performed without a delay, and even if the simulation is paused
      */
     public final void forceDespawn() throws EntityNotAlive {
-        this.setDelay(0);
         despawnInternal(true);
-        this.resetDelay();
     }
     
     /** delay is in simulation ticks */
@@ -188,7 +184,7 @@ public abstract class Entity {
 
     // protected
 
-    protected void spawnInternal(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
+    protected void spawnInternal(int column, int row, Direction direction, boolean force) throws EntityAlreadyAlive, CellBlockedByWall {
         for(Entity e : this.simulation().entitiesWith(row, column)) {
             if(e instanceof Wall) throw new CellBlockedByWall();
         }
@@ -198,7 +194,7 @@ public abstract class Entity {
         this.delayed(() -> {
             if (this.alive()) throw new EntityAlreadyAlive();
             this.simulation().setWorldObject(this, wob, ev);
-        });
+        }, force ? 0 : this._delayTicks);
     }
 
     protected void despawnInternal(boolean force) {
@@ -206,7 +202,7 @@ public abstract class Entity {
         this.delayed(() -> {
             if (!this.alive()) throw new EntityNotAlive();
             this.simulation().setWorldObject(this, null, ev);
-        });
+        }, force ? 0 : this._delayTicks);
     }
 
     /**
