@@ -105,6 +105,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     public void drop(Sprite type) throws CanNotDropException, EntityNotAlive {
         this.delayed(() -> {
             if (!this.canDrop(type)) throw new CanNotDropException();
+            this._inventory.remove(type);
             WorldObject wob = this.worldObject();
             type.createEntity(this.simulation()).spawn(wob.column, wob.row);
             this.dropped(type);
