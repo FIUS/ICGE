@@ -189,8 +189,9 @@ public abstract class Entity {
     // protected
 
     protected void spawnInternal(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
-        for(Entity e : this.simulation().entitiesWith(row, column))
+        for(Entity e : this.simulation().entitiesWith(row, column)) {
             if(e instanceof Wall) throw new CellBlockedByWall();
+        }
         
         WorldObject wob = new WorldObject(this.sprite(), column, row, getZ(), direction);
         SimulationEvent ev = new SpawnEvent(this.simulation(), this, wob);

@@ -20,8 +20,9 @@ public class Wall extends Entity {
      */
     @Override
     protected void spawnInternal(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
-        for(Entity e : this.simulation().entitiesWith(row, column))
+        for(Entity e : this.simulation().entitiesWith(row, column)) {
             throw new CellNotEmpty();
+        }
         
         super.spawnInternal(column, row, direction);
     }
