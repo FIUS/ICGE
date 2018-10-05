@@ -113,14 +113,17 @@ public class EntityInspector {
         this.setEntity(this._entities.get(0));
     }
     
-    private void setEntity(Entity ent) {
+    private void setEntity(final Entity ent) {
         this._selectedEntity = ent;
-        EventDispatcher.addListener(EntityEvent.class, entity -> {
-            if (entity == ent) {
-                this.updateEntityValues();
-                return true;
+        EventDispatcher.addListener(EntityEvent.class, event -> {
+            EntityEvent ev = (EntityEvent) event;
+            if (this._selectedEntity != ent) {
+                return false;
             }
-            return false;
+            if (ev.entity == ent) {
+                this.updateEntityValues();
+            }
+            return true;
         });
         this.inspectEntity();
         this.updateEntityValues();
