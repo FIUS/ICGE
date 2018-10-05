@@ -209,7 +209,9 @@ public class EntityInspector {
         } else if (type == String.class) {
             userInput = getUserInput("Edit attribute \"" + attr + "\"", "Input new Value:");
         }
+        if (userInput == null) return;
         this._inspectionManager.setAttributeValue(this._selectedEntity, attr, userInput);
+        this.updateEntityValues();
     }
 
     /**
@@ -261,10 +263,7 @@ public class EntityInspector {
      */
     private String getUserInput(String title, String description) {
         String s = JOptionPane.showInputDialog(this._frame, description, title, JOptionPane.PLAIN_MESSAGE);
-        if (s != null) {
-            return s;
-        }
-        return "";
+        return s;
     }
     
     /**
@@ -276,12 +275,13 @@ public class EntityInspector {
      *            description of dialog
      * @return user input
      */
-    private int getUserInt(String title, String description) {
+    private Integer getUserInt(String title, String description) {
         String input = this.getUserInput(title, description);
+        if (input == null) return null;
         try {
-            return Integer.parseInt(input);
+            return new Integer(Integer.parseInt(input));
         } catch (NumberFormatException e) {}
-        return 0;
+        return new Integer(0);
     }
     
     /**
@@ -293,12 +293,13 @@ public class EntityInspector {
      *            description of dialog
      * @return user input
      */
-    private long getUserLong(String title, String description) {
+    private Long getUserLong(String title, String description) {
         String input = this.getUserInput(title, description);
+        if (input == null) return null;
         try {
-            return Long.parseLong(input);
+            return new Long(Long.parseLong(input));
         } catch (NumberFormatException e) {}
-        return 0;
+        return new Long(0);
     }
     
     /**
@@ -310,12 +311,13 @@ public class EntityInspector {
      *            description of dialog
      * @return user input
      */
-    private float getUserFloat(String title, String description) {
+    private Float getUserFloat(String title, String description) {
         String input = this.getUserInput(title, description);
+        if (input == null) return null;
         try {
-            return Float.parseFloat(input);
+            return new Float(Float.parseFloat(input));
         } catch (NumberFormatException e) {}
-        return 0;
+        return new Float(0);
     }
     
     /**
@@ -327,12 +329,13 @@ public class EntityInspector {
      *            description of dialog
      * @return user input
      */
-    private double getUserDouble(String title, String description) {
+    private Double getUserDouble(String title, String description) {
         String input = this.getUserInput(title, description);
+        if (input == null) return null;
         try {
-            return Double.parseDouble(input);
+            return new Double(Double.parseDouble(input));
         } catch (NumberFormatException e) {}
-        return 0;
+        return new Double(0);
     }
     
     /**
@@ -344,8 +347,9 @@ public class EntityInspector {
      *            description of dialog
      * @return user input
      */
-    private boolean getUserBoolean(String title, String description) {
+    private Boolean getUserBoolean(String title, String description) {
         String input = this.getUserInput(title, description);
-        return input.equals("true");
+        if (input == null) return null;
+        return new Boolean(input.equals("true"));
     }
 }
