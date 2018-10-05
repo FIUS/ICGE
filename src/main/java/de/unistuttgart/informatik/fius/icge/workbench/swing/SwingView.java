@@ -186,6 +186,8 @@ public class SwingView implements WorkbenchView {
         JPanel logPanel = new JPanel(new BorderLayout());
         this._logArea = new JTextArea(0, 22);
         this._logArea.setEditable(false);
+        this._logArea.setLineWrap(true);
+        this._logArea.setWrapStyleWord(true);
         JScrollPane scrollPane = new JScrollPane(this._logArea);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         

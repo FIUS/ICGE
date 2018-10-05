@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import de.unistuttgart.informatik.fius.icge.animations.AnimatedTerritory;
+import de.unistuttgart.informatik.fius.icge.simulation.EntityType;
 import de.unistuttgart.informatik.fius.icge.territory.Territory;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 import de.unistuttgart.informatik.fius.icge.workbench.tools.ToolHandler;
 
 public class SimPanel extends JPanel {
@@ -49,22 +49,26 @@ public class SimPanel extends JPanel {
             
             @Override
             public void mousePressed(MouseEvent e) {
-                SimPanel.this._mouseDown = true;
-                SimPanel.this.updateSettings();
-                if (SimPanel.this._s.animator != null) {
-                    SimPanel.this.handleMousePress();
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    SimPanel.this._mouseDown = true;
+                    SimPanel.this.updateSettings();
+                    if (SimPanel.this._s.animator != null) {
+                        SimPanel.this.handleMousePress();
+                    }
+                    SimPanel.this._view.update();
                 }
-                SimPanel.this._view.update();
             }
             
             @Override
             public void mouseReleased(MouseEvent e) {
-                SimPanel.this._mouseDown = false;
-                SimPanel.this.updateSettings();
-                if (SimPanel.this._s.animator != null) {
-                    SimPanel.this.handleMouseRelease();
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    SimPanel.this._mouseDown = false;
+                    SimPanel.this.updateSettings();
+                    if (SimPanel.this._s.animator != null) {
+                        SimPanel.this.handleMouseRelease();
+                    }
+                    SimPanel.this._view.update();
                 }
-                SimPanel.this._view.update();
             }
             
             @Override
@@ -136,7 +140,7 @@ public class SimPanel extends JPanel {
             for (int x = this._startCol; x <= this._endCol; ++x) {
                 int captX = x, captY = y;
                 if (!tty.containsWith(wob -> (wob.column == captX) && (wob.row == captY))) {
-                    tty = tty.add(new WorldObject(Sprite.WALL, x, y));
+                    tty = tty.add(new WorldObject(EntityType.WALL, x, y));
                 }
             }
         }
@@ -149,7 +153,7 @@ public class SimPanel extends JPanel {
             for (int x = this._startCol; x <= this._endCol; ++x) {
                 int captX = x, captY = y;
                 Territory oldTty = tty;
-                tty = oldTty.removeIf(wob -> (wob.column == captX) && (wob.row == captY) && (wob.sprite == Sprite.WALL));
+                tty = oldTty.removeIf(wob -> (wob.column == captX) && (wob.row == captY) && (wob.type == EntityType.WALL));
                 if (tty != oldTty) {
                     this.drawImage(x, y, img);
                 }

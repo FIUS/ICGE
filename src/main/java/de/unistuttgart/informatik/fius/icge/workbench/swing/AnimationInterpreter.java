@@ -14,9 +14,9 @@ import java.util.HashMap;
 import de.unistuttgart.informatik.fius.icge.animations.AnimatedTerritory;
 import de.unistuttgart.informatik.fius.icge.animations.Animation;
 import de.unistuttgart.informatik.fius.icge.animations.Animation.AnimationType;
+import de.unistuttgart.informatik.fius.icge.simulation.EntityType;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
 public class AnimationInterpreter {
     
@@ -41,7 +41,7 @@ public class AnimationInterpreter {
             if ((currentTick < animation.begin)) throw new IllegalArgumentException();
             float undone = (animation.end - currentTick) / (float) (animation.end - animation.begin);
             float progress = 1 - undone;
-            this._image = _animatedImages.get(animation.type).get(wob.sprite, wob.direction, progress);
+            this._image = _animatedImages.get(animation.type).get(wob.type, wob.direction, progress);
             if (this._image != null) {
                 if (animation.type == AnimationType.Move) {
                     switch (wob.direction) {
@@ -63,7 +63,7 @@ public class AnimationInterpreter {
                 return;
             }
         }
-        this._image = _noneAnimations.get(wob.sprite, wob.direction);
+        this._image = _noneAnimations.get(wob.type, wob.direction);
     }
     
     public float column() {
@@ -81,26 +81,26 @@ public class AnimationInterpreter {
     static {
         {
             AnimatedImages moveAnimations = new AnimatedImages();
-            moveAnimations.set(Sprite.MARIO, Direction.EAST, Arrays.asList("mario/mario-east-0.png", "mario/mario-east-1.png"));
-            moveAnimations.set(Sprite.MARIO, Direction.NORTH, Arrays.asList("mario/mario-north-0.png", "mario/mario-north-1.png"));
-            moveAnimations.set(Sprite.MARIO, Direction.WEST, Arrays.asList("mario/mario-west-0.png", "mario/mario-west-1.png"));
-            moveAnimations.set(Sprite.MARIO, Direction.SOUTH, Arrays.asList("mario/mario-south-0.png", "mario/mario-south-1.png"));
+            moveAnimations.set(EntityType.MARIO, Direction.EAST, Arrays.asList("mario/mario-east-0.png", "mario/mario-east-1.png"));
+            moveAnimations.set(EntityType.MARIO, Direction.NORTH, Arrays.asList("mario/mario-north-0.png", "mario/mario-north-1.png"));
+            moveAnimations.set(EntityType.MARIO, Direction.WEST, Arrays.asList("mario/mario-west-0.png", "mario/mario-west-1.png"));
+            moveAnimations.set(EntityType.MARIO, Direction.SOUTH, Arrays.asList("mario/mario-south-0.png", "mario/mario-south-1.png"));
             _animatedImages.put(AnimationType.Move, moveAnimations);
         }
         {
             AnimatedImages turnLeftAnimations = new AnimatedImages();
-            turnLeftAnimations.set(Sprite.MARIO, Direction.EAST, Arrays.asList("mario/mario-south-0.png", "mario/mario-east-1.png"));
-            turnLeftAnimations.set(Sprite.MARIO, Direction.NORTH, Arrays.asList("mario/mario-east-0.png", "mario/mario-north-1.png"));
-            turnLeftAnimations.set(Sprite.MARIO, Direction.WEST, Arrays.asList("mario/mario-north-0.png", "mario/mario-west-1.png"));
-            turnLeftAnimations.set(Sprite.MARIO, Direction.SOUTH, Arrays.asList("mario/mario-west-0.png", "mario/mario-south-1.png"));
+            turnLeftAnimations.set(EntityType.MARIO, Direction.EAST, Arrays.asList("mario/mario-south-0.png", "mario/mario-east-1.png"));
+            turnLeftAnimations.set(EntityType.MARIO, Direction.NORTH, Arrays.asList("mario/mario-east-0.png", "mario/mario-north-1.png"));
+            turnLeftAnimations.set(EntityType.MARIO, Direction.WEST, Arrays.asList("mario/mario-north-0.png", "mario/mario-west-1.png"));
+            turnLeftAnimations.set(EntityType.MARIO, Direction.SOUTH, Arrays.asList("mario/mario-west-0.png", "mario/mario-south-1.png"));
             _animatedImages.put(AnimationType.TurnLeft, turnLeftAnimations);
         }
         
-        _noneAnimations.set(Sprite.MARIO, Direction.EAST, "mario/mario-east-0.png");
-        _noneAnimations.set(Sprite.MARIO, Direction.NORTH, "mario/mario-north-0.png");
-        _noneAnimations.set(Sprite.MARIO, Direction.WEST, "mario/mario-west-0.png");
-        _noneAnimations.set(Sprite.MARIO, Direction.SOUTH, "mario/mario-south-0.png");
-        _noneAnimations.set(Sprite.WALL, "wall/wall-default.png");
-        _noneAnimations.set(Sprite.COIN, "coin/coin-default.png");
+        _noneAnimations.set(EntityType.MARIO, Direction.EAST, "mario/mario-east-0.png");
+        _noneAnimations.set(EntityType.MARIO, Direction.NORTH, "mario/mario-north-0.png");
+        _noneAnimations.set(EntityType.MARIO, Direction.WEST, "mario/mario-west-0.png");
+        _noneAnimations.set(EntityType.MARIO, Direction.SOUTH, "mario/mario-south-0.png");
+        _noneAnimations.set(EntityType.WALL, "wall/wall-default.png");
+        _noneAnimations.set(EntityType.COIN, "coin/coin-default.png");
     }
 }

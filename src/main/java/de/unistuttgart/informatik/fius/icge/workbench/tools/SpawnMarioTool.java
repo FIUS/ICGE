@@ -7,6 +7,7 @@
 
 package de.unistuttgart.informatik.fius.icge.workbench.tools;
 
+import de.unistuttgart.informatik.fius.icge.simulation.Entity;
 import de.unistuttgart.informatik.fius.icge.simulation.Mario;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 
@@ -15,7 +16,7 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
  * 
  * @author Tim Neumann
  */
-public class SpawnMarioTool extends AbstractTool {
+public class SpawnMarioTool extends AbstractSpawnEntityTool {
     
     /**
      * Creates a spawn mario tool
@@ -24,13 +25,9 @@ public class SpawnMarioTool extends AbstractTool {
         super("Spawn a mario", "mario/mario-east-0.png");
     }
     
-    /**
-     * @see de.unistuttgart.informatik.fius.icge.workbench.tools.Tool#apply(de.unistuttgart.informatik.fius.icge.simulation.Simulation,
-     *      int, int)
-     */
     @Override
-    public void apply(Simulation sim, int row, int column) {
-        new Mario(sim).forceSpawn(column, row);
+    protected Entity entityToSpawn(Simulation sim) {
+        return new Mario(sim);
     }
     
 }

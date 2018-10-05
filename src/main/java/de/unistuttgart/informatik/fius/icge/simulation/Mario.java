@@ -8,34 +8,33 @@
 package de.unistuttgart.informatik.fius.icge.simulation;
 
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
+
 
 public class Mario extends GreedyEntity {
     
-    @InspectionAttribute
     private int coinCount = 0;
     
     public Mario(Simulation sim) {
-        super(sim, Sprite.MARIO);
+        super(sim, EntityType.MARIO);
     }
     
     @Override
-    public boolean canCollectType(Sprite type) {
-        return type == Sprite.COIN;
+    public boolean canCollectType(EntityType type) {
+        return type == EntityType.COIN;
     }
     
     @Override
-    public void collected(Sprite type) {
+    public void collected(EntityType type) {
         this.coinCount++;
     }
     
     @Override
-    public boolean canDropType(Sprite type) {
-        return type == Sprite.COIN;
+    public boolean canDropType(EntityType type) {
+        return type == EntityType.COIN;
     }
     
     @Override
-    public void dropped(Sprite type) {
+    public void dropped(EntityType type) {
         this.coinCount--;
     }
 }
