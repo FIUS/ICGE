@@ -10,6 +10,7 @@ package de.unistuttgart.informatik.fius.icge.workbench.tools;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.lang.ref.WeakReference;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -22,6 +23,7 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation.PauseEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.ResumeEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
 import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
+import de.unistuttgart.informatik.fius.icge.workbench.Workbench.SetSimulationEvent;
 import de.unistuttgart.informatik.fius.icge.workbench.swing.Images;
 import de.unistuttgart.informatik.fius.icge.workbench.swing.ToolBar;
 
@@ -31,7 +33,7 @@ import de.unistuttgart.informatik.fius.icge.workbench.swing.ToolBar;
  */
 public class SimulationController {
     private final ToolBar tb;
-    private final WorkbenchView wb;
+    private final WeakReference<WorkbenchView> _view;
 
     private final JButton playButton;
 
@@ -40,18 +42,16 @@ public class SimulationController {
     private final Image playImage;
     private final Image pauseImage;
 
-    private boolean isRunning = false;
 
-    
     /**
      * Creates a tool handler.
      * 
      * @param toolBar
      *            The ToolBar to use.
      */
-    public SimulationController(ToolBar toolBar, WorkbenchView workBench) {
+    public SimulationController(ToolBar toolBar, WorkbenchView view) {
         this.tb = toolBar;
-        this.wb = workBench;
+        this._view = new WeakReference<>(view);
         this.playButton = new JButton();
         this.playButton.addActionListener(this::playButtonPressed);
         this.playButton.setMargin(new Insets(0, 0, 0, 0));
@@ -70,30 +70,47 @@ public class SimulationController {
         this.playImage = Images.image("play.png");
         this.pauseImage = Images.image("pause.png");
 
-        this.updatePlayButton();
+        this.updatePlayButton(false);
 
+        EventDispatcher.addListener(SetSimulationEvent.class, this::handleSetSimulation);
         EventDispatcher.addListener(PauseEvent.class, this::setPaused);
         EventDispatcher.addListener(ResumeEvent.class, this::setRunning);
     }
 
+    private boolean handleSetSimulation(Event ev) {
+        WorkbenchView view = this._view.get();
+        if (view == null) {
+            return false; // Unregister in case the view doesn't exist anymore
+        }
+        if (view == ((SetSimulationEvent) ev).view) {
+            Simulation sim = view.simulation();
+            updatePlayButton(sim != null && sim.running());
+        }
+        return true;
+    }
+
     private boolean setRunning(Event ev) {
+        WorkbenchView view = this._view.get();
+        if (view == null) {
+            return false; // Unregister in case the view doesn't exist anymore
+        }
         SimulationEvent sev = (SimulationEvent) ev;
-        if (this.wb.simulation() != sev.simulation) return true;
-        this.isRunning = true;
-        this.updatePlayButton();
+        if (view.simulation() == sev.simulation) this.updatePlayButton(true);
         return true;
     }
 
     private boolean setPaused(Event ev) {
+        WorkbenchView view = this._view.get();
+        if (view == null) {
+            return false; // Unregister in case the view doesn't exist anymore
+        }
         SimulationEvent sev = (SimulationEvent) ev;
-        if (this.wb.simulation() != sev.simulation) return true;
-        this.isRunning = false;
-        this.updatePlayButton();
+        if (view.simulation() == sev.simulation) this.updatePlayButton(false);
         return true;
     }
 
-    private void updatePlayButton() {
-        if (this.isRunning) {
+    private void updatePlayButton(boolean isRunning) {
+        if (isRunning) {
             if (this.pauseImage != null) {
                 this.playButton.setIcon(new ImageIcon(this.pauseImage));
             }
@@ -107,7 +124,8 @@ public class SimulationController {
     }
 
     private void playButtonPressed(ActionEvent e) {
-        Simulation sim = this.wb.simulation();
+        WorkbenchView view = this._view.get();
+        Simulation sim = view == null ? null : view.simulation();
         if (sim == null) return;
         if (sim.running()) {
             sim.pause();
@@ -117,7 +135,8 @@ public class SimulationController {
     }
 
     private void stepButtonPressed(ActionEvent e) {
-        Simulation sim = this.wb.simulation();
+        WorkbenchView view = this._view.get();
+        Simulation sim = view == null ? null : view.simulation();
         if (sim == null) return;
         if (!sim.running()) {
             sim.resume();
