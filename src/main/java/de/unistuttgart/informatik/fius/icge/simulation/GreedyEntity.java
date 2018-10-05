@@ -10,7 +10,6 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 import java.util.ArrayList;
 
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
 /**
  * A entity which is also a collector and has an inventory
@@ -19,24 +18,24 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
  */
 public abstract class GreedyEntity extends MovableEntity implements EntityCollector {
 
-    public ArrayList<Sprite> _inventory = new ArrayList<>();
+    public ArrayList<EntityType> _inventory = new ArrayList<>();
 
-    public GreedyEntity(Simulation sim, Sprite sprite) {
-        super(sim, sprite);
+    public GreedyEntity(Simulation sim, EntityType type) {
+        super(sim, type);
     }
     
     private boolean canCollectEntity(Entity ent) throws EntityNotAlive {
         if (!(ent instanceof CollectableEntity) || !ent.worldObject().isSamePos(this.worldObject()))
             return false;
-        Sprite sprite = ent.sprite();
-        return this.canCollectType(sprite);
+        EntityType type = ent.type();
+        return this.canCollectType(type);
     }
     
     private void collectEntity(CollectableEntity ent) throws EntityNotAlive {
-        Sprite sprite = ent.worldObject().sprite;
+        EntityType type = ent.worldObject().type;
         ent.despawn();
-        this._inventory.add(sprite);
-        this.collected(sprite);
+        this._inventory.add(type);
+        this.collected(type);
     }
     
     /**
@@ -48,10 +47,10 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * @throws EntityNotAlive
      *             When this entity is not alive.
      */
-    public boolean canCollect(Sprite type) throws EntityNotAlive {
+    public boolean canCollect(EntityType type) throws EntityNotAlive {
         synchronized (this.simulation()) {
             for (Entity ent : this.simulation().entities()) {
-                if ((ent.worldObject().sprite == type) && canCollectEntity(ent)) return true;
+                if ((ent.worldObject().type == type) && canCollectEntity(ent)) return true;
             }
         }
         return false;
@@ -73,10 +72,10 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         return false;
     }
     
-    public void collect(Sprite type) throws CanNotCollectException, EntityNotAlive {
+    public void collect(EntityType type) throws CanNotCollectException, EntityNotAlive {
         this.delayed(() -> {
             for (Entity ent : this.simulation().entities()) {
-                if ((ent.worldObject().sprite == type) && canCollectEntity(ent)) {
+                if ((ent.worldObject().type == type) && canCollectEntity(ent)) {
                     this.collectEntity((CollectableEntity) ent);
                     return;
                 }
@@ -97,12 +96,12 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         });
     }
 
-    public boolean canDrop(Sprite type) throws EntityNotAlive {
+    public boolean canDrop(EntityType type) throws EntityNotAlive {
         if (!this.alive()) throw new EntityNotAlive();
         return this.canDropType(type) && this._inventory.contains(type);
     }
     
-    public void drop(Sprite type) throws CanNotDropException, EntityNotAlive {
+    public void drop(EntityType type) throws CanNotDropException, EntityNotAlive {
         this.delayed(() -> {
             if (!this.canDrop(type)) throw new CanNotDropException();
             this._inventory.remove(type);
@@ -119,7 +118,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      *            The type that should be collected
      * @return Whether the entity can be collected
      */
-    abstract boolean canCollectType(Sprite type);
+    abstract boolean canCollectType(EntityType type);
     
     /**
      * Informs the instance that a CollectableEntity has been collected.
@@ -127,7 +126,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * @param type
      *            The type of collected entity
      */
-    abstract void collected(Sprite type);
+    abstract void collected(EntityType type);
     
     /**
      * Checks whether an entity of the given type can be dropped by the instance, in general.
@@ -136,7 +135,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      *            The type of entity that should be dropped
      * @return Whether the entity can be dropped
      */
-    abstract boolean canDropType(Sprite type);
+    abstract boolean canDropType(EntityType type);
     
     /**
      * Informs the instance that a CollectableEntity has been dropped.
@@ -144,5 +143,5 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * @param type
      *            The type of the dropped entity
      */
-    abstract void dropped(Sprite type);
+    abstract void dropped(EntityType type);
 }

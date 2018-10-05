@@ -8,7 +8,6 @@
 package de.unistuttgart.informatik.fius.icge.simulation;
 
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityNotAlive;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
 /**
  * A class implementing this interface can collect entities.
@@ -26,7 +25,7 @@ public interface EntityCollector {
      * @throws EntityNotAlive
      *             When this entity is not alive.
      */
-    public boolean canCollect(Sprite type) throws EntityNotAlive;
+    public boolean canCollect(EntityType type) throws EntityNotAlive;
 
     /**
      * Checks whether this entity can currently collect an entity.
@@ -37,15 +36,15 @@ public interface EntityCollector {
      */
     public boolean canCollect() throws EntityNotAlive;
 
-    public void collect(Sprite type) throws CanNotCollectException, EntityNotAlive;
+    public void collect(EntityType type) throws CanNotCollectException, EntityNotAlive;
 
     public void collect() throws CanNotCollectException, EntityNotAlive;
 
-    public boolean canDrop(Sprite type) throws EntityNotAlive;
+    public boolean canDrop(EntityType type) throws EntityNotAlive;
 
-    public void drop(Sprite type) throws CanNotDropException, EntityNotAlive;
+    public void drop(EntityType type) throws CanNotDropException, EntityNotAlive;
 
-    default public boolean tryCollect(Sprite type) {
+    default public boolean tryCollect(EntityType type) {
         try {
             this.collect(type);
             return true;
@@ -63,7 +62,7 @@ public interface EntityCollector {
         }
     }
 
-    default public boolean tryDrop(Sprite type) {
+    default public boolean tryDrop(EntityType type) {
         try {
             this.drop(type);
             return true;

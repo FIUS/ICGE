@@ -7,10 +7,10 @@
 
 package de.unistuttgart.informatik.fius.icge.workbench.tools;
 
+import de.unistuttgart.informatik.fius.icge.simulation.EntityType;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.territory.Territory;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
 /**
  * A tool for creating walls
@@ -56,7 +56,7 @@ public class WallCreationTool extends AbstractTool implements AreaTool {
         final int captX = x;
         final int captY = y;
         if (!tty.containsWith(wob -> (wob.column == captX) && (wob.row == captY))) {
-            return tty.add(new WorldObject(Sprite.WALL, x, y));
+            return tty.add(new WorldObject(EntityType.WALL, x, y));
         }
         return tty;
     }
