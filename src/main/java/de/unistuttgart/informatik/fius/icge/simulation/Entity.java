@@ -57,11 +57,11 @@ public abstract class Entity {
         return 25;
     }
     
-    public void spawn(int column, int row) throws EntityAlreadyAlive {
+    public void spawn(int column, int row) throws EntityAlreadyAlive, CellBlockedByWall {
         this.spawn(column, row, Direction.EAST);
     }
     
-    public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive {
+    public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
         this.spawnInternal(column, row, direction);
     }
 
@@ -188,7 +188,11 @@ public abstract class Entity {
 
     // protected
 
-    protected void spawnInternal(int column, int row, Direction direction) throws EntityAlreadyAlive {
+    protected void spawnInternal(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
+        for(Entity e : this.simulation().entitiesWith(row, column)) {
+            if(e instanceof Wall) throw new CellBlockedByWall();
+        }
+        
         WorldObject wob = new WorldObject(this.sprite(), column, row, getZ(), direction);
         SimulationEvent ev = new SpawnEvent(this.simulation(), this, wob);
         this.delayed(() -> {
@@ -250,6 +254,10 @@ public abstract class Entity {
     public static class EntityNotAlive extends RuntimeException {
         private static final long serialVersionUID = -21686971924440414L;
     }
+    
+    public static class CellBlockedByWall extends RuntimeException {
+    }
+    
     
     public static class EntityAlreadyAlive extends RuntimeException {
         private static final long serialVersionUID = -1865306897160094130L;
