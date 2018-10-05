@@ -9,6 +9,7 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 
 import java.util.ArrayList;
 
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 
 /**
@@ -18,6 +19,8 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
  */
 public abstract class GreedyEntity extends MovableEntity implements EntityCollector {
 
+    
+    @InspectionAttribute(readOnly = true, name = "Inventory")
     public ArrayList<EntityType> _inventory = new ArrayList<>();
 
     public GreedyEntity(Simulation sim, EntityType type) {
@@ -47,6 +50,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * @throws EntityNotAlive
      *             When this entity is not alive.
      */
+    @Override
     public boolean canCollect(EntityType type) throws EntityNotAlive {
         synchronized (this.simulation()) {
             for (Entity ent : this.simulation().entities()) {
@@ -63,6 +67,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * @throws EntityNotAlive
      *             When this entity is not alive.
      */
+    @Override
     public boolean canCollect() throws EntityNotAlive {
         synchronized (this.simulation()) {
             for (Entity ent : this.simulation().entities()) {
@@ -72,6 +77,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         return false;
     }
     
+    @Override
     public void collect(EntityType type) throws CanNotCollectException, EntityNotAlive {
         this.delayed(() -> {
             for (Entity ent : this.simulation().entities()) {
@@ -84,6 +90,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         });
     }
     
+    @Override
     public void collect() throws CanNotCollectException, EntityNotAlive {
         this.delayed(() -> {
             for (Entity ent : this.simulation().entities()) {
@@ -96,11 +103,12 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         });
     }
 
+    @Override
     public boolean canDrop(EntityType type) throws EntityNotAlive {
         if (!this.alive()) throw new EntityNotAlive();
         return this.canDropType(type) && this._inventory.contains(type);
     }
-    
+    @Override
     public void drop(EntityType type) throws CanNotDropException, EntityNotAlive {
         this.delayed(() -> {
             if (!this.canDrop(type)) throw new CanNotDropException();

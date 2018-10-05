@@ -7,6 +7,9 @@
 
 package de.unistuttgart.informatik.fius.icge.simulation;
 
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
+
+
 public class Mario extends GreedyEntity {
     
     private int coinCount = 0;

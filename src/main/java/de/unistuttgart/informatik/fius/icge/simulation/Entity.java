@@ -9,45 +9,91 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 
 import java.util.concurrent.Semaphore;
 
-import javax.print.event.PrintEvent;
-
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.TickEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMethod;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 
 public abstract class Entity {
-    
+
     private final Simulation _sim;
     private final EntityType _type;
     private int _delayTicks = 25;
     private int _lastMoveTick = Integer.MIN_VALUE;
-    
+
     protected Entity(Simulation sim, EntityType type) {
         this._sim = sim;
         this._type = type;
         this._delayTicks = this.getStandardDelayTicks();
     }
-    
+
     public final Simulation simulation() {
         return this._sim;
     }
-    
+
     public final EntityType type() {
         return this._type;
     }
-    
+
     public final WorldObject worldObject() throws EntityNotAlive {
         WorldObject result = this.simulation().worldObject(this);
         if (result == null) throw new EntityNotAlive();
         return result;
     }
-    
+
     public final boolean alive() {
         return this.simulation().entities().contains(this);
     }
-    
+
+    /**
+     * Get the row of this entity.
+     * 
+     * @return the row
+     */
+    @InspectionAttribute
+    public int getRow() {
+        return this.worldObject().row;
+    }
+
+    /**
+     * Set the row of this entity.
+     * 
+     * @param row
+     *            the row
+     */
+    @InspectionAttribute
+    private void setRow(int row) {
+        WorldObject wobOld = this.worldObject();
+        WorldObject wobNew = new WorldObject(wobOld.type, wobOld.column, row, wobOld.z, wobOld.direction);
+        this.simulation().setWorldObject(this, wobNew, new TeleportEvent(this._sim, this, wobNew));
+    }
+
+    /**
+     * Get the column of this entity.
+     * 
+     * @return the column
+     */
+    @InspectionAttribute
+    public int getColumn() {
+        return this.worldObject().column;
+    }
+
+    /**
+     * Set the column of this entity.
+     * 
+     * @param column
+     *            the column
+     */
+    @InspectionAttribute
+    private void setColumn(int column) {
+        WorldObject wobOld = this.worldObject();
+        WorldObject wobNew = new WorldObject(wobOld.type, column, wobOld.row, wobOld.z, wobOld.direction);
+        this.simulation().setWorldObject(this, wobNew, new TeleportEvent(this._sim, this, wobNew));
+    }
+
     protected float getZ() {
         return 0;
     }
@@ -55,11 +101,11 @@ public abstract class Entity {
     protected int getStandardDelayTicks() {
         return 25;
     }
-    
+
     public void spawn(int column, int row) throws EntityAlreadyAlive, CellBlockedByWall {
         this.spawn(column, row, Direction.EAST);
     }
-    
+
     public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
         this.spawnInternal(column, row, direction, false);
     }
@@ -78,8 +124,9 @@ public abstract class Entity {
         this.spawnInternal(column, row, direction, true);
     }
 
+    @InspectionMethod
     public final void despawn() throws EntityNotAlive {
-        despawnInternal(false);
+        this.despawnInternal(false);
     }
 
     /**
@@ -88,7 +135,7 @@ public abstract class Entity {
     public final void forceDespawn() throws EntityNotAlive {
         despawnInternal(true);
     }
-    
+
     /** delay is in simulation ticks */
     public void setDelay(int delay) {
         this._delayTicks = delay;
@@ -103,7 +150,7 @@ public abstract class Entity {
      * Generates a Message Event that gets written to the log Panel.
      * 
      * @param message
-     *      The message to print
+     *            The message to print
      */
     public void print(String message) {
         SimulationEvent ev = new MessageEvent(this.simulation(), this, message);
@@ -141,14 +188,14 @@ public abstract class Entity {
         this.print(String.valueOf(message));
     }
 
-
     /**
      * Generates a Message Event that gets written to the log Panel.
      * Adds a newline Character to the end of the message.
      * 
      * @param message
-     *      The message to print
+     *            The message to print
      */
+    @InspectionMethod
     public void printLn(String message) {
         this.print(message + "\n");
     }
@@ -183,11 +230,12 @@ public abstract class Entity {
 
     // protected
 
-    protected void spawnInternal(int column, int row, Direction direction, boolean force) throws EntityAlreadyAlive, CellBlockedByWall {
-        for(Entity e : this.simulation().entitiesWith(row, column)) {
-            if(e instanceof Wall) throw new CellBlockedByWall();
+    protected void spawnInternal(int column, int row, Direction direction, boolean force)
+            throws EntityAlreadyAlive, CellBlockedByWall {
+        for (Entity e : this.simulation().entitiesWith(row, column)) {
+            if (e instanceof Wall) throw new CellBlockedByWall();
         }
-        
+
         WorldObject wob = new WorldObject(this.type(), column, row, getZ(), direction);
         SimulationEvent ev = new SpawnEvent(this.simulation(), this, wob);
         this.delayed(() -> {
@@ -243,38 +291,37 @@ public abstract class Entity {
             this._lastMoveTick = this.simulation().tickCount();
         }
     }
-    
+
     // Exceptions:
-    
+
     public static class EntityNotAlive extends RuntimeException {
         private static final long serialVersionUID = -21686971924440414L;
     }
-    
+
     public static class CellBlockedByWall extends RuntimeException {
         private static final long serialVersionUID = -7878416133186725145L;
     }
-    
-    
+
     public static class EntityAlreadyAlive extends RuntimeException {
         private static final long serialVersionUID = -1865306897160094130L;
     }
-    
+
     // Events:
-    
+
     public static abstract class EntityEvent extends SimulationEvent {
-        
+
         public final Entity entity;
-        
+
         EntityEvent(Simulation sim, Entity entity) {
             super(sim);
             this.entity = entity;
         }
     }
-    
+
     public static class MessageEvent extends EntityEvent {
-        
+
         public final String message;
-        
+
         MessageEvent(Simulation sim, Entity entity, String message) {
             super(sim, entity);
             this.message = message;
@@ -282,25 +329,41 @@ public abstract class Entity {
 
     }
 
-    
     public static class SpawnEvent extends EntityEvent {
-        
+
         public final int row;
         public final int column;
-        
+
         SpawnEvent(Simulation sim, Entity entity, int row, int column) {
             super(sim, entity);
             this.row = row;
             this.column = column;
         }
-        
+
         SpawnEvent(Simulation sim, Entity entity, WorldObject wob) {
             super(sim, entity);
             this.row = wob.row;
             this.column = wob.column;
         }
     }
-    
+
+    public static class TeleportEvent extends EntityEvent {
+        public final int row;
+        public final int column;
+
+        TeleportEvent(Simulation sim, Entity entity, int row, int column) {
+            super(sim, entity);
+            this.row = row;
+            this.column = column;
+        }
+
+        TeleportEvent(Simulation sim, Entity entity, WorldObject wob) {
+            super(sim, entity);
+            this.row = wob.row;
+            this.column = wob.column;
+        }
+    }
+
     public static class DespawnEvent extends EntityEvent {
         public DespawnEvent(Simulation sim, Entity entity) {
             super(sim, entity);
