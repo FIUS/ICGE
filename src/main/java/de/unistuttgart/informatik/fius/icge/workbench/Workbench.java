@@ -106,7 +106,7 @@ public class Workbench {
             this._view.println("Simulation :: setTerritory(...)");
         } else if (ev instanceof TickEvent) {
             int tickCount = ((TickEvent) ev).tickCount;
-            if ((tickCount % 100) == 0) {
+            if ((tickCount % 6000) == 0) {
                 this._view.println("Simulation :: tickCount() == " + tickCount);
             }
         } else if (ev instanceof PauseEvent) {
