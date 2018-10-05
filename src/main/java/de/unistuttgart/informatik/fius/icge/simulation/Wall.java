@@ -28,5 +28,6 @@ public class Wall extends Entity {
     }
     
     public static class CellNotEmpty extends RuntimeException {
+        private static final long serialVersionUID = -4741977214724813309L;
     }
 }

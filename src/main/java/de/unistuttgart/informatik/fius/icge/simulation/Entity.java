@@ -256,6 +256,7 @@ public abstract class Entity {
     }
     
     public static class CellBlockedByWall extends RuntimeException {
+        private static final long serialVersionUID = -7878416133186725145L;
     }
     
     
