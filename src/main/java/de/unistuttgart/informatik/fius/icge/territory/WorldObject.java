@@ -13,30 +13,30 @@ import de.unistuttgart.informatik.fius.icge.simulation.*;
 
 public class WorldObject implements Comparable<WorldObject> {
 
-    public final Sprite sprite;
+    public final EntityType type;
     public final int column;
     public final int row;
     public final Direction direction;
     public final float z;
 
-    public WorldObject(Sprite sprite, int column, int row, float z, Direction direction) {
+    public WorldObject(EntityType type, int column, int row, float z, Direction direction) {
         this.column = column;
         this.row = row;
-        this.sprite = sprite;
+        this.type = type;
         this.z = z;
         this.direction = direction;
     }
 
-    public WorldObject(Sprite sprite, int column, int row, Direction direction) {
-        this(sprite, column, row, 0, direction);
+    public WorldObject(EntityType type, int column, int row, Direction direction) {
+        this(type, column, row, 0, direction);
     }
 
-    public WorldObject(Sprite sprite, int column, int row, float z) {
-        this(sprite, column, row, z, Direction.EAST);
+    public WorldObject(EntityType type, int column, int row, float z) {
+        this(type, column, row, z, Direction.EAST);
     }
 
-    public WorldObject(Sprite sprite, int column, int row) {
-        this(sprite, column, row, Direction.EAST);
+    public WorldObject(EntityType type, int column, int row) {
+        this(type, column, row, Direction.EAST);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class WorldObject implements Comparable<WorldObject> {
         if (other == this) return true;
         if (!(other instanceof WorldObject)) return false;
         WorldObject wob = (WorldObject) other;
-        return wob.sprite == this.sprite && wob.column == this.column && wob.row == this.row && wob.direction == this.direction && wob.z == this.z;
+        return wob.type == this.type && wob.column == this.column && wob.row == this.row && wob.direction == this.direction && wob.z == this.z;
     }
 
     /**
@@ -79,20 +79,6 @@ public class WorldObject implements Comparable<WorldObject> {
         }
     }
 
-    public static enum Sprite {
-        MARIO(Mario::new), WALL(Wall::new), COIN(Coin::new);
-
-        private Function<Simulation, Entity> _creator;
-
-        Sprite(Function<Simulation, Entity> creator) {
-            this._creator = creator;
-        }
-
-        public Entity createEntity(Simulation sim) {
-            return this._creator.apply(sim);
-        }
-    }
-
     @Override
     public int compareTo(WorldObject o) {
         float compareResult = 0;
@@ -104,7 +90,7 @@ public class WorldObject implements Comparable<WorldObject> {
             compareResult = this.z - o.z;
         }
         if (compareResult == 0) {
-            return this.sprite.compareTo(o.sprite);
+            return this.type.compareTo(o.type);
         }
         if (compareResult < 0) {
             return -1;

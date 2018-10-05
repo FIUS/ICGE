@@ -8,11 +8,10 @@
 package de.unistuttgart.informatik.fius.icge.simulation;
 
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
 public class Wall extends Entity {
     public Wall(Simulation sim) {
-        super(sim, Sprite.WALL);
+        super(sim, EntityType.WALL);
     }
     
     /**

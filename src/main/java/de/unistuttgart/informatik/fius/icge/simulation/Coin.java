@@ -7,11 +7,9 @@
 
 package de.unistuttgart.informatik.fius.icge.simulation;
 
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
-
 public class Coin extends CollectableEntity {
     public Coin(Simulation sim) {
-        super(sim, Sprite.COIN);
+        super(sim, EntityType.COIN);
     }
     
     @Override

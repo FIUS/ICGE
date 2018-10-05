@@ -14,14 +14,13 @@ import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
 public abstract class MovableEntity extends Entity {
     
     private final Deque<MoveEvent> _positionStack = new ArrayDeque<>(100);
     
-    protected MovableEntity(Simulation sim, Sprite sprite) {
-        super(sim, sprite);
+    protected MovableEntity(Simulation sim, EntityType type) {
+        super(sim, type);
         EventDispatcher.addListener(SpawnEvent.class, ev -> {
             SpawnEvent se = (SpawnEvent) ev;
             if ((se.simulation == this.simulation()) && (se.entity == this)) {
@@ -110,8 +109,8 @@ public abstract class MovableEntity extends Entity {
         }
         int newCol = column;
         int newRow = row;
-        if (this.simulation().territory().containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && (wall.sprite == Sprite.WALL))) throw new IllegalMove();
-        return new WorldObject(wob.sprite, column, row, 100, wob.direction);
+        if (this.simulation().territory().containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && (wall.type == EntityType.WALL))) throw new IllegalMove();
+        return new WorldObject(wob.type, column, row, 100, wob.direction);
     }
     
     private WorldObject wobAfterTurnLeft() throws EntityNotAlive {
@@ -133,7 +132,7 @@ public abstract class MovableEntity extends Entity {
             default:
                 dir = Direction.EAST;
         }
-        return new WorldObject(wob.sprite, wob.column, wob.row, 100, dir);
+        return new WorldObject(wob.type, wob.column, wob.row, 100, dir);
     }
     
     // Exceptions:

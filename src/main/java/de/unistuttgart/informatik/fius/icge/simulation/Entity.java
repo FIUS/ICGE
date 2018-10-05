@@ -16,18 +16,17 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEven
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.TickEvent;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
-import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
 public abstract class Entity {
     
     private final Simulation _sim;
-    private final Sprite _sprite;
+    private final EntityType _type;
     private int _delayTicks = 25;
     private int _lastMoveTick = Integer.MIN_VALUE;
     
-    protected Entity(Simulation sim, Sprite sprite) {
+    protected Entity(Simulation sim, EntityType type) {
         this._sim = sim;
-        this._sprite = sprite;
+        this._type = type;
         this._delayTicks = this.getStandardDelayTicks();
     }
     
@@ -35,8 +34,8 @@ public abstract class Entity {
         return this._sim;
     }
     
-    public final Sprite sprite() {
-        return this._sprite;
+    public final EntityType type() {
+        return this._type;
     }
     
     public final WorldObject worldObject() throws EntityNotAlive {
@@ -193,7 +192,7 @@ public abstract class Entity {
             if(e instanceof Wall) throw new CellBlockedByWall();
         }
         
-        WorldObject wob = new WorldObject(this.sprite(), column, row, getZ(), direction);
+        WorldObject wob = new WorldObject(this.type(), column, row, getZ(), direction);
         SimulationEvent ev = new SpawnEvent(this.simulation(), this, wob);
         this.delayed(() -> {
             if (this.alive()) throw new EntityAlreadyAlive();

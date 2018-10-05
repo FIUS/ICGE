@@ -101,7 +101,7 @@ public class Simulation {
             this._entityObjects.values().removeIf(wob -> !tty.contains(wob));
             tty.forEach(wob -> {
                 if (!this._entityObjects.containsValue(wob)) {
-                    this._entityObjects.put(wob.sprite.createEntity(this), wob);
+                    this._entityObjects.put(wob.type.createEntity(this), wob);
                 }
             });
             this._tty = tty;
