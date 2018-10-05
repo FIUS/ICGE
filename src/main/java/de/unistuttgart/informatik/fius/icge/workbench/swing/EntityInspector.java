@@ -268,6 +268,7 @@ public class EntityInspector {
                 userInput = getUserInput("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
             }
             if (userInput == null) return;
+            parameterValues[i] = userInput;
         }
 
         new Thread(() -> {
