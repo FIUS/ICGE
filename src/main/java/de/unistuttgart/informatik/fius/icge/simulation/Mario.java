@@ -9,8 +9,6 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 
 public class Mario extends GreedyEntity {
     
-    private int coinCount = 0;
-    
     public Mario(Simulation sim) {
         super(sim, EntityType.MARIO);
     }
@@ -21,17 +19,8 @@ public class Mario extends GreedyEntity {
     }
     
     @Override
-    public void collected(EntityType type) {
-        this.coinCount++;
-    }
-    
-    @Override
     public boolean canDropType(EntityType type) {
         return type == EntityType.COIN;
     }
-    
-    @Override
-    public void dropped(EntityType type) {
-        this.coinCount--;
-    }
+
 }

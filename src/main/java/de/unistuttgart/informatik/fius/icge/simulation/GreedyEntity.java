@@ -121,12 +121,14 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     abstract boolean canCollectType(EntityType type);
     
     /**
-     * Informs the instance that a CollectableEntity has been collected.
+     * Informs the instance that a CollectableEntity has been collected. This method exists to be overriden.
      * 
      * @param type
      *            The type of collected entity
      */
-    abstract void collected(EntityType type);
+    void collected(EntityType type) {
+        // default implementation: do nothing
+    }
     
     /**
      * Checks whether an entity of the given type can be dropped by the instance, in general.
@@ -138,10 +140,12 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     abstract boolean canDropType(EntityType type);
     
     /**
-     * Informs the instance that a CollectableEntity has been dropped.
+     * Informs the instance that a CollectableEntity has been dropped. This method exists to be overriden.
      * 
      * @param type
      *            The type of the dropped entity
      */
-    abstract void dropped(EntityType type);
+    void dropped(EntityType type) {
+        // default implementation: do nothing
+    }
 }
