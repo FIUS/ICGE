@@ -134,6 +134,17 @@ public class InspectionData {
         return Collections.unmodifiableList(new ArrayList<>(this.inspectableMethods.keySet()));
     }
     
+    /**
+     * Get the method detail for the method with the given name
+     * 
+     * @param methodName
+     *            The name of the method to get the detail for
+     * @return The method detail.
+     */
+    public Method getMethodByName(String methodName) {
+        return this.inspectableMethods.get(methodName);
+    }
+    
     public Object invokeMethod(Object obj, String methodName, Object... args) {
         Method m = this.inspectableMethods.get(methodName);
         if (m == null) throw new IllegalStateException("No such method!");

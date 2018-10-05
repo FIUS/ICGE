@@ -8,6 +8,7 @@
 package de.unistuttgart.informatik.fius.icge.simulation.inspection;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -129,6 +130,21 @@ public class InspectionManager {
         InspectionData d = this.inspectableClasses.get(entity.getClass());
         if (d == null) return false;
         return d.setAttributeValue(entity, attributeName, value);
+    }
+    
+    /**
+     * Get the detail of the method with the given name of the given name.
+     * 
+     * @param entity
+     *            The entity to get the method of.
+     * @param methodName
+     *            The name of the method to get.
+     * @return The method detail.
+     */
+    public Method getMethodDetail(Entity entity, String methodName) {
+        InspectionData d = this.inspectableClasses.get(entity.getClass());
+        if (d == null) return null;
+        return d.getMethodByName(methodName);
     }
     
     /**
