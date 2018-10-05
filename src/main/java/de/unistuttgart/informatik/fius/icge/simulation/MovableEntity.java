@@ -22,20 +22,28 @@ public abstract class MovableEntity extends Entity {
 
     protected MovableEntity(Simulation sim, EntityType type) {
         super(sim, type);
+    }
+
+    @Override
+    public void spawn(int column, int row, Direction direction) {
         EventDispatcher.addListener(SpawnEvent.class, ev -> {
             SpawnEvent se = (SpawnEvent) ev;
             if ((se.simulation == this.simulation()) && (se.entity == this)) {
                 this._positionStack.add(new MoveEvent(this.simulation(), this, se.row, se.column));
+                return this.alive();
             }
-            return this.alive();
+            return true;
         });
         EventDispatcher.addListener(MoveEvent.class, ev -> {
             MoveEvent me = (MoveEvent) ev;
             if ((me.simulation == this.simulation()) && (me.entity == this)) {
                 this._positionStack.add(me);
+                return this.alive();
             }
-            return this.alive();
+            return true;
         });
+
+        super.spawn(column, row, direction);
     }
 
     @Override
