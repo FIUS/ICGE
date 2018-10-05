@@ -12,6 +12,7 @@ import java.util.Deque;
 
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMethod;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
@@ -43,6 +44,7 @@ public abstract class MovableEntity extends Entity {
         return 100;
     }
     
+    @InspectionMethod
     public void move() throws IllegalMove, EntityNotAlive {
         this.delayed(() -> {
             WorldObject wobAfter = this.wobAfterMove();
@@ -69,6 +71,7 @@ public abstract class MovableEntity extends Entity {
         }
     }
     
+    @InspectionMethod
     public void turnLeft() throws EntityNotAlive {
         SimulationEvent ev = new TurnLeftEvent(this.simulation(), this);
         this.delayed(() -> {
@@ -110,7 +113,9 @@ public abstract class MovableEntity extends Entity {
         }
         int newCol = column;
         int newRow = row;
-        if (this.simulation().territory().containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && (wall.sprite == Sprite.WALL))) throw new IllegalMove();
+        if (this.simulation().territory()
+                .containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && (wall.sprite == Sprite.WALL)))
+            throw new IllegalMove();
         return new WorldObject(wob.sprite, column, row, 100, wob.direction);
     }
     

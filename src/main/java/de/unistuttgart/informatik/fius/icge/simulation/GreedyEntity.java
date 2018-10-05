@@ -9,6 +9,7 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 
 import java.util.ArrayList;
 
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
@@ -18,16 +19,16 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
  * @author haslersn, neumantm
  */
 public abstract class GreedyEntity extends MovableEntity implements EntityCollector {
-
+    
+    @InspectionAttribute(readOnly = true, name = "Inventory")
     public ArrayList<Sprite> _inventory = new ArrayList<>();
-
+    
     public GreedyEntity(Simulation sim, Sprite sprite) {
         super(sim, sprite);
     }
     
     private boolean canCollectEntity(Entity ent) throws EntityNotAlive {
-        if (!(ent instanceof CollectableEntity) || !ent.worldObject().isSamePos(this.worldObject()))
-            return false;
+        if (!(ent instanceof CollectableEntity) || !ent.worldObject().isSamePos(this.worldObject())) return false;
         Sprite sprite = ent.sprite();
         return this.canCollectType(sprite);
     }
@@ -48,6 +49,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * @throws EntityNotAlive
      *             When this entity is not alive.
      */
+    @Override
     public boolean canCollect(Sprite type) throws EntityNotAlive {
         synchronized (this.simulation()) {
             for (Entity ent : this.simulation().entities()) {
@@ -64,6 +66,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * @throws EntityNotAlive
      *             When this entity is not alive.
      */
+    @Override
     public boolean canCollect() throws EntityNotAlive {
         synchronized (this.simulation()) {
             for (Entity ent : this.simulation().entities()) {
@@ -73,6 +76,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         return false;
     }
     
+    @Override
     public void collect(Sprite type) throws CanNotCollectException, EntityNotAlive {
         this.delayed(() -> {
             for (Entity ent : this.simulation().entities()) {
@@ -85,6 +89,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         });
     }
     
+    @Override
     public void collect() throws CanNotCollectException, EntityNotAlive {
         this.delayed(() -> {
             for (Entity ent : this.simulation().entities()) {
@@ -96,12 +101,14 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
             throw new CanNotCollectException("No such entity.");
         });
     }
-
+    
+    @Override
     public boolean canDrop(Sprite type) throws EntityNotAlive {
         if (!this.alive()) throw new EntityNotAlive();
         return this.canDropType(type) && this._inventory.contains(type);
     }
     
+    @Override
     public void drop(Sprite type) throws CanNotDropException, EntityNotAlive {
         this.delayed(() -> {
             if (!this.canDrop(type)) throw new CanNotDropException();

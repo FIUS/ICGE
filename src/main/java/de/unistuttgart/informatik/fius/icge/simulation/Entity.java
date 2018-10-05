@@ -13,6 +13,7 @@ import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.TickEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMethod;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
@@ -76,7 +77,7 @@ public abstract class Entity {
      * 
      * @return the column
      */
-    @InspectionAttribute(readOnly = true)
+    @InspectionAttribute
     public int getColumn() {
         return this.worldObject().column;
     }
@@ -87,7 +88,7 @@ public abstract class Entity {
      * @param column
      *            the column
      */
-    //@InspectionAttribute
+    @InspectionAttribute
     private void setColumn(int column) {
         WorldObject wobOld = this.worldObject();
         WorldObject wobNew = new WorldObject(wobOld.sprite, column, wobOld.row, wobOld.z, wobOld.direction);
@@ -126,6 +127,7 @@ public abstract class Entity {
         this.resetDelay();
     }
     
+    @InspectionMethod
     public final void despawn() throws EntityNotAlive {
         this.despawnInternal(false);
     }
@@ -198,6 +200,7 @@ public abstract class Entity {
      * @param message
      *            The message to print
      */
+    @InspectionMethod
     public void printLn(String message) {
         this.print(message + "\n");
     }
