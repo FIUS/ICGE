@@ -26,7 +26,7 @@ public class Simulation {
 
     private final HashMap<Entity, WorldObject> _entityObjects = new HashMap<>();
     private Territory _tty;
-    private boolean _running = true;
+    private boolean _running = false;
     private int _tickCount = 0;
     private TimerTask _timerTask;
     private Semaphore _timerTaskSem;
@@ -34,7 +34,8 @@ public class Simulation {
     /**
      * Create simulation from territory.
      *
-     * @param tty Territory
+     * @param tty
+     *            Territory
      */
     public Simulation(Territory tty) {
         this.init(tty);
@@ -43,7 +44,8 @@ public class Simulation {
     /**
      * Create new simulation from previous simulation state.
      *
-     * @param sim previous simulation state
+     * @param sim
+     *            previous simulation state
      */
     public Simulation(Simulation sim) {
         synchronized (sim) {
@@ -93,7 +95,8 @@ public class Simulation {
     /**
      * Set the simulation territory
      *
-     * @param tty the new territory
+     * @param tty
+     *            the new territory
      */
     public void setTerritory(Territory tty) {
         SimulationEvent ev = new SetTerritoryEvent(this);
@@ -117,7 +120,8 @@ public class Simulation {
     }
 
     /**
-     * @param pred test function to filter entities
+     * @param pred
+     *            test function to filter entities
      * @return all entities within the simulation with the given predicate
      */
     public synchronized ArrayList<Entity> entitiesWith(Predicate<Entity> pred) {
@@ -159,7 +163,8 @@ public class Simulation {
     }
 
     /**
-     * @param ent entity to test
+     * @param ent
+     *            entity to test
      * @return true if entity is part of this simulation
      */
     public boolean contains(Entity ent) {
@@ -167,7 +172,8 @@ public class Simulation {
     }
 
     /**
-     * @param pred predicate to test entities
+     * @param pred
+     *            predicate to test entities
      * @return true if at least one entity matches the given predicate
      */
     public synchronized boolean containsWith(Predicate<Entity> pred) {
@@ -182,7 +188,8 @@ public class Simulation {
     }
 
     /**
-     * @param ent an entity of this simulation
+     * @param ent
+     *            an entity of this simulation
      * @return the associated WorldObject
      */
     public WorldObject worldObject(Entity ent) {
@@ -190,9 +197,12 @@ public class Simulation {
     }
 
     /**
-     * @param ent the source entity for the WorldObject
-     * @param newWob the new WorldObject (use null to remove an old WorldObject)
-     * @param ev the simulation event to raise
+     * @param ent
+     *            the source entity for the WorldObject
+     * @param newWob
+     *            the new WorldObject (use null to remove an old WorldObject)
+     * @param ev
+     *            the simulation event to raise
      */
     public synchronized void setWorldObject(Entity ent, WorldObject newWob, SimulationEvent ev) {
         if (newWob == null) {
@@ -217,7 +227,6 @@ public class Simulation {
     private void init(Territory tty) {
         this.setTerritory(tty);
         EventDispatcher.raise(new InitEvent(this));
-        this.startTimer();
     }
 
     private void startTimer() {

@@ -16,9 +16,8 @@ import javax.swing.JButton;
 
 import de.unistuttgart.informatik.fius.icge.event.Event;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
-import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityEvent;
-import de.unistuttgart.informatik.fius.icge.simulation.Simulation.InitEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.PauseEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.ResumeEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
@@ -74,13 +73,12 @@ public class SimulationController {
         this.updatePlayButton();
 
         EventDispatcher.addListener(PauseEvent.class, this::setPaused);
-        EventDispatcher.addListener(InitEvent.class, this::setRunning);
         EventDispatcher.addListener(ResumeEvent.class, this::setRunning);
     }
 
     private boolean setRunning(Event ev) {
         SimulationEvent sev = (SimulationEvent) ev;
-        if (!(ev instanceof InitEvent) && this.wb.simulation() != sev.simulation) return true;
+        if (this.wb.simulation() != sev.simulation) return true;
         this.isRunning = true;
         this.updatePlayButton();
         return true;
