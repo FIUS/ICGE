@@ -55,6 +55,14 @@ public class InspectionManager {
         if (d == null) return Collections.emptyList();
         return d.getAttributeNames();
     }
+
+    public boolean isAttributeEditable(Entity entity, String attributeName) {
+        return false; // TODO
+    }
+
+    public Class<?> getAttributeType(Entity entity, String attributeName) {
+        return Object.class; // TODO
+    }
     
     /**
      * Get the value of the attribute with the given name from the given entity
