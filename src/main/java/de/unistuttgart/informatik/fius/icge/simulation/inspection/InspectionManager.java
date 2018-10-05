@@ -55,13 +55,35 @@ public class InspectionManager {
         if (d == null) return Collections.emptyList();
         return d.getAttributeNames();
     }
-
+    
+    /**
+     * Checks whether the attribute with the given name in the given entity is writable.
+     * 
+     * @param entity
+     *            The entity.
+     * @param attributeName
+     *            The name of the attribute
+     * @return Whether the attribute is writable.
+     */
     public boolean isAttributeEditable(Entity entity, String attributeName) {
-        return false; // TODO
+        InspectionData d = this.inspectableClasses.get(entity.getClass());
+        if (d == null) return false;
+        return !d.isAttributeReadOnly(attributeName);
     }
-
+    
+    /**
+     * Get's the type of the attribute with the given name in the given entity.
+     * 
+     * @param entity
+     *            The entity.
+     * @param attributeName
+     *            The name of the attribute
+     * @return The type of the attribute.
+     */
     public Class<?> getAttributeType(Entity entity, String attributeName) {
-        return Object.class; // TODO
+        InspectionData d = this.inspectableClasses.get(entity.getClass());
+        if (d == null) return null;
+        return d.getAttributeType(attributeName);
     }
     
     /**

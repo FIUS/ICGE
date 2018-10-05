@@ -76,7 +76,7 @@ public abstract class Entity {
      * 
      * @return the column
      */
-    @InspectionAttribute
+    @InspectionAttribute(readOnly = true)
     public int getColumn() {
         return this.worldObject().column;
     }
@@ -87,7 +87,7 @@ public abstract class Entity {
      * @param column
      *            the column
      */
-    @InspectionAttribute
+    //@InspectionAttribute
     private void setColumn(int column) {
         WorldObject wobOld = this.worldObject();
         WorldObject wobNew = new WorldObject(wobOld.sprite, column, wobOld.row, wobOld.z, wobOld.direction);

@@ -7,10 +7,12 @@
 
 package de.unistuttgart.informatik.fius.icge.simulation;
 
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Sprite;
 
 public class Mario extends GreedyEntity {
     
+    @InspectionAttribute
     private int coinCount = 0;
     
     public Mario(Simulation sim) {
