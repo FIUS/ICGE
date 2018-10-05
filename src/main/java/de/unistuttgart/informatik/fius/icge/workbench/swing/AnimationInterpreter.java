@@ -19,26 +19,25 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 
 public class AnimationInterpreter {
-    
-    private final AnimatedTerritory _animated;
+
     private float _column;
     private float _row;
+    private BufferedImage _unanimatedImage;
     private BufferedImage _image;
-    
+    private boolean _inAnimation = false;
+
     private static AnimatedImages _noneAnimations = new AnimatedImages();
     private static HashMap<AnimationType, AnimatedImages> _animatedImages = new HashMap<>();
     
-    public AnimationInterpreter(AnimatedTerritory animated) {
-        this._animated = animated;
-    }
-    
-    public void setObject(WorldObject wob, int currentTick) {
-        if (!this._animated.territory().contains(wob)) throw new IllegalArgumentException();
+    public AnimationInterpreter(AnimatedTerritory animated, WorldObject wob, int currentTick) {
+        if (!animated.territory().contains(wob)) throw new IllegalArgumentException();
         this._column = wob.column;
         this._row = wob.row;
-        Animation animation = this._animated.animation(wob);
+        this._unanimatedImage = this._image = _noneAnimations.get(wob.type, wob.direction);
+        Animation animation = animated.animation(wob);
         if (animation != null && currentTick < animation.end) {
             if ((currentTick < animation.begin)) throw new IllegalArgumentException();
+            this._inAnimation = true;
             float undone = (animation.end - currentTick) / (float) (animation.end - animation.begin);
             float progress = 1 - undone;
             this._image = _animatedImages.get(animation.type).get(wob.type, wob.direction, progress);
@@ -60,10 +59,8 @@ public class AnimationInterpreter {
                         break;
                     }
                 }
-                return;
             }
         }
-        this._image = _noneAnimations.get(wob.type, wob.direction);
     }
     
     public float column() {
@@ -73,9 +70,17 @@ public class AnimationInterpreter {
     public float row() {
         return this._row;
     }
+
+    public BufferedImage unanimatedImage() {
+        return this._unanimatedImage;
+    }
     
     public BufferedImage image() {
         return this._image;
+    }
+
+    public boolean inAnimation() {
+        return _inAnimation;
     }
     
     static {

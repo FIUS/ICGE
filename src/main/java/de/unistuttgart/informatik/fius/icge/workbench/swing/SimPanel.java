@@ -11,10 +11,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.color.ColorSpace;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -202,39 +204,44 @@ public class SimPanel extends JPanel {
     
     private void drawWorldObjects() {
         ArrayList<WorldObject> wobs = this._animated.territory().worldObjects();
-        WorldObject lastWob = null;
+        WorldObject nextWob = wobs.get(0);
         int drawCount = 1;
-        for (int i = 0; i < wobs.size(); ++i) {
-            WorldObject nextWob = wobs.get(i);
-            if (nextWob.equals(lastWob)) {
+        for (int i = 1; i <= wobs.size(); ++i) {
+            WorldObject lastWob = nextWob;
+            drawWorldObject(lastWob);
+            nextWob = (i == wobs.size()) ? null : wobs.get(i);
+            if (lastWob.equals(nextWob)) {
                 ++drawCount;
-                continue;
             }
-            if (lastWob != null) {
-                drawWorldObject(lastWob, drawCount);
+            else {
+                drawCount(lastWob.column, lastWob.row, drawCount);
+                drawCount = 1;
             }
-            lastWob = nextWob;
-            drawCount = 1;
-        }
-        if (lastWob != null) {
-            drawWorldObject(lastWob, drawCount);
         }
     }
     
-    private void drawWorldObject(WorldObject wob, int count) {
-        AnimationInterpreter interpreter = new AnimationInterpreter(this._animated);
+    private void drawWorldObject(WorldObject wob) {
         int currentTick = this._s.animator.simulation().tickCount();
-        if (!this._s.animator.simulation().running()) {
-            currentTick = Integer.MAX_VALUE;
+        AnimationInterpreter interpreter = new AnimationInterpreter(this._animated, wob, currentTick);
+
+        if (interpreter.inAnimation() && !this._s.animator.simulation().running()) {
+            BufferedImage unanimated = interpreter.unanimatedImage();
+            BufferedImage grayScale = new BufferedImage(unanimated.getWidth(), unanimated.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+            op.filter(unanimated, grayScale);
+            this.drawImage(wob.column, wob.row, grayScale);
         }
-        interpreter.setObject(wob, currentTick);
+
         BufferedImage img = interpreter.image();
         if (img != null) {
             this.drawImage(interpreter.column(), interpreter.row(), img);
         }
+    }
+
+    private void drawCount(int col, int row, int count) {
         if (count > 1) {
-            int x = (int) (this._x0 + (this._s.scale * (interpreter.column() - 0.45f)));
-            int y = (int) (this._y0 + (this._s.scale * (interpreter.row() + 0.45f)));
+            int x = (int) (this._x0 + (this._s.scale * (col - 0.45f)));
+            int y = (int) (this._y0 + (this._s.scale * (row + 0.45f)));
             this._g.drawString(String.valueOf(count), x, y);
         }
     }
