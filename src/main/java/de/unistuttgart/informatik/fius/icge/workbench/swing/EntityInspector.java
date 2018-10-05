@@ -295,27 +295,35 @@ public class EntityInspector {
             return "\"" + (String) obj + "\"";
         } else if (obj instanceof Array) {
             String result = "[";
+            ArrayList<String> values = new ArrayList<>(((Object[]) obj).length);
             for (Object ob : (Object[]) obj) {
-                result += this.objectToString(ob) + ",";
+                values.add(this.objectToString(ob));
             }
+            result += String.join(", ", values);
             return result += "]";
         } else if (obj instanceof List<?>) {
+            ArrayList<String> values = new ArrayList<>(((List<?>) obj).size());
             String result = "[";
             for (Object ob : (List<?>) obj) {
-                result += this.objectToString(ob) + ",";
+                values.add(this.objectToString(ob));
             }
+            result += String.join(", ", values);
             return result += "]";
         } else if (obj instanceof Set<?>) {
             String result = "{";
+            ArrayList<String> values = new ArrayList<>(((Set<?>) obj).size());
             for (Object ob : (Set<?>) obj) {
-                result += this.objectToString(ob) + ",";
+                values.add(this.objectToString(ob));
             }
+            result += String.join(", ", values);
             return result += "}";
         } else if (obj instanceof Map<?, ?>) {
             String result = "{";
+            ArrayList<String> values = new ArrayList<>(((Map<?,?>) obj).size());
             for (Object ob : ((Map<?, ?>) obj).keySet()) {
-                result += this.objectToString(ob) + ": " + this.objectToString(((Map<?, ?>) obj).get(ob)) + ",";
+                values.add(this.objectToString(ob) + ": " + this.objectToString(((Map<?, ?>) obj).get(ob)));
             }
+            result += String.join(", ", values);
             return result += "}";
         }
         return String.valueOf(obj);
