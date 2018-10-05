@@ -16,17 +16,18 @@ public class Wall extends Entity {
     }
     
     /**
-     * @see de.unistuttgart.informatik.fius.icge.simulation.Entity#spawnInternal(int, int, de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction)
+     * @see de.unistuttgart.informatik.fius.icge.simulation.Entity#spawn(int, int, de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction)
      */
     @Override
-    protected void spawnInternal(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
-        for(Entity e : this.simulation().entitiesWith(row, column)) {
+    public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
+        if (!this.simulation().entitiesWith(row, column).isEmpty()) {
             throw new CellNotEmpty();
         }
         
-        super.spawnInternal(column, row, direction);
+        super.spawn(column, row, direction);
     }
     
     public static class CellNotEmpty extends RuntimeException {
+        private static final long serialVersionUID = -4741977214724813309L;
     }
 }
