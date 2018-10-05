@@ -8,6 +8,7 @@
 package de.unistuttgart.informatik.fius.icge.workbench.tools;
 
 import de.unistuttgart.informatik.fius.icge.simulation.Coin;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 
 /**
@@ -15,7 +16,7 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
  * 
  * @author Tim Neumann
  */
-public class SpawnCoinTool extends AbstractTool {
+public class SpawnCoinTool extends AbstractSpawnEntityTool {
     
     /**
      * Creates a new spawn coin tool.
@@ -24,13 +25,9 @@ public class SpawnCoinTool extends AbstractTool {
         super("Spawn Coin", "coin/coin-default.png");
     }
     
-    /**
-     * @see de.unistuttgart.informatik.fius.icge.workbench.tools.Tool#apply(de.unistuttgart.informatik.fius.icge.simulation.Simulation,
-     *      int, int)
-     */
     @Override
-    public void apply(Simulation sim, int row, int column) {
-        new Coin(sim).forceSpawn(column, row);
+    protected Entity entityToSpawn(Simulation sim) {
+        return new Coin(sim);
     }
     
 }
