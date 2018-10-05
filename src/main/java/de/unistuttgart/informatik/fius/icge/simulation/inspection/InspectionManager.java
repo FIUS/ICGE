@@ -57,6 +57,19 @@ public class InspectionManager {
     }
     
     /**
+     * Get's all method names of the given entity.
+     * 
+     * @param entity
+     *            The entity to get the names for
+     * @return A List of method names.
+     */
+    public List<String> getMethodNamesOfEntity(Entity entity) {
+        InspectionData d = this.inspectableClasses.get(entity.getClass());
+        if (d == null) return Collections.emptyList();
+        return d.getMethodNames();
+    }
+    
+    /**
      * Checks whether the attribute with the given name in the given entity is writable.
      * 
      * @param entity
@@ -106,16 +119,36 @@ public class InspectionManager {
      * 
      * @param entity
      *            The entity to set the value in
-     * @param attributeNmae
+     * @param attributeName
      *            The name of the attribute to set the value for.
      * @param value
      *            The value to set.
      * @return Whether it worked.
      */
-    public boolean setAttributeValue(Entity entity, String attributeNmae, Object value) {
+    public boolean setAttributeValue(Entity entity, String attributeName, Object value) {
         InspectionData d = this.inspectableClasses.get(entity.getClass());
         if (d == null) return false;
-        return d.setAttributeValue(entity, attributeNmae, value);
+        return d.setAttributeValue(entity, attributeName, value);
+    }
+    
+    /**
+     * Invokes the method with the given name on the given entity.
+     * Uses the given arguments.
+     * 
+     * @param entity
+     *            The entity to invoke the method in.
+     * @param methodName
+     *            The name of the method to invoke.
+     * @param args
+     *            The arguments for the method invocation.
+     * @return The return value of the method.
+     * @throws IllegalStateException
+     *             When anything goes wrong.
+     */
+    public Object invokeMethod(Entity entity, String methodName, Object... args) {
+        InspectionData d = this.inspectableClasses.get(entity.getClass());
+        if (d == null) throw new IllegalStateException("Not a known inspectable class");
+        return d.invokeMethod(entity, methodName, args);
     }
     
 }

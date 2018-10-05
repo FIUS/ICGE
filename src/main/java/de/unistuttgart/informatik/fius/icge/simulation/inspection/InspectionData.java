@@ -35,6 +35,7 @@ public class InspectionData {
         this.inspectableAttributes = new HashMap<>();
         this.inspectableMethods = new HashMap<>();
         this.initAttributes();
+        this.initMethods();
     }
     
     /**
@@ -124,9 +125,33 @@ public class InspectionData {
         return !(this.inspectableAttributes.isEmpty() && this.inspectableMethods.isEmpty());
     }
     
+    /**
+     * Get the mathod names of the class for this inspection data.
+     * 
+     * @return A list of method names.
+     */
+    public List<String> getMethodNames() {
+        return Collections.unmodifiableList(new ArrayList<>(this.inspectableMethods.keySet()));
+    }
+    
+    public Object invokeMethod(Object obj, String methodName, Object... args) {
+        Method m = this.inspectableMethods.get(methodName);
+        if (m == null) throw new IllegalStateException("No such method!");
+        try {
+            return m.invoke(obj, args);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Invokation didn't work", e);
+        }
+    }
+    
     private void initMethods() {
         List<Method> methods = AnnotationReader.getAllMethodsWithAnnotationRecursively(this.c, InspectionMethod.class);
         
+        for (Method m : methods) {
+            m.setAccessible(true);
+            this.inspectableMethods.put(this.getDsiplayNameForInspectionMethod(m), m);
+        }
     }
     
     private void initAttributes() {
@@ -223,6 +248,15 @@ public class InspectionData {
             if ((name != null) && !name.isEmpty()) return name;
         }
         return f.getName();
+    }
+    
+    private String getDsiplayNameForInspectionMethod(Method m) {
+        InspectionMethod anno = m.getAnnotation(InspectionMethod.class);
+        if (anno != null) {
+            String name = anno.name();
+            if ((name != null) && !name.isEmpty()) return name;
+        }
+        return m.getName();
     }
     
     private String getDisplayNameForMethod(Method m, String possiblePrefixToRemove) {
