@@ -10,7 +10,7 @@ import java.util.function.Function;
  */
 
 public enum EntityType {
-    MARIO(Mario::new), WALL(Wall::new), COIN(Coin::new);
+    MARIO(Mario::new), LUIGI(Luigi::new), WALL(Wall::new), COIN(Coin::new);
 
     private Function<Simulation, Entity> _creator;
 
