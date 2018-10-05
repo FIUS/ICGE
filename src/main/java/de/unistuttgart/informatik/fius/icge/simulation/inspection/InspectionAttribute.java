@@ -28,4 +28,7 @@ import java.lang.annotation.Target;
 public @interface InspectionAttribute {
     /** The optional name of the attribute, to be displayed in the front end. */
     String name() default "";
+    
+    /** Optional argument setting this attribute to read only. */
+    boolean readOnly() default false;
 }
