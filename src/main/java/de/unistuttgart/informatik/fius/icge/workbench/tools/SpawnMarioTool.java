@@ -7,10 +7,9 @@
 
 package de.unistuttgart.informatik.fius.icge.workbench.tools;
 
+import de.unistuttgart.informatik.fius.icge.simulation.Entity;
 import de.unistuttgart.informatik.fius.icge.simulation.Mario;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
-import de.unistuttgart.informatik.fius.icge.simulation.Entity;
-import de.unistuttgart.informatik.fius.icge.simulation.Entity.CellBlockedByWall;
 
 /**
  * A tool for spawning marios.
