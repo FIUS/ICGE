@@ -219,7 +219,11 @@ public class SimPanel extends JPanel {
     
     private void drawWorldObject(WorldObject wob, int count) {
         AnimationInterpreter interpreter = new AnimationInterpreter(this._animated);
-        interpreter.setObject(wob, this._s.animator.simulation().tickCount());
+        int currentTick = this._s.animator.simulation().tickCount();
+        if (!this._s.animator.simulation().running()) {
+            currentTick = Integer.MAX_VALUE;
+        }
+        interpreter.setObject(wob, currentTick);
         BufferedImage img = interpreter.image();
         if (img != null) {
             this.drawImage(interpreter.column(), interpreter.row(), img);

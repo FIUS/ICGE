@@ -11,21 +11,9 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.lang.reflect.Array;
-import java.util.Map;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import de.unistuttgart.informatik.fius.icge.Engine;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
@@ -35,10 +23,13 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionManager;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 
+/**
+ * Window to inspect and manipulate Entities.
+ */
 public class EntityInspector {
-
-    private final Set<Class<?>> _editableTypes = new HashSet<>(Arrays.asList(String.class, Integer.TYPE, Integer.class, 
-    Double.TYPE, Double.class, Float.TYPE, Float.class, Long.TYPE, Long.class, Boolean.TYPE, Boolean.class));
+    
+    private final Set<Class<?>> _editableTypes = new HashSet<>(Arrays.asList(String.class, Integer.TYPE, Integer.class,
+            Double.TYPE, Double.class, Float.TYPE, Float.class, Long.TYPE, Long.class, Boolean.TYPE, Boolean.class));
     
     private final InspectionManager _inspectionManager;
     private final Simulation _simulation;
@@ -51,28 +42,42 @@ public class EntityInspector {
     private JComboBox<String> _entityChooser;
     
     private Entity _selectedEntity;
-
+    
     private List<String> _attributeList;
     private Map<String, JLabel> _attributeToLabel;
-
+    
     private List<String> _methodList;
     
+    /**
+     * Create new entity inspector which chooses from all available entities
+     * 
+     * @param sim
+     */
     public EntityInspector(Simulation sim) {
         this._simulation = sim;
         this._entities = sim.entities();
         this._inspectionManager = Engine.getEngine().getInspectionManager();
     }
     
+    /**
+     * Create new entity inspector which chooses from all available entities in (row, column)
+     * 
+     * @param sim
+     * @param row
+     * @param column
+     */
     public EntityInspector(Simulation sim, int row, int column) {
         this._simulation = sim;
         this._entities = sim.entitiesWith(row, column);
         this._inspectionManager = Engine.getEngine().getInspectionManager();
     }
     
+    /** Show the entity inspector window */
     public void show() {
         EventQueue.invokeLater(() -> this.initFrame());
     }
     
+    /** Build the main frame */
     private void initFrame() {
         this._frame = new JFrame("Entity Inspector");
         this._frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -83,7 +88,7 @@ public class EntityInspector {
         this.initMainPanel();
         this.initEntitySelector();
     }
-
+    
     private void initMainPanel() {
         this._mainPanel = new JPanel(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(this._mainPanel);
@@ -113,7 +118,12 @@ public class EntityInspector {
         this.setEntity(this._entities.get(0));
     }
     
-    private void setEntity(final Entity ent) {
+    /**
+     * Set the specific entity to inspect
+     * 
+     * @param ent
+     */
+    private void setEntity(Entity ent) {
         this._selectedEntity = ent;
         EventDispatcher.addListener(EntityEvent.class, event -> {
             EntityEvent ev = (EntityEvent) event;
@@ -125,10 +135,9 @@ public class EntityInspector {
             }
             return true;
         });
-        this.inspectEntity();
         this.updateEntityValues();
     }
-
+    
     private void inspectEntity() {
         if (this._selectedEntity == null) throw new IllegalStateException("Must set entity before inspecting it.");
         
@@ -148,11 +157,10 @@ public class EntityInspector {
         for (String attr : attributeList) {
             Class<?> type = this._inspectionManager.getAttributeType(this._selectedEntity, attr);
             attributePanel.add(new JLabel(attr + " (" + type.getSimpleName() + "):"));
-            JLabel valueLabel = new JLabel("", JLabel.CENTER);
+            JLabel valueLabel = new JLabel("", SwingConstants.CENTER);
             attributeToLabel.put(attr, valueLabel);
             attributePanel.add(valueLabel);
-            if (this._inspectionManager.isAttributeEditable(this._selectedEntity, attr) 
-                    && this._editableTypes.contains(type)) {
+            if (this._inspectionManager.isAttributeEditable(this._selectedEntity, attr) && this._editableTypes.contains(type)) {
                 JButton attrEditButton = new JButton("edit");
                 attributePanel.add(attrEditButton);
             } else {
@@ -174,6 +182,7 @@ public class EntityInspector {
         this._methodList = methodList;
     }
     
+    /** Update UI on value changes in entity */
     private void updateEntityValues() {
         for (String attr : this._attributeList) {
             JLabel valueLabel = this._attributeToLabel.get(attr);
@@ -182,7 +191,7 @@ public class EntityInspector {
             valueLabel.setText(this.objectToString(value));
         }
     }
-
+    
     /**
      * Get String representation of object.
      * 
@@ -211,13 +220,112 @@ public class EntityInspector {
                 result += this.objectToString(ob) + ",";
             }
             return result += "}";
-        } else if (obj instanceof Map<?,?>) {
+        } else if (obj instanceof Map<?, ?>) {
             String result = "{";
-            for (Object ob : ((Map<?,?>) obj).keySet()) {
-                result += this.objectToString(ob) + ": " + this.objectToString(((Map<?,?>) obj).get(ob)) + ",";
+            for (Object ob : ((Map<?, ?>) obj).keySet()) {
+                result += this.objectToString(ob) + ": " + this.objectToString(((Map<?, ?>) obj).get(ob)) + ",";
             }
             return result += "}";
-        } 
+        }
         return String.valueOf(obj);
+    }
+    
+    /**
+     * Open user input dialog
+     * 
+     * @param title
+     *            title of dialog
+     * @param description
+     *            description of dialog
+     * @return user input
+     */
+    private String getUserInput(String title, String description) {
+        String s = JOptionPane.showInputDialog(this._frame, description, title, JOptionPane.PLAIN_MESSAGE);
+        if (s != null) {
+            return s;
+        }
+        return "";
+    }
+    
+    /**
+     * Open user input dialog
+     * 
+     * @param title
+     *            title of dialog
+     * @param description
+     *            description of dialog
+     * @return user input
+     */
+    private int getUserInt(String title, String description) {
+        String input = this.getUserInput(title, description);
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {}
+        return 0;
+    }
+    
+    /**
+     * Open user input dialog
+     * 
+     * @param title
+     *            title of dialog
+     * @param description
+     *            description of dialog
+     * @return user input
+     */
+    private long getUserLong(String title, String description) {
+        String input = this.getUserInput(title, description);
+        try {
+            return Long.parseLong(input);
+        } catch (NumberFormatException e) {}
+        return 0;
+    }
+    
+    /**
+     * Open user input dialog
+     * 
+     * @param title
+     *            title of dialog
+     * @param description
+     *            description of dialog
+     * @return user input
+     */
+    private float getUserFloat(String title, String description) {
+        String input = this.getUserInput(title, description);
+        try {
+            return Float.parseFloat(input);
+        } catch (NumberFormatException e) {}
+        return 0;
+    }
+    
+    /**
+     * Open user input dialog
+     * 
+     * @param title
+     *            title of dialog
+     * @param description
+     *            description of dialog
+     * @return user input
+     */
+    private double getUserDouble(String title, String description) {
+        String input = this.getUserInput(title, description);
+        try {
+            return Double.parseDouble(input);
+        } catch (NumberFormatException e) {}
+        return 0;
+    }
+    
+    /**
+     * Open user input dialog
+     * 
+     * @param title
+     *            title of dialog
+     * @param description
+     *            description of dialog
+     * @return user input
+     */
+    private boolean getUserBoolean(String title, String description) {
+        String input = this.getUserInput(title, description);
+        return input.equals("true");
     }
 }
