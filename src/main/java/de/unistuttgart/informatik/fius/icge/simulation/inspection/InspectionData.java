@@ -124,6 +124,11 @@ public class InspectionData {
         return !(this.inspectableAttributes.isEmpty() && this.inspectableMethods.isEmpty());
     }
     
+    private void initMethods() {
+        List<Method> methods = AnnotationReader.getAllMethodsWithAnnotationRecursively(this.c, InspectionMethod.class);
+        
+    }
+    
     private void initAttributes() {
         List<Field> fields = AnnotationReader.getAllAttributesWithAnnotationRecursively(this.c, InspectionAttribute.class);
         List<Method> methods = AnnotationReader.getAllMethodsWithAnnotationRecursively(this.c, InspectionAttribute.class);
@@ -236,7 +241,19 @@ public class InspectionData {
         return name;
     }
     
-    private class AttributeInspectionPoint {
+    private static class AttributeInspectionPoint {
+        private static final Map<Class<?>, Class<?>> primitiveToWrapperMap = new HashMap<>();
+        static {
+            primitiveToWrapperMap.put(Integer.TYPE, Integer.class);
+            primitiveToWrapperMap.put(Long.TYPE, Long.class);
+            primitiveToWrapperMap.put(Character.TYPE, Character.class);
+            primitiveToWrapperMap.put(Byte.TYPE, Byte.class);
+            primitiveToWrapperMap.put(Float.TYPE, Float.class);
+            primitiveToWrapperMap.put(Double.TYPE, Double.class);
+            primitiveToWrapperMap.put(Short.TYPE, Short.class);
+            primitiveToWrapperMap.put(Boolean.TYPE, Boolean.class);
+            primitiveToWrapperMap.put(Void.TYPE, Void.class);
+        }
         private final boolean usesField;
         private final Field f;
         private final Method getter;
@@ -255,7 +272,7 @@ public class InspectionData {
             this.f = field;
             this.getter = null;
             this.setter = null;
-            this.type = field.getType();
+            this.type = convertTypeToWrappers(field.getType());
             this.readOnly = field.getAnnotation(InspectionAttribute.class).readOnly();
         }
         
@@ -264,7 +281,7 @@ public class InspectionData {
             this.f = null;
             this.getter = getter;
             this.setter = null;
-            this.type = getter.getReturnType();
+            this.type = convertTypeToWrappers(getter.getReturnType());
             this.readOnly = true;
         }
         
@@ -273,8 +290,13 @@ public class InspectionData {
             this.f = null;
             this.getter = getter;
             this.setter = setter;
-            this.type = getter.getReturnType();
+            this.type = convertTypeToWrappers(getter.getReturnType());
             this.readOnly = false;
+        }
+        
+        private Class<?> convertTypeToWrappers(Class<?> cls) {
+            if (!cls.isPrimitive()) return cls;
+            return primitiveToWrapperMap.get(cls);
         }
         
         public Object getValue(Object obj) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -285,11 +307,13 @@ public class InspectionData {
         public void setValue(Object obj, Object value)
                 throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
             if (this.readOnly) throw new InspectionPointException("Attribute is read only.");
-            if (!this.type.isInstance(value)) throw new IllegalArgumentException("Not the correct attribute type.");
+            if (!this.type.isAssignableFrom(value.getClass()))
+                throw new IllegalArgumentException("Not the correct attribute type.");
             if (this.usesField) {
                 this.f.set(obj, value);
+            } else {
+                this.setter.invoke(obj, value);
             }
-            this.setter.invoke(obj, value);
         }
         
         /**
@@ -316,7 +340,7 @@ public class InspectionData {
      * 
      * @author Tim Neumann
      */
-    public class InspectionPointException extends RuntimeException {
+    public static class InspectionPointException extends RuntimeException {
         /**
          * generated
          */

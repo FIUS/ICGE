@@ -9,10 +9,7 @@ package de.unistuttgart.informatik.fius.icge.workbench;
 
 import de.unistuttgart.informatik.fius.icge.event.Event;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
-import de.unistuttgart.informatik.fius.icge.simulation.Entity.DespawnEvent;
-import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityEvent;
-import de.unistuttgart.informatik.fius.icge.simulation.Entity.MessageEvent;
-import de.unistuttgart.informatik.fius.icge.simulation.Entity.SpawnEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.*;
 import de.unistuttgart.informatik.fius.icge.simulation.MovableEntity.MoveEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.MovableEntity.TurnLeftEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
@@ -101,6 +98,8 @@ public class Workbench {
             this._view.println(((EntityEvent) ev).entity.getClass().getSimpleName() + " :: despawn();");
         } else if (ev instanceof MoveEvent) {
             this._view.println(((EntityEvent) ev).entity.getClass().getSimpleName() + " :: move();");
+        } else if (ev instanceof TeleportEvent) {
+            this._view.println(((EntityEvent) ev).entity.getClass().getSimpleName() + " :: teleport();");
         } else if (ev instanceof TurnLeftEvent) {
             this._view.println(((EntityEvent) ev).entity.getClass().getSimpleName() + " :: turnLeft();");
         } else if (ev instanceof SetTerritoryEvent) {
