@@ -150,7 +150,7 @@ public class InspectionData {
         if (m == null) throw new IllegalStateException("No such method!");
         try {
             return m.invoke(obj, args);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new IllegalStateException("Invokation didn't work", e);
         }
