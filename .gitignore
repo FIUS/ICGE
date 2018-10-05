@@ -24,8 +24,12 @@ hs_err_pid*
 
 #Other -neumantm
 /target/
+/bin/
 .directory
 
 #Other -vscode
 .vscode
 
+# .classpath and .project should be generated automatically
+.classpath
+.project
