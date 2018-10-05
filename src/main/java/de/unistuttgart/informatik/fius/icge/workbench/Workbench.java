@@ -43,6 +43,7 @@ public class Workbench {
     
     public void setSimulation(Simulation sim) {
         this._view.setSimulation(sim);
+        EventDispatcher.raise(new SetSimulationEvent(this._view));
     }
     
     public double scale() {
@@ -122,5 +123,18 @@ public class Workbench {
         }
         this._view.update();
         return true;
+    }
+
+    // Events
+
+    /**
+     * Intentionally doesn't extend SimulationEvent
+     */
+    public static class SetSimulationEvent implements Event {
+        public final WorkbenchView view;
+
+        public SetSimulationEvent(WorkbenchView view) {
+            this.view = view;
+        }
     }
 }
