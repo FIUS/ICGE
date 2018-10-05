@@ -125,6 +125,7 @@ public class EntityInspector {
      */
     private void setEntity(Entity ent) {
         this._selectedEntity = ent;
+        this.inspectEntity();
         EventDispatcher.addListener(EntityEvent.class, event -> {
             EntityEvent ev = (EntityEvent) event;
             if (this._selectedEntity != ent) {
@@ -154,7 +155,7 @@ public class EntityInspector {
         JPanel attributePanel = new JPanel(new GridLayout(attributeList.size(), 3));
         this._mainPanel.add(BorderLayout.NORTH, attributePanel);
         Map<String, JLabel> attributeToLabel = new HashMap<>();
-        for (String attr : attributeList) {
+        for (final String attr : attributeList) {
             Class<?> type = this._inspectionManager.getAttributeType(this._selectedEntity, attr);
             attributePanel.add(new JLabel(attr + " (" + type.getSimpleName() + "):"));
             JLabel valueLabel = new JLabel("", SwingConstants.CENTER);
@@ -162,6 +163,7 @@ public class EntityInspector {
             attributePanel.add(valueLabel);
             if (this._inspectionManager.isAttributeEditable(this._selectedEntity, attr) && this._editableTypes.contains(type)) {
                 JButton attrEditButton = new JButton("edit");
+                attrEditButton.addActionListener(l -> {this.editAttribute(attr);});
                 attributePanel.add(attrEditButton);
             } else {
                 attributePanel.add(new JPanel());
@@ -191,7 +193,25 @@ public class EntityInspector {
             valueLabel.setText(this.objectToString(value));
         }
     }
-    
+
+    private void editAttribute(String attr) {
+        Class<?> type = this._inspectionManager.getAttributeType(this._selectedEntity, attr);
+
+        Object userInput = null;
+        if (type == Integer.TYPE || type == Integer.class) {
+            userInput = getUserInt("Edit attribute \"" + attr + "\"", "Input new Value:");
+        } else if (type == Long.TYPE || type == Long.class) {
+            userInput = getUserLong("Edit attribute \"" + attr + "\"", "Input new Value:");
+        } else if (type == Float.TYPE || type == Float.class) {
+            userInput = getUserFloat("Edit attribute \"" + attr + "\"", "Input new Value:");
+        } else if (type == Double.TYPE || type ==  Double.class) {
+            userInput = getUserDouble("Edit attribute \"" + attr + "\"", "Input new Value:");
+        } else if (type == String.class) {
+            userInput = getUserInput("Edit attribute \"" + attr + "\"", "Input new Value:");
+        }
+        this._inspectionManager.setAttributeValue(this._selectedEntity, attr, userInput);
+    }
+
     /**
      * Get String representation of object.
      * 
