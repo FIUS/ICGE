@@ -11,22 +11,27 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 
+import de.unistuttgart.informatik.fius.icge.Engine;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity;
-import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
+import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionManager;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 
 public class EntityInspector {
     
-    private Simulation _simulation; 
+    private final Simulation _simulation;
     private JFrame _frame;
-    private List<Entity> _entities;
-
+    private final List<Entity> _entities;
+    
     private JComboBox<String> _entityChooser;
-
+    
     private Entity _selectedEntity;
     
     public EntityInspector(Simulation sim) {
@@ -37,15 +42,17 @@ public class EntityInspector {
     public EntityInspector(Simulation sim, int row, int column) {
         this._simulation = sim;
         this._entities = sim.entitiesWith(row, column);
+        InspectionManager im = Engine.getEngine().getInspectionManager();
+        System.out.println("asdas");
     }
     
     public void show() {
         EventQueue.invokeLater(() -> this.initFrame());
     }
-
+    
     private void initFrame() {
         this._frame = new JFrame("Entity Inspector");
-        this._frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this._frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this._frame.setLocationByPlatform(true);
         this._frame.setResizable(true);
         this._frame.setSize(400, 300);
@@ -54,9 +61,9 @@ public class EntityInspector {
             this.startEntitySelection();
         }
     }
-
+    
     private void startEntitySelection() {
-        if (this._entities != null && this._entities.size() < 1) {
+        if ((this._entities != null) && (this._entities.size() < 1)) {
             this._frame.getContentPane().add(new JLabel("No Entities..."));
             return;
         }
@@ -77,7 +84,7 @@ public class EntityInspector {
         this._frame.getContentPane().add(BorderLayout.NORTH, this._entityChooser);
         this.setEntity(this._entities.get(0));
     }
-
+    
     private void setEntity(Entity ent) {
         this._entityChooser.setSelectedIndex(-1);
         this._selectedEntity = ent;
@@ -90,7 +97,7 @@ public class EntityInspector {
         });
         this.updateEntityValues();
     }
-
+    
     private void updateEntityValues() {
         // TODO update UI to reflect changes of Entity
     }

@@ -28,6 +28,7 @@ public class Workbench {
     public Workbench(String name) {
         this._name = name;
         this._view = new SwingView(name);
+        
         EventDispatcher.addListener(SimulationEvent.class, this::handle);
     }
     
