@@ -73,18 +73,14 @@ public class SimPanel extends JPanel {
             
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    SimPanel.this._mouseInside = true;
-                    SimPanel.this._view.update();
-                }
+                SimPanel.this._mouseInside = true;
+                SimPanel.this._view.update();
             }
             
             @Override
             public void mouseExited(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    SimPanel.this._mouseInside = false;
-                    SimPanel.this._view.update();
-                }
+                SimPanel.this._mouseInside = false;
+                SimPanel.this._view.update();
             }
         });
         this.addMouseMotionListener(new MouseMotionListener() {
