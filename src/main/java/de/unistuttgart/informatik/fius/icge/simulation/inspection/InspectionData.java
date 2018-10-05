@@ -145,6 +145,17 @@ public class InspectionData {
         return this.inspectableMethods.get(methodName);
     }
     
+    /**
+     * Invoke the method with the given name in the given object, using the given arguments
+     * 
+     * @param obj
+     *            The object to call the method on
+     * @param methodName
+     *            The name of the method to call
+     * @param args
+     *            The arguments to use
+     * @return The return value.
+     */
     public Object invokeMethod(Object obj, String methodName, Object... args) {
         Method m = this.inspectableMethods.get(methodName);
         if (m == null) throw new IllegalStateException("No such method!");
