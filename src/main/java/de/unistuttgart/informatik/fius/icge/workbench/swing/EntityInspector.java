@@ -11,6 +11,8 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 import javax.swing.*;
@@ -47,6 +49,7 @@ public class EntityInspector {
     private Map<String, JLabel> _attributeToLabel;
     
     private List<String> _methodList;
+    private Map<String, JLabel> _methodToLabel;
     
     /**
      * Create new entity inspector which chooses from all available entities
@@ -90,7 +93,7 @@ public class EntityInspector {
     }
     
     private void initMainPanel() {
-        this._mainPanel = new JPanel(new BorderLayout());
+        this._mainPanel = new JPanel(new GridLayout(2, 1));
         JScrollPane scrollPane = new JScrollPane(this._mainPanel);
         this._frame.getContentPane().add(BorderLayout.CENTER, scrollPane);
     }
@@ -150,10 +153,10 @@ public class EntityInspector {
         }
         
         // attributePanel
-        List<String> attributeList = new ArrayList(this._inspectionManager.getAttributeNamesOfEntity(this._selectedEntity));
+        List<String> attributeList = new ArrayList<>(this._inspectionManager.getAttributeNamesOfEntity(this._selectedEntity));
         attributeList.sort((a1, a2) -> a1.compareToIgnoreCase(a2));
         JPanel attributePanel = new JPanel(new GridLayout(attributeList.size(), 3));
-        this._mainPanel.add(BorderLayout.NORTH, attributePanel);
+        this._mainPanel.add(attributePanel);
         Map<String, JLabel> attributeToLabel = new HashMap<>();
         for (final String attr : attributeList) {
             Class<?> type = this._inspectionManager.getAttributeType(this._selectedEntity, attr);
@@ -163,7 +166,9 @@ public class EntityInspector {
             attributePanel.add(valueLabel);
             if (this._inspectionManager.isAttributeEditable(this._selectedEntity, attr) && this._editableTypes.contains(type)) {
                 JButton attrEditButton = new JButton("edit");
-                attrEditButton.addActionListener(l -> {this.editAttribute(attr);});
+                attrEditButton.addActionListener(l -> {
+                    EventQueue.invokeLater(() -> this.editAttribute(attr));
+                });
                 attributePanel.add(attrEditButton);
             } else {
                 attributePanel.add(new JPanel());
@@ -174,14 +179,42 @@ public class EntityInspector {
         this._attributeToLabel = attributeToLabel;
         
         // methodPanel
-        List<String> methodList = new ArrayList<>();
+        List<String> methodList = new ArrayList<>(this._inspectionManager.getMethodNamesOfEntity(this._selectedEntity));
         methodList.sort((a1, a2) -> a1.compareToIgnoreCase(a2));
         JPanel methodPanel = new JPanel(new GridLayout(methodList.size(), 3));
+        this._mainPanel.add(methodPanel);
+        Map<String, JLabel> methodToLabel = new HashMap<>();
         for (String method : methodList) {
-            // TODO
+            Method methodDetail = this._inspectionManager.getMethodDetail(this._selectedEntity, method);
+            String methodName = method + "(";
+            Parameter[] paramDetails = methodDetail.getParameters();
+            List<String> params = new ArrayList<>(paramDetails.length);
+            boolean paramsArePrimitive = true;
+            for (Parameter param : paramDetails) {
+                if (!this._editableTypes.contains(param.getType())) {
+                    paramsArePrimitive = false;
+                }
+                params.add(param.getType().getSimpleName() + " " + param.getName());
+            }
+            methodName += String.join(", ", params);
+            methodName += "): " + methodDetail.getReturnType().getSimpleName();
+            methodPanel.add(new JLabel(methodName));
+            if (paramsArePrimitive) {
+                JButton methodCallButton = new JButton("call");
+                methodCallButton.addActionListener(l -> {
+                    EventQueue.invokeLater(() -> this.callMethod(method));
+                });
+                methodPanel.add(methodCallButton);
+            } else {
+                methodPanel.add(new JPanel());
+            }
+            JLabel valueLabel = new JLabel("", SwingConstants.CENTER);
+            methodToLabel.put(method, valueLabel);
+            methodPanel.add(valueLabel);
         }
         this._methodPanel = methodPanel;
         this._methodList = methodList;
+        this._methodToLabel = methodToLabel;
     }
     
     /** Update UI on value changes in entity */
@@ -199,19 +232,54 @@ public class EntityInspector {
 
         Object userInput = null;
         if (type == Integer.TYPE || type == Integer.class) {
-            userInput = getUserInt("Edit attribute \"" + attr + "\"", "Input new Value:");
+            userInput = getUserInt("Edit attribute \"" + attr + "\"", "Input new value:");
         } else if (type == Long.TYPE || type == Long.class) {
-            userInput = getUserLong("Edit attribute \"" + attr + "\"", "Input new Value:");
+            userInput = getUserLong("Edit attribute \"" + attr + "\"", "Input new value:");
         } else if (type == Float.TYPE || type == Float.class) {
-            userInput = getUserFloat("Edit attribute \"" + attr + "\"", "Input new Value:");
+            userInput = getUserFloat("Edit attribute \"" + attr + "\"", "Input new value:");
         } else if (type == Double.TYPE || type ==  Double.class) {
-            userInput = getUserDouble("Edit attribute \"" + attr + "\"", "Input new Value:");
+            userInput = getUserDouble("Edit attribute \"" + attr + "\"", "Input new value:");
         } else if (type == String.class) {
-            userInput = getUserInput("Edit attribute \"" + attr + "\"", "Input new Value:");
+            userInput = getUserInput("Edit attribute \"" + attr + "\"", "Input new value:");
         }
         if (userInput == null) return;
         this._inspectionManager.setAttributeValue(this._selectedEntity, attr, userInput);
         this.updateEntityValues();
+    }
+
+    private void callMethod(String method) {
+        Method methodDetail = this._inspectionManager.getMethodDetail(this._selectedEntity, method);
+        Parameter[] params = methodDetail.getParameters();
+
+        Object[] parameterValues = new Object[params.length];
+        for (int i = 0; i < params.length; ++i) {
+            Class<?> type = params[i].getType();
+
+            Object userInput = null;
+            if (type == Integer.TYPE || type == Integer.class) {
+                userInput = getUserInt("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
+            } else if (type == Long.TYPE || type == Long.class) {
+                userInput = getUserLong("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
+            } else if (type == Float.TYPE || type == Float.class) {
+                userInput = getUserFloat("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
+            } else if (type == Double.TYPE || type ==  Double.class) {
+                userInput = getUserDouble("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
+            } else if (type == String.class) {
+                userInput = getUserInput("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
+            }
+            if (userInput == null) return;
+        }
+
+        new Thread(() -> {
+            try {
+                Object result = this._inspectionManager.invokeMethod(this._selectedEntity, method, parameterValues);
+                JLabel valueLabel = this._methodToLabel.get(method);
+                if (valueLabel != null) {
+                    valueLabel.setText(this.objectToString(result));
+                }
+            } catch (IllegalStateException e) {}
+            this.updateEntityValues();
+        }, "Inspector (Call " + method + ")").start();
     }
 
     /**
