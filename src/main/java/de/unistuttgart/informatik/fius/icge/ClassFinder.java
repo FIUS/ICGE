@@ -108,11 +108,15 @@ public class ClassFinder {
 
     private static String convertPathToClassName(String path, String rootDir) {
         if (!path.startsWith(rootDir)) throw new IllegalStateException("File not starting with root dir!");
-        String lineSep = System.getProperty("file.separator");
+        String[] fileSeps = new String[] { System.getProperty("file.separator"), "/" };
         String relPath = path.substring(rootDir.length());
-        if (relPath.startsWith(lineSep)) {
-            relPath = relPath.substring(1);
+        for (String fileSep : fileSeps) {
+            if (relPath.startsWith(fileSep)) {
+                relPath = relPath.substring(1);
+            }
+            relPath = relPath.replace(fileSep, ".");
         }
-        return relPath.replace(lineSep, ".");
+        return relPath;
+
     }
 }
