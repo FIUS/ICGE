@@ -28,4 +28,31 @@ public class Presets {
 
         return ed;
     }
+    
+    /**
+     * This function generates an Editor with a array defined map with coins.
+     * A -1 in a Cell indicates a wall
+     * A 0 indicates nothing
+     * And 1 upwords indicates the number of coins in that field.
+     *  
+     * @param map the array containing a predefined map
+     * @return returns an Editor to add further work on a map
+     */
+    public static Editor loadFromArray(int[][] map) {
+        Editor ed = new Editor(new Territory());
+        
+        for (int y = 0; y < map.length; y++) {
+            for (int x = 0; x < map[y].length; x++) {
+                if (map[y][x] == -1) {
+                    ed.add(EntityType.WALL, x, y);
+                } else if (map[y][x] > 0) {
+                    for (int i = 0; i < map[y][x]; i++) {
+                        ed.add(EntityType.COIN, x, y);
+                    }
+                }
+            }
+        }
+        
+        return ed;
+    }
 }
