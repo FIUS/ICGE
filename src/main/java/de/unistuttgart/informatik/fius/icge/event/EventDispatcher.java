@@ -7,12 +7,14 @@
 
 package de.unistuttgart.informatik.fius.icge.event;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 public class EventDispatcher {
     
     private static ArrayList<Listening> _listenings = new ArrayList<>();
-    private static ArrayList<EventListener> _toRemove = new ArrayList<>();
+    private static ArrayDeque<Runnable> _afterwards = new ArrayDeque<>();
+    private static int _raiseRecursionDepth = 0;
     
     public static synchronized EventListener addListener(Class<?> listensFor, EventListener listener) {
         if (!Event.class.isAssignableFrom(listensFor)) throw new IllegalArgumentException();
@@ -21,25 +23,45 @@ public class EventDispatcher {
     }
     
     public static synchronized boolean removeListener(EventListener listener) {
-        if (_listenings.stream().filter(entry -> entry.listener == listener).findFirst().isPresent()) {
-            _toRemove.add(listener);
-            return true;
-        } else
-            return false;
+        return _listenings.removeIf(entry -> entry.listener == listener);
     }
     
-    public static synchronized void raise(Event e) {
-        for (EventListener listener : _toRemove) {
-            _listenings.removeIf(entry -> entry.listener == listener);
+    public static synchronized void raise(Event e) throws RaiseAlreadyActive {
+        if (_raiseRecursionDepth != 0) {
+            throw new RaiseAlreadyActive(); // recursive raise is not supported for now
         }
-        _toRemove.clear();
-        for (Listening entry : _listenings) {
-            if (entry.listensFor.isAssignableFrom(e.getClass())) {
-                if (!entry.listener.handle(e)) {
-                    removeListener(entry.listener);
+
+        // actual event hadling
+        ++_raiseRecursionDepth;
+        try {
+            for (Listening entry : new ArrayList<>(_listenings)) { // new list cause it might get modified concurrently
+                if (entry.listensFor.isAssignableFrom(e.getClass())) {
+                    if (!entry.listener.handle(e)) {
+                        removeListener(entry.listener);
+                    }
                 }
             }
         }
+        finally {
+            --_raiseRecursionDepth;
+        }
+
+        // Call runnables that have been scheduled to be called after the event handling
+        while (!_afterwards.isEmpty()) {
+            _afterwards.pop().run();
+        }
+    }
+
+    /**
+     * Schedules a runnable that is run synchronously after the handling of the next event.
+     * If an `EventHandler.raise()` call is currently active (i.e. an event is currently handled)
+     * AND this method is called from the same thread where that event is raised (and handled) in,
+     * the runnable is run after the handling of that event.
+     * @param rn
+     *            The runnable to schedule
+     */
+    public static synchronized void afterwards(Runnable rn) {
+        _afterwards.add(rn);
     }
     
     private static class Listening {
@@ -51,4 +73,11 @@ public class EventDispatcher {
         public final Class<?> listensFor;
         public final EventListener listener;
     }
+
+    // Exceptions
+
+    public static class RaiseAlreadyActive extends RuntimeException {
+        private static final long serialVersionUID = 7713141366627046771L;
+    }
+
 }

@@ -38,6 +38,7 @@ public class SimulationController {
     private final JButton playButton;
 
     private final JButton stepButton;
+    private int _pendingSteps = 0;
 
     private final Image playImage;
     private final Image pauseImage;
@@ -73,8 +74,9 @@ public class SimulationController {
         this.updatePlayButton(false);
 
         EventDispatcher.addListener(SetSimulationEvent.class, this::handleSetSimulation);
-        EventDispatcher.addListener(PauseEvent.class, this::setPaused);
-        EventDispatcher.addListener(ResumeEvent.class, this::setRunning);
+        EventDispatcher.addListener(EntityEvent.class, this::handleEntityEvent);
+        EventDispatcher.addListener(PauseEvent.class, this::handlePause);
+        EventDispatcher.addListener(ResumeEvent.class, this::handleResume);
     }
 
     private boolean handleSetSimulation(Event ev) {
@@ -89,7 +91,21 @@ public class SimulationController {
         return true;
     }
 
-    private boolean setRunning(Event ev) {
+    private boolean handleEntityEvent(Event ev) {
+        WorkbenchView view = this._view.get();
+        if (view == null) return false;
+        synchronized (this) {
+            Simulation sim = view.simulation();
+            if (sim == null || this._pendingSteps == 0) return true;
+            --this._pendingSteps;
+            if (this._pendingSteps == 0) {
+                EventDispatcher.afterwards(sim::pause);
+            }
+        }
+        return true;
+    }
+    
+    private boolean handleResume(Event ev) {
         WorkbenchView view = this._view.get();
         if (view == null) {
             return false; // Unregister in case the view doesn't exist anymore
@@ -99,7 +115,7 @@ public class SimulationController {
         return true;
     }
 
-    private boolean setPaused(Event ev) {
+    private boolean handlePause(Event ev) {
         WorkbenchView view = this._view.get();
         if (view == null) {
             return false; // Unregister in case the view doesn't exist anymore
@@ -109,13 +125,14 @@ public class SimulationController {
         return true;
     }
 
-    private void updatePlayButton(boolean isRunning) {
+    private synchronized void updatePlayButton(boolean isRunning) {
         if (isRunning) {
             if (this.pauseImage != null) {
                 this.playButton.setIcon(new ImageIcon(this.pauseImage));
             }
             this.playButton.setToolTipText("Pause simulation");
         } else {
+            this._pendingSteps = 0; // if something pauses the simulation, we wanna drop pending steps
             if (this.playImage != null) {
                 this.playButton.setIcon(new ImageIcon(this.playImage));
             }
@@ -123,28 +140,33 @@ public class SimulationController {
         }
     }
 
-    private void playButtonPressed(ActionEvent e) {
+    private synchronized void playButtonPressed(ActionEvent e) {
         WorkbenchView view = this._view.get();
         Simulation sim = view == null ? null : view.simulation();
         if (sim == null) return;
-        if (sim.running()) {
-            sim.pause();
-        } else {
-            sim.resume();
+        this._pendingSteps = 0;
+        synchronized (sim) {
+            if (sim.running()) {
+                sim.pause();
+            } else {
+                sim.resume();
+            }
         }
     }
 
-    private void stepButtonPressed(ActionEvent e) {
+    private synchronized void stepButtonPressed(ActionEvent e) {
         WorkbenchView view = this._view.get();
         Simulation sim = view == null ? null : view.simulation();
         if (sim == null) return;
-        if (!sim.running()) {
-            sim.resume();
+        synchronized (sim) {
+            if (sim.running()) {
+                ++this._pendingSteps;
+            }
+            else {
+                this._pendingSteps = 1;
+                sim.resume();
+            }
         }
-        EventDispatcher.addListener(EntityEvent.class, ev -> {
-            sim.pause();
-            return false;
-        });
     }
-    
+
 }

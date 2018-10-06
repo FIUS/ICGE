@@ -239,8 +239,8 @@ public class Simulation {
                 if (!this.sem.tryAcquire()) {
                     this.cancel();
                 }
+                EventDispatcher.afterwards(this.sem::release);
                 Simulation.this.tick();
-                this.sem.release();
             }
         };
         new Timer().schedule(this._timerTask, 10, 10);
