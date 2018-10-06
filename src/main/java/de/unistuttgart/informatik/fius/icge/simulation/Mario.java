@@ -68,9 +68,15 @@ public class Mario extends GreedyEntity {
      */
     @InspectionAttribute
     protected void setCoinCount(int count) {
-        int toAdd = count - this._inventory.size();
-        for (int i = 0; i < toAdd; i++) {
-            this._inventory.add(EntityType.COIN);
+        int diff = count - getCoinCount();
+        if (diff > 0) {
+            for (int i = 0; i < diff; i++) {
+                this._inventory.add(EntityType.COIN);
+            }
+        } else {
+            for (int i = 0; i < -diff; i++) {
+                this._inventory.remove(EntityType.COIN);
+            }
         }
     }
 
