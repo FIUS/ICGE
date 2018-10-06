@@ -7,7 +7,7 @@
 
 package de.unistuttgart.informatik.fius.icge.territory;
 
-import de.unistuttgart.informatik.fius.icge.simulation.EntityType;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 
 public class Editor {
@@ -26,12 +26,12 @@ public class Editor {
         this._tty = this._tty.add(wob);
     }
     
-    public void add(EntityType type, int column, int row, Direction direction) {
-        this.add(new WorldObject(type, column, row, direction));
+    public void add(EntityState state, int column, int row, Direction direction) {
+        this.add(new WorldObject(state, column, row, direction));
     }
     
-    public void add(EntityType type, int column, int row) {
-        this.add(type, column, row, Direction.EAST);
+    public void add(EntityState state, int column, int row) {
+        this.add(state, column, row, Direction.EAST);
     }
     
     public void clear() {
@@ -42,11 +42,11 @@ public class Editor {
         this._tty = this._tty.removeIf(wob -> (wob.column == column) && (wob.row == row));
     }
     
-    public void clear(EntityType type) {
-        this._tty = this._tty.removeIf(wob -> wob.type == type);
+    public void clear(Class<? extends EntityState> cls) {
+        this._tty = this._tty.removeIf(wob -> wob.state.getClass() == cls);
     }
     
-    public void clear(EntityType type, int column, int row) {
-        this._tty = this._tty.removeIf(wob -> (wob.type == type) && (wob.column == column) && (wob.row == row));
+    public void clear(Class<? extends EntityState> cls, int column, int row) {
+        this._tty = this._tty.removeIf(wob -> (wob.state.getClass() == cls) && (wob.column == column) && (wob.row == row));
     }
 }

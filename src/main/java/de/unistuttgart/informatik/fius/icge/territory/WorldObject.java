@@ -13,39 +13,30 @@ import de.unistuttgart.informatik.fius.icge.simulation.*;
 
 public class WorldObject implements Comparable<WorldObject> {
 
-    public final EntityType type;
+    public final EntityState state;
     public final int column;
     public final int row;
     public final Direction direction;
     public final float z;
 
-    public WorldObject(EntityType type, int column, int row, float z, Direction direction) {
+    public WorldObject(EntityState state, int column, int row, float z, Direction direction) {
         this.column = column;
         this.row = row;
-        this.type = type;
+        this.state = state;
         this.z = z;
         this.direction = direction;
     }
 
-    public WorldObject(EntityType type, int column, int row, Direction direction) {
-        this(type, column, row, 0, direction);
+    public WorldObject(EntityState state, int column, int row, Direction direction) {
+        this(state, column, row, 0, direction);
     }
 
-    public WorldObject(EntityType type, int column, int row, float z) {
-        this(type, column, row, z, Direction.EAST);
+    public WorldObject(EntityState state, int column, int row, float z) {
+        this(state, column, row, z, Direction.EAST);
     }
 
-    public WorldObject(EntityType type, int column, int row) {
-        this(type, column, row, Direction.EAST);
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (other == null) return false;
-        if (other == this) return true;
-        if (!(other instanceof WorldObject)) return false;
-        WorldObject wob = (WorldObject) other;
-        return wob.type == this.type && wob.column == this.column && wob.row == this.row && wob.direction == this.direction && wob.z == this.z;
+    public WorldObject(EntityState state, int column, int row) {
+        this(state, column, row, Direction.EAST);
     }
 
     /**
@@ -89,12 +80,12 @@ public class WorldObject implements Comparable<WorldObject> {
         if (compareResult == 0) {
             compareResult = this.column - o.column;
         }
-        if (compareResult == 0) {
-            return this.type.compareTo(o.type);
-        }
         if (compareResult < 0) {
             return -1;
         }
-        return 1;
+        if (compareResult > 0) {
+            return 1;
+        }
+        return 0;
     }
 }

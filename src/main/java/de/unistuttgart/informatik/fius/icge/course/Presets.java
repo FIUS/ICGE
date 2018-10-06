@@ -7,7 +7,8 @@
 
 package de.unistuttgart.informatik.fius.icge.course;
 
-import de.unistuttgart.informatik.fius.icge.simulation.EntityType;
+import de.unistuttgart.informatik.fius.icge.simulation.Coin.CoinState;
+import de.unistuttgart.informatik.fius.icge.simulation.Wall.WallState;
 import de.unistuttgart.informatik.fius.icge.territory.Editor;
 import de.unistuttgart.informatik.fius.icge.territory.Territory;
 
@@ -37,13 +38,13 @@ public class Presets {
      */
     public static Editor cage(Editor ed, int width, int height) {
         for (int x = -1; x <= width; ++x) {
-            ed.add(EntityType.WALL, x, -1);
-            ed.add(EntityType.WALL, x, height);
+            ed.add(new WallState(), x, -1);
+            ed.add(new WallState(), x, height);
         }
 
         for (int y = 0; y < height; ++y) {
-            ed.add(EntityType.WALL, -1, y);
-            ed.add(EntityType.WALL, width, y);
+            ed.add(new WallState(), -1, y);
+            ed.add(new WallState(), width, y);
         }
 
         return ed;
@@ -107,10 +108,10 @@ public class Presets {
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
                 if (map[y][x] == -1) {
-                    ed.add(EntityType.WALL, x + offsetX, y + offsetY);
+                    ed.add(new WallState(), x + offsetX, y + offsetY);
                 } else if (map[y][x] > 0) {
                     for (int i = 0; i < map[y][x]; i++) {
-                        ed.add(EntityType.COIN, x + offsetX, y + offsetY);
+                        ed.add(new CoinState(), x + offsetX, y + offsetY);
                     }
                 }
             }

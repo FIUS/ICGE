@@ -7,8 +7,8 @@
 
 package de.unistuttgart.informatik.fius.icge.workbench.tools;
 
-import de.unistuttgart.informatik.fius.icge.simulation.EntityType;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
+import de.unistuttgart.informatik.fius.icge.simulation.Wall.WallState;
 import de.unistuttgart.informatik.fius.icge.territory.Territory;
 
 /**
@@ -54,7 +54,7 @@ public class WallDemolishingTool extends AbstractTool implements AreaTool {
     private Territory internalApply(Territory tty, int x, int y) {
         final int captX = x;
         final int captY = y;
-        return tty.removeIf(wob -> (wob.column == captX) && (wob.row == captY) && (wob.type == EntityType.WALL));
+        return tty.removeIf(wob -> (wob.column == captX) && (wob.row == captY) && (wob.state.getClass() == WallState.class));
     }
     
 }
