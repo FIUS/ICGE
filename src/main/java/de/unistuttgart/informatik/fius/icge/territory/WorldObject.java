@@ -82,12 +82,12 @@ public class WorldObject implements Comparable<WorldObject> {
     @Override
     public int compareTo(WorldObject o) {
         float compareResult = 0;
-        compareResult = this.row - o.row;
+        compareResult = this.z - o.z;
         if (compareResult == 0) {
-            compareResult = this.column - o.column;
+            compareResult = this.row - o.row;
         }
         if (compareResult == 0) {
-            compareResult = this.z - o.z;
+            compareResult = this.column - o.column;
         }
         if (compareResult == 0) {
             return this.type.compareTo(o.type);
