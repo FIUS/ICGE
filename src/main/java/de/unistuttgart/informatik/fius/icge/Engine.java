@@ -74,7 +74,9 @@ public class Engine {
                     try {
                         obj.test();
                     } catch (AssertionError e) {
-                        this._workbench.println("Assertion error!");
+                        this._workbench.println("Test failed!");
+                        this._workbench.println(e.getMessage());
+                        e.printStackTrace();
                     } catch (Exception e) {
                         e.printStackTrace();
                         this._workbench.println(e.toString());
