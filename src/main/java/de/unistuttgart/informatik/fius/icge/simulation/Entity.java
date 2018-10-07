@@ -55,6 +55,10 @@ public abstract class Entity {
         return this.worldObject().row;
     }
 
+    public String toString() {
+        return "<Entity " + this.getClass().getSimpleName() + ">";
+    }
+
     /**
      * Set the row of this entity.
      * 
