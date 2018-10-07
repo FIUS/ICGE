@@ -23,6 +23,12 @@ public abstract class MovableEntity extends Entity {
 
     private final Deque<MoveEvent> _positionStack = new ArrayDeque<>(100);
 
+    /**
+     * Creates a new movable entity in the given simulation
+     * 
+     * @param sim
+     *            The simulation to create the movable entity in.
+     */
     protected MovableEntity(Simulation sim) {
         super(sim);
 
@@ -50,8 +56,10 @@ public abstract class MovableEntity extends Entity {
     /**
      * Move this entity one field in the current direction
      * 
-     * @throws IllegalMove the field is occupied by a solid entity
-     * @throws EntityNotAlive the entity is not spawned or already despawned
+     * @throws IllegalMove
+     *             the field is occupied by a solid entity
+     * @throws EntityNotAlive
+     *             the entity is not spawned or already despawned
      */
     @InspectionMethod
     public void move() throws IllegalMove, EntityNotAlive {
@@ -93,7 +101,8 @@ public abstract class MovableEntity extends Entity {
     /**
      * Turn this entity 90° counterclockwise (meaning 1 step to this entity's left)
      * 
-     * @throws EntityNotAlive the entity is not spawned or already despawned 
+     * @throws EntityNotAlive
+     *             the entity is not spawned or already despawned
      */
     @InspectionMethod
     public void turnLeft() throws EntityNotAlive {
@@ -108,17 +117,16 @@ public abstract class MovableEntity extends Entity {
      * 
      * The first position is the entity's spawn position
      * 
-     * @return
+     * @return The move event for the position
      */
     public MoveEvent firstPosition() {
         return this._positionStack.peekFirst();
     }
 
-
     /**
      * Get the last known position of this entity as a MoveEvent
      * 
-     * @return
+     * @return The move event for the position
      */
     public MoveEvent lastPosition() {
         return this._positionStack.peekLast();
@@ -128,8 +136,8 @@ public abstract class MovableEntity extends Entity {
      * Get the whole position history of this entity as an Iterable for use in a for loop
      * 
      * The iterable starts with this.firstPosition() and ends with this.lastPosition
-     *  
-     * @return
+     * 
+     * @return A iterable of move events
      */
     public Iterable<MoveEvent> positionHistory() {
         return () -> this._positionStack.iterator();
@@ -138,12 +146,14 @@ public abstract class MovableEntity extends Entity {
     // private
 
     /**
-     * Create a new worldobject with the calculated coordinates of one field in 
+     * Create a new world object with the calculated coordinates of one field in
      * front of this entity
-     *  
-     * @return
+     * 
+     * @return The world object that would be when this entity would move now
      * @throws IllegalMove
+     *             When the move is illegal
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
     private WorldObject wobAfterMove() throws IllegalMove, EntityNotAlive {
         WorldObject wob = this.worldObject();
@@ -165,8 +175,8 @@ public abstract class MovableEntity extends Entity {
         }
         int newCol = column;
         int newRow = row;
-        if (this.simulation().territory()
-                .containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && wall.state.isSolid()))
+        if (this.simulation().territory().containsWith(
+                wall -> (wall.column == newCol) && (wall.row == newRow) && wall.state.isSolid()))
             throw new IllegalMove();
         return new WorldObject(wob.state, column, row, 100, wob.direction);
     }
@@ -174,8 +184,9 @@ public abstract class MovableEntity extends Entity {
     /**
      * Create a new WorldObject with the direction after a left turn
      * 
-     * @return
+     * @return The world object that would be when this entity would turn left now
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
     private WorldObject wobAfterTurnLeft() throws EntityNotAlive {
         WorldObject wob = this.worldObject();
@@ -201,6 +212,9 @@ public abstract class MovableEntity extends Entity {
 
     // Exceptions:
 
+    /**
+     * A exception for when a move is illegal
+     */
     public static class IllegalMove extends RuntimeException {
         private static final long serialVersionUID = 6992550372582751611L;
     }
@@ -211,6 +225,14 @@ public abstract class MovableEntity extends Entity {
      * Base class for events from movable entities
      */
     public static abstract class MovableEntityEvent extends EntityEvent {
+        /**
+         * Creates a new movable entity event in the given simulation for the given entity
+         * 
+         * @param sim
+         *            The simulation to create the event in
+         * @param entity
+         *            The simulation to create the event for
+         */
         MovableEntityEvent(Simulation sim, MovableEntity entity) {
             super(sim, entity);
         }
@@ -221,15 +243,41 @@ public abstract class MovableEntity extends Entity {
      */
     public static class MoveEvent extends MovableEntityEvent {
 
+        /** The column the entity moved to. */
         public final int column;
+        /** The row the entity moved to. */
         public final int row;
 
+        /**
+         * Creates a new move event in the given simulation for the given entity signaling the move to the given point.
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         * @param row
+         *            The row the entity moved to.
+         * @param column
+         *            The column the entity moved to.
+         */
         MoveEvent(Simulation sim, MovableEntity entity, int column, int row) {
             super(sim, entity);
             this.row = row;
             this.column = column;
         }
 
+        /**
+         * Creates a new move event in the given simulation for the given entity signaling the move to the point
+         * described in the given world object.
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         * @param wob
+         *            The world object to get the location after the move from
+         * 
+         */
         MoveEvent(Simulation sim, MovableEntity entity, WorldObject wob) {
             super(sim, entity);
             this.row = wob.row;
@@ -241,6 +289,14 @@ public abstract class MovableEntity extends Entity {
      * Event for left turns of an entity
      */
     public static class TurnLeftEvent extends MovableEntityEvent {
+        /**
+         * Creates a new turn left event in the given simulation for the given entity
+         * 
+         * @param sim
+         *            The simulation to create the event in
+         * @param entity
+         *            The simulation to create the event for
+         */
         TurnLeftEvent(Simulation sim, MovableEntity entity) {
             super(sim, entity);
         }

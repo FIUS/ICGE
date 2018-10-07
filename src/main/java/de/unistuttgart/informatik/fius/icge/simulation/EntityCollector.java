@@ -23,26 +23,30 @@ public interface EntityCollector {
      *            The class of entity to collect
      * @return Whether this entity can currently collect such an entity.
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
-    public boolean canCollect(Class<? extends Entity> cls) throws EntityNotAlive;
+    boolean canCollect(Class<? extends Entity> cls) throws EntityNotAlive;
 
     /**
      * Checks whether this entity can currently collect an entity.
      * 
      * @return Whether this entity can currently collect.
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
-    public boolean canCollect() throws EntityNotAlive;
+    boolean canCollect() throws EntityNotAlive;
 
     /**
      * Collect a collectable entity by class
      * 
-     * @param cls class of a collectable entity
-     * @throws CanNotCollectException 
+     * @param cls
+     *            class of a collectable entity
+     * @throws CanNotCollectException
      *             this entity collector can not collect this collectable entity
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
-    public void collect(Class<? extends Entity> cls) throws CanNotCollectException, EntityNotAlive;
+    void collect(Class<? extends Entity> cls) throws CanNotCollectException, EntityNotAlive;
 
     /**
      * Collect a collectable entity with the same coordinates as this entity collector
@@ -50,37 +54,43 @@ public interface EntityCollector {
      * @throws CanNotCollectException
      *             this entity collector can not collect any entity with this coordinates
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
-    public void collect() throws CanNotCollectException, EntityNotAlive;
+    void collect() throws CanNotCollectException, EntityNotAlive;
 
     /**
      * Return if this entity collector can drop an entity of the given class
      * 
-     * @param cls the class of the entity to drop
-     * @return 
-     *             true iff the entity collector can drop entities of this class 
-     *             and currently holds an entity of this class
+     * @param cls
+     *            the class of the entity to drop
+     * @return
+     *         true iff the entity collector can drop entities of this class
+     *         and currently holds an entity of this class
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
-    public boolean canDrop(Class<? extends Entity> cls) throws EntityNotAlive;
+    boolean canDrop(Class<? extends Entity> cls) throws EntityNotAlive;
 
     /**
      * Drop an entity of the given class
-     *  
+     * 
      * @param cls
-     * @throws CanNotDropException 
+     *            The type of entity to drop
+     * @throws CanNotDropException
      *             if canDrop(cls) == false
-     * @throws EntityNotAlive 
+     * @throws EntityNotAlive
+     *             When the entity is not alive
      */
-    public void drop(Class<? extends Entity> cls) throws CanNotDropException, EntityNotAlive;
+    void drop(Class<? extends Entity> cls) throws CanNotDropException, EntityNotAlive;
 
     /**
      * Try to collect a collectable entity with the given class
      * 
      * @param cls
+     *            The type of entity to try to collect
      * @return true iff entity was collected
      */
-    default public boolean tryCollect(Class<? extends Entity> cls) {
+    default boolean tryCollect(Class<? extends Entity> cls) {
         try {
             this.collect(cls);
             return true;
@@ -94,7 +104,7 @@ public interface EntityCollector {
      * 
      * @return true iff entity was collected
      */
-    default public boolean tryCollect() {
+    default boolean tryCollect() {
         try {
             this.collect();
             return true;
@@ -107,9 +117,10 @@ public interface EntityCollector {
      * Try to drop a collectable entity with the given class
      * 
      * @param cls
+     *            The type of entity to try to drop
      * @return true iff entity was dropped
      */
-    default public boolean tryDrop(Class<? extends Entity> cls) {
+    default boolean tryDrop(Class<? extends Entity> cls) {
         try {
             this.drop(cls);
             return true;
@@ -128,7 +139,7 @@ public interface EntityCollector {
          * generated
          */
         private static final long serialVersionUID = 4812373675702003596L;
-        
+
         /**
          * Constructs a new runtime exception with {@code null} as its
          * detail message. The cause is not initialized, and may subsequently be
@@ -137,7 +148,7 @@ public interface EntityCollector {
         public CanNotCollectException() {
             super();
         }
-        
+
         /**
          * Constructs a new runtime exception with the specified detail message.
          * The cause is not initialized, and may subsequently be initialized by a
@@ -150,7 +161,7 @@ public interface EntityCollector {
         public CanNotCollectException(String message) {
             super(message);
         }
-        
+
         /**
          * Constructs a new runtime exception with the specified detail message and
          * cause.
@@ -172,7 +183,7 @@ public interface EntityCollector {
         public CanNotCollectException(String message, Throwable cause) {
             super(message, cause);
         }
-        
+
         /**
          * Constructs a new runtime exception with the specified cause and a
          * detail message of <tt>(cause==null ? null : cause.toString())</tt>
@@ -190,7 +201,7 @@ public interface EntityCollector {
         public CanNotCollectException(Throwable cause) {
             super(cause);
         }
-        
+
         /**
          * Constructs a new runtime exception with the specified detail
          * message, cause, suppression enabled or disabled, and writable
@@ -210,24 +221,25 @@ public interface EntityCollector {
          *
          * @since 1.7
          */
-        protected CanNotCollectException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        protected CanNotCollectException(String message, Throwable cause, boolean enableSuppression,
+                boolean writableStackTrace) {
             super(message, cause, enableSuppression, writableStackTrace);
         }
-        
+
     }
-    
+
     /**
      * A exception thrown when it is impossible for an object to drop a entity.
      * 
      * @author neumantm
      */
     public class CanNotDropException extends RuntimeException {
-        
+
         /**
          * generated
          */
         private static final long serialVersionUID = 1616122776622736935L;
-        
+
         /**
          * Constructs a new runtime exception with {@code null} as its
          * detail message. The cause is not initialized, and may subsequently be
@@ -236,7 +248,7 @@ public interface EntityCollector {
         public CanNotDropException() {
             super();
         }
-        
+
         /**
          * Constructs a new runtime exception with the specified detail message.
          * The cause is not initialized, and may subsequently be initialized by a
@@ -249,7 +261,7 @@ public interface EntityCollector {
         public CanNotDropException(String message) {
             super(message);
         }
-        
+
         /**
          * Constructs a new runtime exception with the specified detail message and
          * cause.
@@ -271,7 +283,7 @@ public interface EntityCollector {
         public CanNotDropException(String message, Throwable cause) {
             super(message, cause);
         }
-        
+
         /**
          * Constructs a new runtime exception with the specified cause and a
          * detail message of <tt>(cause==null ? null : cause.toString())</tt>
@@ -289,7 +301,7 @@ public interface EntityCollector {
         public CanNotDropException(Throwable cause) {
             super(cause);
         }
-        
+
         /**
          * Constructs a new runtime exception with the specified detail
          * message, cause, suppression enabled or disabled, and writable

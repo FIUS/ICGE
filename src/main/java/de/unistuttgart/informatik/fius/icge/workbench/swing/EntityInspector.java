@@ -7,15 +7,12 @@
 
 package de.unistuttgart.informatik.fius.icge.workbench.swing;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -31,10 +28,10 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
  * Window to inspect and manipulate Entities.
  */
 public class EntityInspector {
-    
+
     private final Set<Class<?>> _editableTypes = new HashSet<>(Arrays.asList(String.class, Integer.TYPE, Integer.class,
             Double.TYPE, Double.class, Float.TYPE, Float.class, Long.TYPE, Long.class, Boolean.TYPE, Boolean.class));
-    
+
     private final InspectionManager _inspectionManager;
     private final Simulation _simulation;
     private JFrame _frame;
@@ -42,46 +39,50 @@ public class EntityInspector {
     private JPanel _attributePanel;
     private JPanel _methodPanel;
     private final List<Entity> _entities;
-    
+
     private JComboBox<String> _entityChooser;
-    
+
     private Entity _selectedEntity;
-    
+
     private List<String> _attributeList;
     private Map<String, JTextArea> _attributeToLabel;
-    
+
     private List<String> _methodList;
     private Map<String, JTextArea> _methodToLabel;
-    
+
     /**
      * Create new entity inspector which chooses from all available entities
      * 
      * @param sim
+     *            The simulation the entity inspector is for
      */
     public EntityInspector(Simulation sim) {
         this._simulation = sim;
         this._entities = sim.entities();
         this._inspectionManager = Engine.getEngine().getInspectionManager();
     }
-    
+
     /**
      * Create new entity inspector which chooses from all available entities in (row, column)
      * 
      * @param sim
+     *            The simulation the entity inspector is for
      * @param row
+     *            The row to choose entities from
      * @param column
+     *            The column to choose entities from
      */
     public EntityInspector(Simulation sim, int row, int column) {
         this._simulation = sim;
         this._entities = sim.entitiesWith(row, column);
         this._inspectionManager = Engine.getEngine().getInspectionManager();
     }
-    
+
     /** Show the entity inspector window */
     public void show() {
         EventQueue.invokeLater(() -> this.initFrame());
     }
-    
+
     /** Build the main frame */
     private void initFrame() {
         this._frame = new JFrame("Entity Inspector");
@@ -93,13 +94,13 @@ public class EntityInspector {
         this.initMainPanel();
         this.initEntitySelector();
     }
-    
+
     private void initMainPanel() {
         this._mainPanel = new JPanel(new GridLayout(2, 1));
         JScrollPane scrollPane = new JScrollPane(this._mainPanel);
         this._frame.getContentPane().add(BorderLayout.CENTER, scrollPane);
     }
-    
+
     private void initEntitySelector() {
         if ((this._entities != null) && (this._entities.size() < 1)) {
             this._frame.getContentPane().add(new JLabel("No Entities..."));
@@ -122,11 +123,12 @@ public class EntityInspector {
         this._frame.getContentPane().add(BorderLayout.NORTH, this._entityChooser);
         this.setEntity(this._entities.get(0));
     }
-    
+
     /**
      * Set the specific entity to inspect
      * 
      * @param ent
+     *            The entity to set
      */
     private void setEntity(Entity ent) {
         this._selectedEntity = ent;
@@ -143,17 +145,17 @@ public class EntityInspector {
         });
         this.updateEntityValues();
     }
-    
+
     private void inspectEntity() {
         if (this._selectedEntity == null) throw new IllegalStateException("Must set entity before inspecting it.");
-        
+
         if (this._attributePanel != null) {
             this._mainPanel.remove(this._attributePanel);
         }
         if (this._methodPanel != null) {
             this._mainPanel.remove(this._methodPanel);
         }
-        
+
         // attributePanel
         List<String> attributeList = new ArrayList<>(this._inspectionManager.getAttributeNamesOfEntity(this._selectedEntity));
         attributeList.sort((a1, a2) -> a1.compareToIgnoreCase(a2));
@@ -181,7 +183,7 @@ public class EntityInspector {
         this._attributePanel = attributePanel;
         this._attributeList = attributeList;
         this._attributeToLabel = attributeToLabel;
-        
+
         // methodPanel
         List<String> methodList = new ArrayList<>(this._inspectionManager.getMethodNamesOfEntity(this._selectedEntity));
         methodList.sort((a1, a2) -> a1.compareToIgnoreCase(a2));
@@ -231,7 +233,7 @@ public class EntityInspector {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         return gbc;
     }
-    
+
     /** Update UI on value changes in entity */
     private void updateEntityValues() {
         for (String attr : this._attributeList) {
@@ -252,7 +254,7 @@ public class EntityInspector {
             userInput = getUserLong("Edit attribute \"" + attr + "\"", "Input new value:");
         } else if (type == Float.TYPE || type == Float.class) {
             userInput = getUserFloat("Edit attribute \"" + attr + "\"", "Input new value:");
-        } else if (type == Double.TYPE || type ==  Double.class) {
+        } else if (type == Double.TYPE || type == Double.class) {
             userInput = getUserDouble("Edit attribute \"" + attr + "\"", "Input new value:");
         } else if (type == String.class) {
             userInput = getUserInput("Edit attribute \"" + attr + "\"", "Input new value:");
@@ -277,7 +279,7 @@ public class EntityInspector {
                 userInput = getUserLong("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
             } else if (type == Float.TYPE || type == Float.class) {
                 userInput = getUserFloat("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
-            } else if (type == Double.TYPE || type ==  Double.class) {
+            } else if (type == Double.TYPE || type == Double.class) {
                 userInput = getUserDouble("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
             } else if (type == String.class) {
                 userInput = getUserInput("Input Parameter \"" + params[i].getName() + "\"", "Input parameter value:");
@@ -302,7 +304,8 @@ public class EntityInspector {
      * Get String representation of object.
      * 
      * @param obj
-     * @return
+     *            The object to get the string representation for
+     * @return The string representation
      */
     private String objectToString(Object obj) {
         if (obj == null) return "null";
@@ -336,7 +339,7 @@ public class EntityInspector {
             return result += "}";
         } else if (obj instanceof Map<?, ?>) {
             String result = "{";
-            ArrayList<String> values = new ArrayList<>(((Map<?,?>) obj).size());
+            ArrayList<String> values = new ArrayList<>(((Map<?, ?>) obj).size());
             for (Object ob : ((Map<?, ?>) obj).keySet()) {
                 values.add(this.objectToString(ob) + ": " + this.objectToString(((Map<?, ?>) obj).get(ob)));
             }
@@ -345,7 +348,7 @@ public class EntityInspector {
         }
         return String.valueOf(obj);
     }
-    
+
     /**
      * Open user input dialog
      * 
@@ -359,7 +362,7 @@ public class EntityInspector {
         String s = JOptionPane.showInputDialog(this._frame, description, title, JOptionPane.PLAIN_MESSAGE);
         return s;
     }
-    
+
     /**
      * Open user input dialog
      * 
@@ -377,7 +380,7 @@ public class EntityInspector {
         } catch (NumberFormatException e) {}
         return new Integer(0);
     }
-    
+
     /**
      * Open user input dialog
      * 
@@ -395,7 +398,7 @@ public class EntityInspector {
         } catch (NumberFormatException e) {}
         return new Long(0);
     }
-    
+
     /**
      * Open user input dialog
      * 
@@ -413,7 +416,7 @@ public class EntityInspector {
         } catch (NumberFormatException e) {}
         return new Float(0);
     }
-    
+
     /**
      * Open user input dialog
      * 
@@ -431,7 +434,7 @@ public class EntityInspector {
         } catch (NumberFormatException e) {}
         return new Double(0);
     }
-    
+
     /**
      * Open user input dialog
      * 

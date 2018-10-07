@@ -23,6 +23,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface InspectionMethod {
-    /** The optional name of the method, to be displayed in the front end. */
+    /** @return The optional name of the method, to be displayed in the front end. */
     String name() default "";
 }

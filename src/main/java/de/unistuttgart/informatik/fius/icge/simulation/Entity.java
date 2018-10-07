@@ -31,6 +31,7 @@ public abstract class Entity {
      * Create a new entity in the given simulation
      * 
      * @param sim
+     *            The simulation to create the entity in
      */
     protected Entity(Simulation sim) {
         this._sim = sim;
@@ -38,26 +39,21 @@ public abstract class Entity {
     }
 
     /**
-     * Get the EntityState object that manages this entity's state
-     * 
-     * @return
+     * @return The EntityState object that manages this entity's state
      */
     public abstract EntityState state();
 
     /**
-     * Get the Simulation object this entity is a part of
-     * 
-     * @return
+     * @return The Simulation object this entity is a part of
      */
     public final Simulation simulation() {
         return this._sim;
     }
 
     /**
-     * Get the current WorldObject of this entity
-     * 
-     * @return
-     * @throws EntityNotAlive only spwaned entities have a world object
+     * @return The current WorldObject of this entity
+     * @throws EntityNotAlive
+     *             only spwaned entities have a world object
      */
     public final WorldObject worldObject() throws EntityNotAlive {
         WorldObject result = this.simulation().worldObject(this);
@@ -90,9 +86,7 @@ public abstract class Entity {
     }
 
     /**
-     * Get the tick the entity waits for for its last move to complete
-     *  
-     * @return
+     * @return The tick the entity waits for for its last move to complete
      */
     public int getMoveEndTick() {
         return this._blockedUntilTick;
@@ -102,7 +96,7 @@ public abstract class Entity {
      * Set the row of this entity.
      * 
      * @param row
-     *            the row
+     *            the row to set
      */
     @InspectionAttribute
     private void setRow(int row) {
@@ -135,21 +129,19 @@ public abstract class Entity {
     }
 
     /**
-     * Get the z value of this entity used to determine the drawing order of 
+     * Get the z value of this entity used to determine the drawing order of
      * entities in the same cell.
-     * 
+     * <p>
      * Entities with higher z are drawn above entities with lower z
-     *   
-     * @return
+     * 
+     * @return The z value of this entity.
      */
     protected float getZ() {
         return 0;
     }
 
     /**
-     * Get the standard delay ticks for actions of this entity
-     * 
-     * @return
+     * @return The standard delay ticks for actions of this entity
      */
     protected int getStandardDelayTicks() {
         return 25;
@@ -159,9 +151,13 @@ public abstract class Entity {
      * Spawn this entity at the given coordinates facing east
      * 
      * @param column
+     *            The column to spawn the entity at
      * @param row
-     * @throws EntityAlreadyAlive the entity is already spawned
-     * @throws CellBlockedBySolidEntity the spawn position is blocked by a solid entity
+     *            The row to spawn the entity at
+     * @throws EntityAlreadyAlive
+     *             the entity is already spawned
+     * @throws CellBlockedBySolidEntity
+     *             the spawn position is blocked by a solid entity
      */
     public void spawn(int column, int row) throws EntityAlreadyAlive, CellBlockedBySolidEntity {
         this.spawn(column, row, Direction.EAST);
@@ -171,10 +167,15 @@ public abstract class Entity {
      * Spawn this entity at the given coordinates with the given direction
      * 
      * @param column
+     *            The column to spawn the entity at
      * @param row
+     *            The row to spawn the entity at
      * @param direction
-     * @throws EntityAlreadyAlive the entity is already spawned
-     * @throws CellBlockedBySolidEntity the spawn position is blocked by a solid entity
+     *            The direction to spawn the entity in
+     * @throws EntityAlreadyAlive
+     *             the entity is already spawned
+     * @throws CellBlockedBySolidEntity
+     *             the spawn position is blocked by a solid entity
      */
     public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedBySolidEntity {
         this.spawnInternal(column, row, direction, false);
@@ -182,6 +183,13 @@ public abstract class Entity {
 
     /**
      * The spawn is performed without a delay, and even if the simulation is paused
+     * 
+     * @param column
+     *            The column to spawn the entity at
+     * @param row
+     *            The row to spawn the entity at
+     * @throws EntityAlreadyAlive
+     *             When the entity is already alive
      */
     public void forceSpawn(int column, int row) throws EntityAlreadyAlive {
         this.forceSpawn(column, row, Direction.EAST);
@@ -189,6 +197,15 @@ public abstract class Entity {
 
     /**
      * The spawn is performed without a delay, and even if the simulation is paused
+     * 
+     * @param column
+     *            The column to spawn the entity at
+     * @param row
+     *            The row to spawn the entity at
+     * @param direction
+     *            The direction to spawn the entity in
+     * @throws EntityAlreadyAlive
+     *             When the entity is already alive
      */
     public void forceSpawn(int column, int row, Direction direction) {
         this.spawnInternal(column, row, direction, true);
@@ -197,7 +214,8 @@ public abstract class Entity {
     /**
      * Despawn this entity
      * 
-     * @throws EntityNotAlive the entity is not spawned
+     * @throws EntityNotAlive
+     *             the entity is not spawned
      */
     @InspectionMethod
     public final void despawn() throws EntityNotAlive {
@@ -206,27 +224,31 @@ public abstract class Entity {
 
     /**
      * The despawn is performed without a delay, and even if the simulation is paused
+     * 
+     * @throws EntityNotAlive
+     *             the entity is not spawned
      */
     public final void forceDespawn() throws EntityNotAlive {
-        despawnInternal(true);
+        this.despawnInternal(true);
     }
 
     /**
      * set the delay in ticks for all actions performed by this entity in the future
-     * 
-     * The delay controls how many ticks the entity is in a blocked/busy state 
+     * <p>
+     * The delay controls how many ticks the entity is in a blocked/busy state
      * after performing an action
      * 
      * @param delay
+     *            The amount of ticks
      */
     public void setDelay(int delay) {
         this._delayTicks = delay;
     }
 
-    /** 
-     * reset delay to standard standard amount of ticks 
+    /**
+     * reset delay to standard standard amount of ticks
      * 
-     * The delay controls how many ticks the entity is in a blocked/busy state 
+     * The delay controls how many ticks the entity is in a blocked/busy state
      * after performing an action
      */
     public void resetDelay() {
@@ -411,12 +433,18 @@ public abstract class Entity {
     /**
      * Internal spawn logic for entities
      * 
-     * @param column
+     ** @param column
+     *            The column to spawn the entity at
      * @param row
+     *            The row to spawn the entity at
      * @param direction
-     * @param force if true perform spawn with delay set to 0
+     *            The direction to spawn the entity in
+     * @param force
+     *            if true perform spawn with delay set to 0
      * @throws EntityAlreadyAlive
+     *             When the entity is already alive
      * @throws CellBlockedBySolidEntity
+     *             When the cell the entity is trying to be spawned in is blocked by a solid entity like a wall
      */
     protected void spawnInternal(int column, int row, Direction direction, boolean force)
             throws EntityAlreadyAlive, CellBlockedBySolidEntity {
@@ -424,7 +452,7 @@ public abstract class Entity {
             if (e.state().isSolid()) throw new CellBlockedBySolidEntity();
         }
 
-        WorldObject wob = new WorldObject(this.state(), column, row, getZ(), direction);
+        WorldObject wob = new WorldObject(this.state(), column, row, this.getZ(), direction);
         SimulationEvent ev = new SpawnEvent(this.simulation(), this, wob);
         this.delayed(() -> {
             if (this.alive()) throw new EntityAlreadyAlive();
@@ -435,7 +463,8 @@ public abstract class Entity {
     /**
      * Internal despawn logic for entities
      * 
-     * @param force if true perform despawn with delay set to 0
+     * @param force
+     *            if true perform despawn with delay set to 0
      */
     protected void despawnInternal(boolean force) {
         SimulationEvent ev = new DespawnEvent(this.simulation(), this);
@@ -448,7 +477,7 @@ public abstract class Entity {
     /**
      * Runs the given runnable after this entity is free
      * 
-     * If (this.simulation().tickCount() >= this._blockedUntilTick)
+     * If (this.simulation().tickCount() {@literal >}= this._blockedUntilTick)
      * the runnable is executed immediately
      * 
      * @param fn
@@ -461,7 +490,7 @@ public abstract class Entity {
     /**
      * Runs the given runnable after this entity is free
      * 
-     * If (this.simulation().tickCount() >= this._blockedUntilTick)
+     * If (this.simulation().tickCount() {@literal >}= this._blockedUntilTick)
      * the runnable is executed immediately
      * 
      * @param fn
@@ -494,14 +523,23 @@ public abstract class Entity {
 
     // Exceptions:
 
+    /**
+     * Exception for when a entity is not alive / not spawned
+     */
     public static class EntityNotAlive extends RuntimeException {
         private static final long serialVersionUID = -21686971924440414L;
     }
 
+    /**
+     * Exception for when a cell is already blocked by a solid entity
+     */
     public static class CellBlockedBySolidEntity extends RuntimeException {
         private static final long serialVersionUID = -7878416133186725145L;
     }
 
+    /**
+     * Exception for when a entity is already alive / spawned
+     */
     public static class EntityAlreadyAlive extends RuntimeException {
         private static final long serialVersionUID = -1865306897160094130L;
     }
@@ -511,10 +549,19 @@ public abstract class Entity {
     /**
      * Base class for all entity related events
      */
-    public static abstract class EntityEvent extends SimulationEvent {
+    public abstract static class EntityEvent extends SimulationEvent {
 
+        /** The entity that caused this event. */
         public final Entity entity;
 
+        /**
+         * Creates a new entity event in the given simulation for the given entity
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         */
         EntityEvent(Simulation sim, Entity entity) {
             super(sim);
             this.entity = entity;
@@ -526,8 +573,21 @@ public abstract class Entity {
      */
     public static class MessageEvent extends EntityEvent {
 
+        /**
+         * The message contained in this event
+         */
         public final String message;
 
+        /**
+         * Creates a new message event in the given simulation for the given entity containing the given message
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         * @param message
+         *            The message to be contained in the event
+         */
         MessageEvent(Simulation sim, Entity entity, String message) {
             super(sim, entity);
             this.message = message;
@@ -540,15 +600,41 @@ public abstract class Entity {
      */
     public static class SpawnEvent extends EntityEvent {
 
+        /** The row the entity was spawned at. */
         public final int row;
+        /** The column the entity was spawned at. */
         public final int column;
 
+        /**
+         * Creates a new spawn event in the given simulation for the given entity signaling the spawn at the given point.
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         * @param row
+         *            The row the entity spawned in
+         * @param column
+         *            The column the entity spawned in
+         */
         SpawnEvent(Simulation sim, Entity entity, int row, int column) {
             super(sim, entity);
             this.row = row;
             this.column = column;
         }
 
+        /**
+         * Creates a new spawn event in the given simulation for the given entity signaling the spawn at the point described in
+         * the given world object.
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         * @param wob
+         *            The world object to get the spawn location from
+         * 
+         */
         SpawnEvent(Simulation sim, Entity entity, WorldObject wob) {
             super(sim, entity);
             this.row = wob.row;
@@ -560,15 +646,41 @@ public abstract class Entity {
      * Teleport event recording target coordinates of this teleport
      */
     public static class TeleportEvent extends EntityEvent {
+        /** The row the entity was teleported to. */
         public final int row;
+        /** The column the entity was teleported to. */
         public final int column;
 
+        /**
+         * Creates a new teleport event in the given simulation for the given entity signaling the teleport to the given point.
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         * @param row
+         *            The row the entity was teleported to.
+         * @param column
+         *            The column the entity was teleported to.
+         */
         TeleportEvent(Simulation sim, Entity entity, int row, int column) {
             super(sim, entity);
             this.row = row;
             this.column = column;
         }
 
+        /**
+         * Creates a new teleport event in the given simulation for the given entity signaling the teleport to the point
+         * described in the given world object.
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         * @param wob
+         *            The world object to get the teleport location from
+         * 
+         */
         TeleportEvent(Simulation sim, Entity entity, WorldObject wob) {
             super(sim, entity);
             this.row = wob.row;
@@ -580,6 +692,14 @@ public abstract class Entity {
      * Despawn event
      */
     public static class DespawnEvent extends EntityEvent {
+        /**
+         * Creates a new despawn event in the given simulation for the given entity
+         * 
+         * @param sim
+         *            The simulation to create the event in.
+         * @param entity
+         *            The entity to create the event for.
+         */
         public DespawnEvent(Simulation sim, Entity entity) {
             super(sim, entity);
         }

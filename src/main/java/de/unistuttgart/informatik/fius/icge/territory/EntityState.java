@@ -19,12 +19,13 @@ public interface EntityState {
      * Creates a new Entity.
      * 
      * @param sim
-     * @return
+     *            The simulation to create the entity in
+     * @return The created entity.
      */
     public Entity createEntity(Simulation sim);
 
     /**
-     * Checks wether the entity is considered  a solid entity.
+     * Checks wether the entity is considered a solid entity.
      * 
      * The default implementation always returns false.
      * 

@@ -22,8 +22,8 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.PauseEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.ResumeEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
-import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
 import de.unistuttgart.informatik.fius.icge.workbench.Workbench.SetSimulationEvent;
+import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
 import de.unistuttgart.informatik.fius.icge.workbench.swing.Images;
 import de.unistuttgart.informatik.fius.icge.workbench.swing.ToolBar;
 
@@ -43,12 +43,13 @@ public class SimulationController {
     private final Image playImage;
     private final Image pauseImage;
 
-
     /**
      * Creates a tool handler.
      * 
      * @param toolBar
      *            The ToolBar to use.
+     * @param view
+     *            The view to use.
      */
     public SimulationController(ToolBar toolBar, WorkbenchView view) {
         this.tb = toolBar;
@@ -67,7 +68,7 @@ public class SimulationController {
         this.playButton.setToolTipText("Simulate unitl next event");
         this.stepButton.setMargin(new Insets(0, 0, 0, 0));
         this.tb.addButton(this.stepButton, -1);
-        
+
         this.playImage = Images.image("play.png");
         this.pauseImage = Images.image("pause.png");
 
@@ -104,7 +105,7 @@ public class SimulationController {
         }
         return true;
     }
-    
+
     private boolean handleResume(Event ev) {
         WorkbenchView view = this._view.get();
         if (view == null) {
@@ -161,8 +162,7 @@ public class SimulationController {
         synchronized (sim) {
             if (sim.running()) {
                 ++this._pendingSteps;
-            }
-            else {
+            } else {
                 this._pendingSteps = 1;
                 sim.resume();
             }

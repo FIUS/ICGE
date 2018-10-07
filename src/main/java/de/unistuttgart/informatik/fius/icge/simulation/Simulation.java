@@ -135,8 +135,12 @@ public class Simulation {
     }
 
     /**
+     * Get all entities in the given row and column
+     * 
      * @param row
+     *            The row the entity must be in
      * @param column
+     *            The column the entity must be in
      * @return all entities in given cell
      */
     public ArrayList<Entity> entitiesWith(int row, int column) {
@@ -147,8 +151,13 @@ public class Simulation {
     }
 
     /**
+     * Get all collectables in the given row and column
+     * 
      * @param row
+     *            The row the collectables must be in
+     * 
      * @param column
+     *            The column the collectables must be in
      * @return all collectable entities in given cell
      */
     public synchronized ArrayList<CollectableEntity> collectablesWith(int row, int column) {
@@ -261,44 +270,100 @@ public class Simulation {
 
     // Events
 
+    /**
+     * A simulation event
+     */
     public static abstract class SimulationEvent implements Event {
-
+        /** The simulation, this event is for. */
         public final Simulation simulation;
 
+        /**
+         * Creates a new simulation event for the given simulation
+         * 
+         * @param sim
+         *            The simulation this event is for
+         */
         SimulationEvent(Simulation sim) {
             this.simulation = sim;
         }
     }
 
+    /**
+     * A event for when the simulation is initialized
+     */
     public static class InitEvent extends SimulationEvent {
+        /**
+         * Creates a new init event for the given simulation
+         * 
+         * @param sim
+         *            The simulation this event is for
+         */
         InitEvent(Simulation sim) {
             super(sim);
         }
     }
 
+    /**
+     * A event for when the simulation is paused
+     */
     public static class PauseEvent extends SimulationEvent {
+        /**
+         * Creates a new pause event for the given simulation
+         * 
+         * @param sim
+         *            The simulation this event is for
+         */
         PauseEvent(Simulation sim) {
             super(sim);
         }
     }
 
+    /**
+     * A event for when the simulation is resumed
+     */
     public static class ResumeEvent extends SimulationEvent {
+        /**
+         * Creates a new resume event for the given simulation
+         * 
+         * @param sim
+         *            The simulation this event is for
+         */
         ResumeEvent(Simulation sim) {
             super(sim);
         }
     }
 
+    /**
+     * A event for when the simulation ticks
+     */
     public static class TickEvent extends SimulationEvent {
-
+        /** The current tick count at the point of this event. */
         public final int tickCount;
 
+        /**
+         * Creates a new tick event for the given simulation with the given tick count
+         * 
+         * @param sim
+         *            The simulation this event is for
+         * @param tickCount
+         *            The current tick count at the point of this event.
+         */
         TickEvent(Simulation sim, int tickCount) {
             super(sim);
             this.tickCount = tickCount;
         }
     }
 
+    /**
+     * A event for when a new territory is set in a simulation
+     */
     public static class SetTerritoryEvent extends SimulationEvent {
+        /**
+         * Creates a new set territory event for the given simulation
+         * 
+         * @param sim
+         *            The simulation this event is for
+         */
         SetTerritoryEvent(Simulation sim) {
             super(sim);
         }
