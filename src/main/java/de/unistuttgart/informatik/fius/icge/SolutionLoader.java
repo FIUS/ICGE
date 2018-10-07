@@ -8,7 +8,6 @@
 package de.unistuttgart.informatik.fius.icge;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,11 +21,11 @@ import de.unistuttgart.informatik.fius.icge.course.TaskTemplate;
  * @author Tim Neumann
  */
 public class SolutionLoader {
-    
+
     private SolutionLoader() {
         //hide constructor
     }
-    
+
     /**
      * Loads all solutions and registers them with the given consumer.
      * 
@@ -39,27 +38,21 @@ public class SolutionLoader {
         List<Class<? extends TaskTemplate>> solutions = ClassFinder
                 .getClassesInClassLoader(SolutionLoader::isValidSolutionClass).stream().map(SolutionLoader::castToCorrectClass)
                 .collect(Collectors.toList());
-        
+
         solutions.sort((cls1, cls2) -> {
-            try {
-                Integer nr1 = (Integer) cls1.getMethod("taskNumber").invoke(null);
-                Integer nr2 = (Integer) cls2.getMethod("taskNumber").invoke(null);
-                if (nr1 < nr2) return -1;
-                if (nr1 > nr2) return 1;
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {}
-            return 0;
+            return cls1.getSimpleName().compareTo(cls2.getSimpleName());
         });
         solutions.forEach(registration);
     }
-    
+
     private static boolean isValidSolutionClass(Class<?> cls) {
         return (TaskTemplate.class.isAssignableFrom(cls) && !Modifier.isAbstract(cls.getModifiers()));
     }
-    
+
     @SuppressWarnings("unchecked")
     private static Class<? extends TaskTemplate> castToCorrectClass(Class<?> cls) {
         if (!isValidSolutionClass(cls)) throw new IllegalArgumentException();
         return (Class<? extends TaskTemplate>) cls;
     }
-    
+
 }
