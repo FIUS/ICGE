@@ -115,7 +115,7 @@ public abstract class MovableEntity extends Entity {
         int newCol = column;
         int newRow = row;
         if (this.simulation().territory()
-                .containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && (wall.state.getClass() == WallState.class)))
+                .containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && wall.state.isSolid()))
             throw new IllegalMove();
         return new WorldObject(wob.state, column, row, 100, wob.direction);
     }

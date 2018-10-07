@@ -16,6 +16,11 @@ public class Coin extends CollectableEntity {
         public Entity createEntity(Simulation sim) {
             return new Coin(sim);
         }
+
+        @Override
+        public boolean isSolid() {
+            return false;
+        }
     }
 
     public Coin(Simulation sim) {
