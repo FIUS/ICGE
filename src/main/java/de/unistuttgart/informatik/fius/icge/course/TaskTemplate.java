@@ -25,10 +25,6 @@ abstract public class TaskTemplate {
         return this._name;
     }
 
-    public static int taskNumber() {
-        return 0;
-    }
-
     /** Has to be implemented by the participants */
     public abstract void solve();
 
