@@ -10,6 +10,7 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 import java.util.ArrayList;
 
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
+import de.unistuttgart.informatik.fius.icge.territory.EntityState;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 
 /**
@@ -19,42 +20,46 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
  */
 public abstract class GreedyEntity extends MovableEntity implements EntityCollector {
 
+    public abstract static class GreedyEntityState implements EntityState {
+        protected final ArrayList<Entity> inventory;
+
+        public GreedyEntityState(ArrayList<Entity> inventory) {
+            this.inventory = inventory;
+        }
+    }
+
     
     @InspectionAttribute(readOnly = true, name = "Inventory")
-    public ArrayList<EntityType> _inventory = new ArrayList<>();
+    protected final ArrayList<Entity> _inventory;
 
-    public GreedyEntity(Simulation sim, EntityType type) {
-        super(sim, type);
+    public GreedyEntity(Simulation sim, ArrayList<Entity> inventory) {
+        super(sim);
+        this._inventory = inventory;
     }
     
-    private boolean canCollectEntity(Entity ent) throws EntityNotAlive {
-        if (!(ent instanceof CollectableEntity) || !ent.worldObject().isSamePos(this.worldObject()))
-            return false;
-        EntityType type = ent.type();
-        return this.canCollectType(type);
+    protected boolean canCollectEntity(Entity ent) throws EntityNotAlive {
+        return (ent instanceof CollectableEntity) && canCollectType(ent.getClass()) && ent.worldObject().isSamePos(this.worldObject());
     }
+
+    protected boolean canDropEntity(Entity ent) throws EntityNotAlive {
+        return canDropType(ent.getClass());
+    }
+
+    protected abstract boolean canCollectType(Class<? extends Entity> cls);
+
+    protected abstract boolean canDropType(Class<? extends Entity> cls);
     
     private void collectEntity(CollectableEntity ent) throws EntityNotAlive {
-        EntityType type = ent.worldObject().type;
         ent.despawn();
-        this._inventory.add(type);
-        this.collected(type);
+        this._inventory.add(ent);
+        this.collected(ent);
     }
-    
-    /**
-     * Checks whether this entity can currently collect an entity of the given type
-     * 
-     * @param type
-     *            The type of entity to collect
-     * @return Whether this entity can currently collect.
-     * @throws EntityNotAlive
-     *             When this entity is not alive.
-     */
+
     @Override
-    public boolean canCollect(EntityType type) throws EntityNotAlive {
+    public boolean canCollect(Class<? extends Entity> cls) throws EntityNotAlive {
         synchronized (this.simulation()) {
             for (Entity ent : this.simulation().entities()) {
-                if ((ent.worldObject().type == type) && canCollectEntity(ent)) return true;
+                if ((ent.getClass() == cls) && canCollectEntity(ent)) return true;
             }
         }
         return false;
@@ -78,10 +83,10 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     }
     
     @Override
-    public void collect(EntityType type) throws CanNotCollectException, EntityNotAlive {
+    public void collect(Class<? extends Entity> cls) throws CanNotCollectException, EntityNotAlive {
         this.delayed(() -> {
             for (Entity ent : this.simulation().entities()) {
-                if ((ent.worldObject().type == type) && canCollectEntity(ent)) {
+                if ((ent.getClass() == cls) && canCollectEntity(ent)) {
                     this.collectEntity((CollectableEntity) ent);
                     return;
                 }
@@ -104,56 +109,46 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     }
 
     @Override
-    public boolean canDrop(EntityType type) throws EntityNotAlive {
+    public boolean canDrop(Class<? extends Entity> cls) throws EntityNotAlive {
         if (!this.alive()) throw new EntityNotAlive();
-        return this.canDropType(type) && this._inventory.contains(type);
+        for (Entity ent : this._inventory) {
+            if (ent.getClass() == cls && this.canDropEntity(ent)) return true;
+        }
+        return false;
     }
     @Override
-    public void drop(EntityType type) throws CanNotDropException, EntityNotAlive {
+    public void drop(Class<? extends Entity> cls) throws CanNotDropException, EntityNotAlive {
         this.delayed(() -> {
-            if (!this.canDrop(type)) throw new CanNotDropException();
-            this._inventory.remove(type);
-            WorldObject wob = this.worldObject();
-            type.createEntity(this.simulation()).spawn(wob.column, wob.row);
-            this.dropped(type);
+            for (Entity ent : this._inventory) {
+                if (ent.getClass() == cls && this.canDropEntity(ent)) {
+                    this._inventory.remove(ent);
+                    WorldObject wob = this.worldObject();
+                    ent.spawn(wob.column, wob.row);
+                    this.dropped(ent);
+                    return;
+                }
+            }
+            throw new CanNotDropException();
         });
     }
     
     /**
-     * Checks whether an entity of the given type can be collected by the instance, in general.
-     * 
-     * @param type
-     *            The type that should be collected
-     * @return Whether the entity can be collected
-     */
-    abstract boolean canCollectType(EntityType type);
-    
-    /**
      * Informs the instance that a CollectableEntity has been collected. This method exists to be overriden.
      * 
-     * @param type
-     *            The type of collected entity
+     * @param ent
+     *            The entity that has been collected
      */
-    void collected(EntityType type) {
+    void collected(Entity ent) {
         // default implementation: do nothing
     }
     
     /**
-     * Checks whether an entity of the given type can be dropped by the instance, in general.
-     * 
-     * @param type
-     *            The type of entity that should be dropped
-     * @return Whether the entity can be dropped
-     */
-    abstract boolean canDropType(EntityType type);
-    
-    /**
      * Informs the instance that a CollectableEntity has been dropped. This method exists to be overriden.
      * 
-     * @param type
-     *            The type of the dropped entity
+     * @param ent
+     *            The dropped entity
      */
-    void dropped(EntityType type) {
+    void dropped(Entity ent) {
         // default implementation: do nothing
     }
 }

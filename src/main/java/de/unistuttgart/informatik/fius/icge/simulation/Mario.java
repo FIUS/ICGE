@@ -7,8 +7,11 @@
 
 package de.unistuttgart.informatik.fius.icge.simulation;
 
+import java.util.ArrayList;
+
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMethod;
+import de.unistuttgart.informatik.fius.icge.territory.EntityState;
 
 /**
  * A mario entity
@@ -17,6 +20,18 @@ import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMeth
  */
 public class Mario extends GreedyEntity {
 
+    public static class MarioState extends GreedyEntityState {
+        public MarioState(ArrayList<Entity> inventory) {
+            super(inventory);
+        }
+
+        @Override
+        public Entity createEntity(Simulation sim) {
+            // This line only works as long as mario can only collect coins
+            return new Mario(sim, this.inventory.size());
+        }
+    }
+
     /**
      * Creates a new mario with in given simulation
      * 
@@ -24,7 +39,7 @@ public class Mario extends GreedyEntity {
      *            The simulation for the new mario.
      */
     public Mario(Simulation sim) {
-        super(sim, EntityType.MARIO);
+        super(sim, new ArrayList<>());
     }
 
     /**
@@ -36,18 +51,23 @@ public class Mario extends GreedyEntity {
      *            The initial count of coins of mario.
      */
     public Mario(Simulation sim, int coinCount) {
-        super(sim, EntityType.MARIO);
+        this(sim);
         setCoinCount(coinCount);
     }
 
     @Override
-    public boolean canCollectType(EntityType type) {
-        return type == EntityType.COIN;
+    public EntityState state() {
+        return new MarioState(this._inventory);
     }
 
     @Override
-    public boolean canDropType(EntityType type) {
-        return type == EntityType.COIN;
+    protected boolean canCollectType(Class<? extends Entity> cls) {
+        return cls == Coin.class;
+    }
+
+    @Override
+    protected boolean canDropType(Class<? extends Entity> cls) {
+        return cls == Coin.class;
     }
 
     /**
@@ -71,11 +91,12 @@ public class Mario extends GreedyEntity {
         int diff = count - getCoinCount();
         if (diff > 0) {
             for (int i = 0; i < diff; i++) {
-                this._inventory.add(EntityType.COIN);
+                this._inventory.add(new Coin(simulation()));
             }
         } else {
             for (int i = 0; i < -diff; i++) {
-                this._inventory.remove(EntityType.COIN);
+                int lastIndex = this._inventory.size() - 1;
+                this._inventory.remove(lastIndex);
             }
         }
     }
@@ -86,14 +107,14 @@ public class Mario extends GreedyEntity {
      * @return Whether mario can collect a coin.
      */
     public boolean canCollectCoin() {
-        return this.canCollect(EntityType.COIN);
+        return this.canCollect(Coin.class);
     }
 
     /**
      * Collect a coin.
      */
     public void collectCoin() {
-        this.collect(EntityType.COIN);
+        this.collect(Coin.class);
     }
 
     /**
@@ -103,7 +124,7 @@ public class Mario extends GreedyEntity {
      */
     @InspectionMethod(name = "collectCoin")
     public boolean tryCollectCoin() {
-        return this.tryCollect(EntityType.COIN);
+        return this.tryCollect(Coin.class);
     }
 
     /**
@@ -112,14 +133,14 @@ public class Mario extends GreedyEntity {
      * @return Whether mario can collect a coin.
      */
     public boolean canDropCoin() {
-        return this.canDrop(EntityType.COIN);
+        return this.canDrop(Coin.class);
     }
 
     /**
      * Drop a coin.
      */
     public void dropCoin() {
-        this.drop(EntityType.COIN);
+        this.drop(Coin.class);
     }
 
     /**
@@ -129,7 +150,7 @@ public class Mario extends GreedyEntity {
      */
     @InspectionMethod(name = "dropCoin")
     public boolean tryDropCoin() {
-        return this.tryDrop(EntityType.COIN);
+        return this.tryDrop(Coin.class);
     }
 
 }

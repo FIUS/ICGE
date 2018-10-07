@@ -12,6 +12,7 @@ import java.util.Deque;
 
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Wall.WallState;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMethod;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
@@ -20,8 +21,8 @@ public abstract class MovableEntity extends Entity {
 
     private final Deque<MoveEvent> _positionStack = new ArrayDeque<>(100);
 
-    protected MovableEntity(Simulation sim, EntityType type) {
-        super(sim, type);
+    protected MovableEntity(Simulation sim) {
+        super(sim);
 
         EventDispatcher.addListener(SpawnEvent.class, ev -> {
             SpawnEvent se = (SpawnEvent) ev;
@@ -114,9 +115,9 @@ public abstract class MovableEntity extends Entity {
         int newCol = column;
         int newRow = row;
         if (this.simulation().territory()
-                .containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && (wall.type == EntityType.WALL)))
+                .containsWith(wall -> (wall.column == newCol) && (wall.row == newRow) && (wall.state.getClass() == WallState.class)))
             throw new IllegalMove();
-        return new WorldObject(wob.type, column, row, 100, wob.direction);
+        return new WorldObject(wob.state, column, row, 100, wob.direction);
     }
 
     private WorldObject wobAfterTurnLeft() throws EntityNotAlive {
@@ -138,7 +139,7 @@ public abstract class MovableEntity extends Entity {
             default:
                 dir = Direction.EAST;
         }
-        return new WorldObject(wob.type, wob.column, wob.row, 100, dir);
+        return new WorldObject(wob.state, wob.column, wob.row, 100, dir);
     }
 
     // Exceptions:

@@ -17,15 +17,15 @@ import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityNotAlive;
 public interface EntityCollector {
 
     /**
-     * Checks whether this entity can currently collect an entity of the given type
+     * Checks whether this entity can currently collect an entity of the given class
      * 
-     * @param type
-     *            The type of entity to collect
-     * @return Whether this entity can currently collect.
+     * @param cls
+     *            The class of entity to collect
+     * @return Whether this entity can currently collect such an entity.
      * @throws EntityNotAlive
      *             When this entity is not alive.
      */
-    public boolean canCollect(EntityType type) throws EntityNotAlive;
+    public boolean canCollect(Class<? extends Entity> cls) throws EntityNotAlive;
 
     /**
      * Checks whether this entity can currently collect an entity.
@@ -36,17 +36,17 @@ public interface EntityCollector {
      */
     public boolean canCollect() throws EntityNotAlive;
 
-    public void collect(EntityType type) throws CanNotCollectException, EntityNotAlive;
+    public void collect(Class<? extends Entity> cls) throws CanNotCollectException, EntityNotAlive;
 
     public void collect() throws CanNotCollectException, EntityNotAlive;
 
-    public boolean canDrop(EntityType type) throws EntityNotAlive;
+    public boolean canDrop(Class<? extends Entity> cls) throws EntityNotAlive;
 
-    public void drop(EntityType type) throws CanNotDropException, EntityNotAlive;
+    public void drop(Class<? extends Entity> cls) throws CanNotDropException, EntityNotAlive;
 
-    default public boolean tryCollect(EntityType type) {
+    default public boolean tryCollect(Class<? extends Entity> cls) {
         try {
-            this.collect(type);
+            this.collect(cls);
             return true;
         } catch (CanNotCollectException | EntityNotAlive e) {
             return false;
@@ -62,9 +62,9 @@ public interface EntityCollector {
         }
     }
 
-    default public boolean tryDrop(EntityType type) {
+    default public boolean tryDrop(Class<? extends Entity> cls) {
         try {
-            this.drop(type);
+            this.drop(cls);
             return true;
         } catch (CanNotDropException | EntityNotAlive e) {
             return false;

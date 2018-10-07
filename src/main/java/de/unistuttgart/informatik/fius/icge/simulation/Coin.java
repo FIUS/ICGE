@@ -7,11 +7,26 @@
 
 package de.unistuttgart.informatik.fius.icge.simulation;
 
+import de.unistuttgart.informatik.fius.icge.territory.EntityState;
+
 public class Coin extends CollectableEntity {
-    public Coin(Simulation sim) {
-        super(sim, EntityType.COIN);
+
+    public static class CoinState implements EntityState {
+        @Override
+        public Entity createEntity(Simulation sim) {
+            return new Coin(sim);
+        }
     }
-    
+
+    public Coin(Simulation sim) {
+        super(sim);
+    }
+
+    @Override
+    public EntityState state() {
+        return new CoinState();
+    }
+
     @Override
     public int requiredSpace() {
         return 0;

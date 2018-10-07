@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 import de.unistuttgart.informatik.fius.icge.animations.AnimatedTerritory;
-import de.unistuttgart.informatik.fius.icge.simulation.EntityType;
+import de.unistuttgart.informatik.fius.icge.simulation.Wall.WallState;
 import de.unistuttgart.informatik.fius.icge.territory.Territory;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.workbench.tools.ToolHandler;
@@ -142,7 +142,7 @@ public class SimPanel extends JPanel {
             for (int x = this._startCol; x <= this._endCol; ++x) {
                 int captX = x, captY = y;
                 if (!tty.containsWith(wob -> (wob.column == captX) && (wob.row == captY))) {
-                    tty = tty.add(new WorldObject(EntityType.WALL, x, y));
+                    tty = tty.add(new WorldObject(new WallState(), x, y));
                 }
             }
         }
@@ -155,7 +155,7 @@ public class SimPanel extends JPanel {
             for (int x = this._startCol; x <= this._endCol; ++x) {
                 int captX = x, captY = y;
                 Territory oldTty = tty;
-                tty = oldTty.removeIf(wob -> (wob.column == captX) && (wob.row == captY) && (wob.type == EntityType.WALL));
+                tty = oldTty.removeIf(wob -> (wob.column == captX) && (wob.row == captY) && (wob.state.getClass() == WallState.class));
                 if (tty != oldTty) {
                     this.drawImage(x, y, img);
                 }
@@ -209,14 +209,15 @@ public class SimPanel extends JPanel {
         for (int i = 1; i <= wobs.size(); ++i) {
             WorldObject lastWob = nextWob;
             drawWorldObject(lastWob);
-            nextWob = (i == wobs.size()) ? null : wobs.get(i);
-            if (lastWob.equals(nextWob)) {
-                ++drawCount;
+            if (i != wobs.size()) {
+                nextWob = wobs.get(i);
+                if (lastWob.state.getClass() == nextWob.state.getClass() && lastWob.isSamePos(nextWob)) {
+                    ++drawCount;
+                    continue;
+                }
             }
-            else {
-                drawCount(lastWob.column, lastWob.row, drawCount);
-                drawCount = 1;
-            }
+            drawCount(lastWob.column, lastWob.row, drawCount);
+            drawCount = 1;
         }
     }
     

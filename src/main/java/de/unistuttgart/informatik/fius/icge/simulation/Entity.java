@@ -14,28 +14,25 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEven
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.TickEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMethod;
+import de.unistuttgart.informatik.fius.icge.territory.EntityState;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 
 public abstract class Entity {
 
     private final Simulation _sim;
-    private final EntityType _type;
     private int _delayTicks = 25;
     private int _lastMoveTick = Integer.MIN_VALUE;
 
-    protected Entity(Simulation sim, EntityType type) {
+    protected Entity(Simulation sim) {
         this._sim = sim;
-        this._type = type;
         this._delayTicks = this.getStandardDelayTicks();
     }
 
+    public abstract EntityState state();
+
     public final Simulation simulation() {
         return this._sim;
-    }
-
-    public final EntityType type() {
-        return this._type;
     }
 
     public final WorldObject worldObject() throws EntityNotAlive {
@@ -67,7 +64,7 @@ public abstract class Entity {
     @InspectionAttribute
     private void setRow(int row) {
         WorldObject wobOld = this.worldObject();
-        WorldObject wobNew = new WorldObject(wobOld.type, wobOld.column, row, wobOld.z, wobOld.direction);
+        WorldObject wobNew = new WorldObject(wobOld.state, wobOld.column, row, wobOld.z, wobOld.direction);
         this.simulation().setWorldObject(this, wobNew, new TeleportEvent(this._sim, this, wobNew));
     }
 
@@ -90,7 +87,7 @@ public abstract class Entity {
     @InspectionAttribute
     private void setColumn(int column) {
         WorldObject wobOld = this.worldObject();
-        WorldObject wobNew = new WorldObject(wobOld.type, column, wobOld.row, wobOld.z, wobOld.direction);
+        WorldObject wobNew = new WorldObject(wobOld.state, column, wobOld.row, wobOld.z, wobOld.direction);
         this.simulation().setWorldObject(this, wobNew, new TeleportEvent(this._sim, this, wobNew));
     }
 
@@ -236,7 +233,7 @@ public abstract class Entity {
             if (e instanceof Wall) throw new CellBlockedByWall();
         }
 
-        WorldObject wob = new WorldObject(this.type(), column, row, getZ(), direction);
+        WorldObject wob = new WorldObject(this.state(), column, row, getZ(), direction);
         SimulationEvent ev = new SpawnEvent(this.simulation(), this, wob);
         this.delayed(() -> {
             if (this.alive()) throw new EntityAlreadyAlive();
