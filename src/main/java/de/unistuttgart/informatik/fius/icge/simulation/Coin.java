@@ -9,6 +9,9 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 
 import de.unistuttgart.informatik.fius.icge.territory.EntityState;
 
+/**
+ * Coin collectable entity
+ */
 public class Coin extends CollectableEntity {
 
     public static class CoinState implements EntityState {

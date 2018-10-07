@@ -10,6 +10,9 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 import de.unistuttgart.informatik.fius.icge.territory.EntityState;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 
+/**
+ * Solid entity with the sprite of a wall
+ */
 public class Wall extends Entity {
     public static class WallState implements EntityState {
         public Entity createEntity(Simulation sim) {
@@ -35,7 +38,7 @@ public class Wall extends Entity {
      * @see de.unistuttgart.informatik.fius.icge.simulation.Entity#spawn(int, int, de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction)
      */
     @Override
-    public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
+    public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedBySolidEntity {
         if (!this.simulation().entitiesWith(row, column).isEmpty()) {
             throw new CellNotEmpty();
         }

@@ -64,7 +64,10 @@ public class SimulationAnimator {
             if (se instanceof MovableEntityEvent) {
                 MovableEntityEvent mee = (MovableEntityEvent) se;
                 int begin = mee.simulation.tickCount();
-                int end = begin + sima._delay;
+                int end = mee.entity.getMoveEndTick();
+                if (end < begin) {
+                    end = begin + 1;
+                }
                 WorldObject wob = mee.entity.worldObject();
                 Animation anim = new Animation(begin, end, animationType(mee));
                 nextAnimated.setAnimation(wob, anim);

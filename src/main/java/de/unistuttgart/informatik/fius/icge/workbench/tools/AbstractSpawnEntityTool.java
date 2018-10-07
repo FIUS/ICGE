@@ -7,7 +7,7 @@
 
 package de.unistuttgart.informatik.fius.icge.workbench.tools;
 
-import de.unistuttgart.informatik.fius.icge.simulation.Entity.CellBlockedByWall;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.CellBlockedBySolidEntity;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity;
 import de.unistuttgart.informatik.fius.icge.simulation.Mario;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
@@ -41,7 +41,7 @@ public abstract class AbstractSpawnEntityTool extends AbstractTool {
     public void apply(Simulation sim, int row, int column) {
         try {
             entityToSpawn(sim).forceSpawn(column, row);
-        } catch(CellBlockedByWall e) {
+        } catch(CellBlockedBySolidEntity e) {
             // intentionally do nothing since this was attempted via the GUI
         }
     }

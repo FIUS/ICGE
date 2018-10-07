@@ -20,6 +20,9 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
  */
 public abstract class GreedyEntity extends MovableEntity implements EntityCollector {
 
+    /**
+     * Entity State for greedy entitys managing basic inventory
+     */
     public abstract static class GreedyEntityState implements EntityState {
         protected final ArrayList<Entity> inventory;
 
@@ -33,7 +36,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         }
     }
 
-    
+    /** internal inventory of a greedy entity */
     @InspectionAttribute(readOnly = true, name = "Inventory")
     protected final ArrayList<Entity> _inventory;
 
@@ -42,18 +45,53 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         this._inventory = inventory;
     }
     
+    /**
+     * Internal test if an entity can be collected by this greedy entity
+     * 
+     * @param ent entity to test
+     * @return
+     * @throws EntityNotAlive
+     */
     protected boolean canCollectEntity(Entity ent) throws EntityNotAlive {
         return (ent instanceof CollectableEntity) && canCollectType(ent.getClass()) && ent.worldObject().isSamePos(this.worldObject());
     }
 
+    /**
+     * Internal test if an entity can be dropped by this greedy entity
+     * 
+     * @param ent entity to test
+     * @return
+     * @throws EntityNotAlive
+     */
     protected boolean canDropEntity(Entity ent) throws EntityNotAlive {
         return canDropType(ent.getClass());
     }
 
+    /**
+     * Check if this greedy entity can collect entities of the given class
+     * 
+     * @param cls
+     * @return true iff class can be collected
+     */
     protected abstract boolean canCollectType(Class<? extends Entity> cls);
 
+
+    /**
+     * Check if this greedy entity can drop entities of the given class
+     * 
+     * @param cls
+     * @return true iff class can be dropped
+     */
     protected abstract boolean canDropType(Class<? extends Entity> cls);
     
+    /**
+     * Internal entity collection logic of greedy entity
+     * 
+     * This method handles despawn of the collected entity and inventory management
+     * 
+     * @param ent
+     * @throws EntityNotAlive
+     */
     private void collectEntity(CollectableEntity ent) throws EntityNotAlive {
         ent.despawn();
         this._inventory.add(ent);
@@ -140,6 +178,8 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     /**
      * Informs the instance that a CollectableEntity has been collected. This method exists to be overriden.
      * 
+     * The invenory management is already done in greedy entity!
+     * 
      * @param ent
      *            The entity that has been collected
      */
@@ -149,6 +189,8 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     
     /**
      * Informs the instance that a CollectableEntity has been dropped. This method exists to be overriden.
+     * 
+     * The invenory management is already done in greedy entity!
      * 
      * @param ent
      *            The dropped entity

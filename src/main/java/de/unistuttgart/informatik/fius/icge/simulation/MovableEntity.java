@@ -12,11 +12,13 @@ import java.util.Deque;
 
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
-import de.unistuttgart.informatik.fius.icge.simulation.Wall.WallState;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMethod;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 
+/**
+ * Base class for movable entities
+ */
 public abstract class MovableEntity extends Entity {
 
     private final Deque<MoveEvent> _positionStack = new ArrayDeque<>(100);
@@ -45,6 +47,12 @@ public abstract class MovableEntity extends Entity {
         return 100;
     }
 
+    /**
+     * Move this entity one field in the current direction
+     * 
+     * @throws IllegalMove the field is occupied by a solid entity
+     * @throws EntityNotAlive the entity is not spawned or already despawned
+     */
     @InspectionMethod
     public void move() throws IllegalMove, EntityNotAlive {
         this.delayed(() -> {
@@ -54,6 +62,11 @@ public abstract class MovableEntity extends Entity {
         });
     }
 
+    /**
+     * Check if the entity can move one field in the current direction
+     * 
+     * @return true iff the entity can move
+     */
     public boolean canMove() {
         try {
             this.wobAfterMove();
@@ -63,6 +76,11 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
+    /**
+     * Try to move this entity one field in the current direction
+     * 
+     * @return true iff the entity has moved
+     */
     public boolean tryMove() {
         try {
             this.move();
@@ -72,6 +90,11 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
+    /**
+     * Turn this entity 90° counterclockwise (meaning 1 step to this entity's left)
+     * 
+     * @throws EntityNotAlive the entity is not spawned or already despawned 
+     */
     @InspectionMethod
     public void turnLeft() throws EntityNotAlive {
         SimulationEvent ev = new TurnLeftEvent(this.simulation(), this);
@@ -80,20 +103,48 @@ public abstract class MovableEntity extends Entity {
         });
     }
 
+    /**
+     * Get the first position of this entity as a MoveEvent
+     * 
+     * The first position is the entity's spawn position
+     * 
+     * @return
+     */
     public MoveEvent firstPosition() {
         return this._positionStack.peekFirst();
     }
 
+
+    /**
+     * Get the last known position of this entity as a MoveEvent
+     * 
+     * @return
+     */
     public MoveEvent lastPosition() {
         return this._positionStack.peekLast();
     }
 
+    /**
+     * Get the whole position history of this entity as an Iterable for use in a for loop
+     * 
+     * The iterable starts with this.firstPosition() and ends with this.lastPosition
+     *  
+     * @return
+     */
     public Iterable<MoveEvent> positionHistory() {
         return () -> this._positionStack.iterator();
     }
 
     // private
 
+    /**
+     * Create a new worldobject with the calculated coordinates of one field in 
+     * front of this entity
+     *  
+     * @return
+     * @throws IllegalMove
+     * @throws EntityNotAlive
+     */
     private WorldObject wobAfterMove() throws IllegalMove, EntityNotAlive {
         WorldObject wob = this.worldObject();
         int column = wob.column;
@@ -120,6 +171,12 @@ public abstract class MovableEntity extends Entity {
         return new WorldObject(wob.state, column, row, 100, wob.direction);
     }
 
+    /**
+     * Create a new WorldObject with the direction after a left turn
+     * 
+     * @return
+     * @throws EntityNotAlive
+     */
     private WorldObject wobAfterTurnLeft() throws EntityNotAlive {
         WorldObject wob = this.worldObject();
         Direction dir = wob.direction;
@@ -150,12 +207,18 @@ public abstract class MovableEntity extends Entity {
 
     // Events
 
+    /**
+     * Base class for events from movable entities
+     */
     public static abstract class MovableEntityEvent extends EntityEvent {
         MovableEntityEvent(Simulation sim, MovableEntity entity) {
             super(sim, entity);
         }
     }
 
+    /**
+     * Move event recording the target coordinates of the movable entity
+     */
     public static class MoveEvent extends MovableEntityEvent {
 
         public final int column;
@@ -174,6 +237,9 @@ public abstract class MovableEntity extends Entity {
         }
     }
 
+    /**
+     * Event for left turns of an entity
+     */
     public static class TurnLeftEvent extends MovableEntityEvent {
         TurnLeftEvent(Simulation sim, MovableEntity entity) {
             super(sim, entity);

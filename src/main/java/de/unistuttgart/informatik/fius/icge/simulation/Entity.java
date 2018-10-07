@@ -18,29 +18,58 @@ import de.unistuttgart.informatik.fius.icge.territory.EntityState;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 
+/**
+ * Base class for all entities
+ */
 public abstract class Entity {
 
     private final Simulation _sim;
     private int _delayTicks = 25;
-    private int _lastMoveTick = Integer.MIN_VALUE;
+    private int _blockedUntilTick = Integer.MIN_VALUE;
 
+    /**
+     * Create a new entity in the given simulation
+     * 
+     * @param sim
+     */
     protected Entity(Simulation sim) {
         this._sim = sim;
         this._delayTicks = this.getStandardDelayTicks();
     }
 
+    /**
+     * Get the EntityState object that manages this entity's state
+     * 
+     * @return
+     */
     public abstract EntityState state();
 
+    /**
+     * Get the Simulation object this entity is a part of
+     * 
+     * @return
+     */
     public final Simulation simulation() {
         return this._sim;
     }
 
+    /**
+     * Get the current WorldObject of this entity
+     * 
+     * @return
+     * @throws EntityNotAlive only spwaned entities have a world object
+     */
     public final WorldObject worldObject() throws EntityNotAlive {
         WorldObject result = this.simulation().worldObject(this);
         if (result == null) throw new EntityNotAlive();
         return result;
     }
 
+    /**
+     * Get the alive state of this entity
+     * 
+     * @return true iff the entity is spawned in its simulation
+     */
     public final boolean alive() {
         return this.simulation().entities().contains(this);
     }
@@ -55,8 +84,18 @@ public abstract class Entity {
         return this.worldObject().row;
     }
 
+    @Override
     public String toString() {
         return "<Entity " + this.getClass().getSimpleName() + ">";
+    }
+
+    /**
+     * Get the tick the entity waits for for its last move to complete
+     *  
+     * @return
+     */
+    public int getMoveEndTick() {
+        return this._blockedUntilTick;
     }
 
     /**
@@ -95,19 +134,49 @@ public abstract class Entity {
         this.simulation().setWorldObject(this, wobNew, new TeleportEvent(this._sim, this, wobNew));
     }
 
+    /**
+     * Get the z value of this entity used to determine the drawing order of 
+     * entities in the same cell.
+     * 
+     * Entities with higher z are drawn above entities with lower z
+     *   
+     * @return
+     */
     protected float getZ() {
         return 0;
     }
 
+    /**
+     * Get the standard delay ticks for actions of this entity
+     * 
+     * @return
+     */
     protected int getStandardDelayTicks() {
         return 25;
     }
 
-    public void spawn(int column, int row) throws EntityAlreadyAlive, CellBlockedByWall {
+    /**
+     * Spawn this entity at the given coordinates facing east
+     * 
+     * @param column
+     * @param row
+     * @throws EntityAlreadyAlive the entity is already spawned
+     * @throws CellBlockedBySolidEntity the spawn position is blocked by a solid entity
+     */
+    public void spawn(int column, int row) throws EntityAlreadyAlive, CellBlockedBySolidEntity {
         this.spawn(column, row, Direction.EAST);
     }
 
-    public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedByWall {
+    /**
+     * Spawn this entity at the given coordinates with the given direction
+     * 
+     * @param column
+     * @param row
+     * @param direction
+     * @throws EntityAlreadyAlive the entity is already spawned
+     * @throws CellBlockedBySolidEntity the spawn position is blocked by a solid entity
+     */
+    public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedBySolidEntity {
         this.spawnInternal(column, row, direction, false);
     }
 
@@ -125,6 +194,11 @@ public abstract class Entity {
         this.spawnInternal(column, row, direction, true);
     }
 
+    /**
+     * Despawn this entity
+     * 
+     * @throws EntityNotAlive the entity is not spawned
+     */
     @InspectionMethod
     public final void despawn() throws EntityNotAlive {
         this.despawnInternal(false);
@@ -137,12 +211,24 @@ public abstract class Entity {
         despawnInternal(true);
     }
 
-    /** delay is in simulation ticks */
+    /**
+     * set the delay in ticks for all actions performed by this entity in the future
+     * 
+     * The delay controls how many ticks the entity is in a blocked/busy state 
+     * after performing an action
+     * 
+     * @param delay
+     */
     public void setDelay(int delay) {
         this._delayTicks = delay;
     }
 
-    /** reset delay to standard */
+    /** 
+     * reset delay to standard standard amount of ticks 
+     * 
+     * The delay controls how many ticks the entity is in a blocked/busy state 
+     * after performing an action
+     */
     public void resetDelay() {
         this._delayTicks = this.getStandardDelayTicks();
     }
@@ -161,30 +247,72 @@ public abstract class Entity {
         });
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void print(boolean message) {
         this.print(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void print(byte message) {
         this.print(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void print(short message) {
         this.print(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void print(int message) {
         this.print(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void print(long message) {
         this.print(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void print(float message) {
         this.print(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void print(double message) {
         this.print(String.valueOf(message));
     }
@@ -201,40 +329,99 @@ public abstract class Entity {
         this.print(message + "\n");
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * Adds a newline Character to the end of the message.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void printLn(boolean message) {
         this.printLn(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * Adds a newline Character to the end of the message.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void printLn(byte message) {
         this.printLn(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * Adds a newline Character to the end of the message.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void printLn(short message) {
         this.printLn(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * Adds a newline Character to the end of the message.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void printLn(int message) {
         this.printLn(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * Adds a newline Character to the end of the message.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void printLn(long message) {
         this.printLn(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * Adds a newline Character to the end of the message.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void printLn(float message) {
         this.printLn(String.valueOf(message));
     }
 
+    /**
+     * Generates a Message Event that gets written to the log Panel.
+     * Adds a newline Character to the end of the message.
+     * 
+     * @param message
+     *            The message to print
+     */
     public void printLn(double message) {
         this.printLn(String.valueOf(message));
     }
 
     // protected
 
+    /**
+     * Internal spawn logic for entities
+     * 
+     * @param column
+     * @param row
+     * @param direction
+     * @param force if true perform spawn with delay set to 0
+     * @throws EntityAlreadyAlive
+     * @throws CellBlockedBySolidEntity
+     */
     protected void spawnInternal(int column, int row, Direction direction, boolean force)
-            throws EntityAlreadyAlive, CellBlockedByWall {
+            throws EntityAlreadyAlive, CellBlockedBySolidEntity {
         for (Entity e : this.simulation().entitiesWith(row, column)) {
-            if (e instanceof Wall) throw new CellBlockedByWall();
+            if (e.state().isSolid()) throw new CellBlockedBySolidEntity();
         }
 
         WorldObject wob = new WorldObject(this.state(), column, row, getZ(), direction);
@@ -245,6 +432,11 @@ public abstract class Entity {
         }, force ? 0 : this._delayTicks);
     }
 
+    /**
+     * Internal despawn logic for entities
+     * 
+     * @param force if true perform despawn with delay set to 0
+     */
     protected void despawnInternal(boolean force) {
         SimulationEvent ev = new DespawnEvent(this.simulation(), this);
         this.delayed(() -> {
@@ -254,7 +446,10 @@ public abstract class Entity {
     }
 
     /**
-     * Runs the given runnable after the delay period or immediately
+     * Runs the given runnable after this entity is free
+     * 
+     * If (this.simulation().tickCount() >= this._blockedUntilTick)
+     * the runnable is executed immediately
      * 
      * @param fn
      *            The runnable
@@ -264,16 +459,20 @@ public abstract class Entity {
     }
 
     /**
-     * Runs the given runnable after the delay period or immediately
+     * Runs the given runnable after this entity is free
+     * 
+     * If (this.simulation().tickCount() >= this._blockedUntilTick)
+     * the runnable is executed immediately
      * 
      * @param fn
      *            The runnable
      * @param delay
-     *            Delay in Ticks after which fn is run. Use 0 or negative numbers to instantly run fn
+     *            Delay in Ticks after which the entity is considered busy after executing the runnable.
+     *            Use 0 or negative numbers to instantly run fn regardless of busy state.
      */
     protected synchronized void delayed(Runnable fn, int delay) {
         if (delay > 0) {
-            int thisMoveTick = this._lastMoveTick + delay;
+            int thisMoveTick = this._blockedUntilTick;
             if (this.simulation().tickCount() < thisMoveTick) {
                 Semaphore sem = new Semaphore(0);
                 EventDispatcher.addListener(TickEvent.class, ev -> {
@@ -288,8 +487,8 @@ public abstract class Entity {
             }
         }
         synchronized (this.simulation()) {
+            this._blockedUntilTick = this.simulation().tickCount() + delay;
             fn.run();
-            this._lastMoveTick = this.simulation().tickCount();
         }
     }
 
@@ -299,7 +498,7 @@ public abstract class Entity {
         private static final long serialVersionUID = -21686971924440414L;
     }
 
-    public static class CellBlockedByWall extends RuntimeException {
+    public static class CellBlockedBySolidEntity extends RuntimeException {
         private static final long serialVersionUID = -7878416133186725145L;
     }
 
@@ -309,6 +508,9 @@ public abstract class Entity {
 
     // Events:
 
+    /**
+     * Base class for all entity related events
+     */
     public static abstract class EntityEvent extends SimulationEvent {
 
         public final Entity entity;
@@ -319,6 +521,9 @@ public abstract class Entity {
         }
     }
 
+    /**
+     * Event containing a message from an entity
+     */
     public static class MessageEvent extends EntityEvent {
 
         public final String message;
@@ -330,6 +535,9 @@ public abstract class Entity {
 
     }
 
+    /**
+     * Spawn event recording spawn coordinates of the entity
+     */
     public static class SpawnEvent extends EntityEvent {
 
         public final int row;
@@ -348,6 +556,9 @@ public abstract class Entity {
         }
     }
 
+    /**
+     * Teleport event recording target coordinates of this teleport
+     */
     public static class TeleportEvent extends EntityEvent {
         public final int row;
         public final int column;
@@ -365,6 +576,9 @@ public abstract class Entity {
         }
     }
 
+    /**
+     * Despawn event
+     */
     public static class DespawnEvent extends EntityEvent {
         public DespawnEvent(Simulation sim, Entity entity) {
             super(sim, entity);
