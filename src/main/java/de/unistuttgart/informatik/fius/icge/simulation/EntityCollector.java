@@ -23,7 +23,6 @@ public interface EntityCollector {
      *            The class of entity to collect
      * @return Whether this entity can currently collect such an entity.
      * @throws EntityNotAlive
-     *             When this entity is not alive.
      */
     public boolean canCollect(Class<? extends Entity> cls) throws EntityNotAlive;
 
@@ -32,18 +31,55 @@ public interface EntityCollector {
      * 
      * @return Whether this entity can currently collect.
      * @throws EntityNotAlive
-     *             When this entity is not alive.
      */
     public boolean canCollect() throws EntityNotAlive;
 
+    /**
+     * Collect a collectable entity by class
+     * 
+     * @param cls class of a collectable entity
+     * @throws CanNotCollectException 
+     *             this entity collector can not collect this collectable entity
+     * @throws EntityNotAlive
+     */
     public void collect(Class<? extends Entity> cls) throws CanNotCollectException, EntityNotAlive;
 
+    /**
+     * Collect a collectable entity with the same coordinates as this entity collector
+     * 
+     * @throws CanNotCollectException
+     *             this entity collector can not collect any entity with this coordinates
+     * @throws EntityNotAlive
+     */
     public void collect() throws CanNotCollectException, EntityNotAlive;
 
+    /**
+     * Return if this entity collector can drop an entity of the given class
+     * 
+     * @param cls the class of the entity to drop
+     * @return 
+     *             true iff the entity collector can drop entities of this class 
+     *             and currently holds an entity of this class
+     * @throws EntityNotAlive
+     */
     public boolean canDrop(Class<? extends Entity> cls) throws EntityNotAlive;
 
+    /**
+     * Drop an entity of the given class
+     *  
+     * @param cls
+     * @throws CanNotDropException 
+     *             if canDrop(cls) == false
+     * @throws EntityNotAlive 
+     */
     public void drop(Class<? extends Entity> cls) throws CanNotDropException, EntityNotAlive;
 
+    /**
+     * Try to collect a collectable entity with the given class
+     * 
+     * @param cls
+     * @return true iff entity was collected
+     */
     default public boolean tryCollect(Class<? extends Entity> cls) {
         try {
             this.collect(cls);
@@ -53,6 +89,11 @@ public interface EntityCollector {
         }
     }
 
+    /**
+     * Try to collect a collectable entity with the same coordinates as this entity collector
+     * 
+     * @return true iff entity was collected
+     */
     default public boolean tryCollect() {
         try {
             this.collect();
@@ -62,6 +103,12 @@ public interface EntityCollector {
         }
     }
 
+    /**
+     * Try to drop a collectable entity with the given class
+     * 
+     * @param cls
+     * @return true iff entity was dropped
+     */
     default public boolean tryDrop(Class<? extends Entity> cls) {
         try {
             this.drop(cls);

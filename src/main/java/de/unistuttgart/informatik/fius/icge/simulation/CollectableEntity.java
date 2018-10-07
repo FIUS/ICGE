@@ -10,7 +10,7 @@ package de.unistuttgart.informatik.fius.icge.simulation;
 import de.unistuttgart.informatik.fius.icge.territory.EntityState;
 
 /**
- * A entity which is collectable.
+ * Base class for collectable entities
  * 
  * @author haslersn, neumantm
  */
@@ -19,5 +19,10 @@ public abstract class CollectableEntity extends Entity {
         super(sim);
     }
     
+    /**
+     * Returns the space or weight requirements of this collectable entity
+     * 
+     * @return
+     */
     public abstract int requiredSpace();
 }
