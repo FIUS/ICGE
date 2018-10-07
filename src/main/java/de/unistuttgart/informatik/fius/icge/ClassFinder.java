@@ -44,7 +44,7 @@ public class ClassFinder {
         List<Class<?>> classes = new ArrayList<>();
 
         for (URL url : urls) {
-            if (url.toString().startsWith("jar:")) {
+            if (url.getProtocol().equals("jar")) {
                 loadClassesFromJar(url, filter, classes, loader);
             } else {
                 loadClassesFromFS(url, filter, classes, loader);
@@ -56,10 +56,10 @@ public class ClassFinder {
 
     private static void loadClassesFromJar(URL url, Predicate<Class<?>> filter, List<Class<?>> classes, ClassLoader loader)
             throws IOException {
-        String urlS = url.toString();
-        String outerUrl = urlS.substring(4, urlS.indexOf('!'));
+        String urlS = url.getPath();
+        String outerUrl = urlS.substring(0, urlS.indexOf('!'));
         String innerUrl = urlS.substring(urlS.indexOf('!') + 2);
-        try (JarFile jar = new JarFile(new URL(outerUrl).getFile())) {
+        try (JarFile jar = new JarFile(new File(new URL(outerUrl).toURI()))) {
             List<JarEntry> entries = Collections.list(jar.entries());
             for (JarEntry e : entries) {
                 if (e.getName().endsWith(".class") && e.getName().startsWith(innerUrl)) {
@@ -73,6 +73,8 @@ public class ClassFinder {
             }
         } catch (ClassNotFoundException e1) {
             throw new IOException(e1);
+        } catch (URISyntaxException e2) {
+            throw new IOException(e2);
         }
     }
 
