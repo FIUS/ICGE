@@ -14,7 +14,11 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
  * Solid entity with the sprite of a wall
  */
 public class Wall extends Entity {
+    /**
+     * The entity state for walls
+     */
     public static class WallState implements EntityState {
+        @Override
         public Entity createEntity(Simulation sim) {
             return new Wall(sim);
         }
@@ -25,6 +29,12 @@ public class Wall extends Entity {
         }
     }
 
+    /**
+     * Creates a new wall in the given simulation
+     * 
+     * @param sim
+     *            The simulation to create the wall in
+     */
     public Wall(Simulation sim) {
         super(sim);
     }
@@ -35,17 +45,21 @@ public class Wall extends Entity {
     }
 
     /**
-     * @see de.unistuttgart.informatik.fius.icge.simulation.Entity#spawn(int, int, de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction)
+     * @see de.unistuttgart.informatik.fius.icge.simulation.Entity#spawn(int, int,
+     *      de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction)
      */
     @Override
     public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedBySolidEntity {
         if (!this.simulation().entitiesWith(row, column).isEmpty()) {
             throw new CellNotEmpty();
         }
-        
+
         super.spawn(column, row, direction);
     }
-    
+
+    /**
+     * A exception for when a cell is not empty
+     */
     public static class CellNotEmpty extends RuntimeException {
         private static final long serialVersionUID = -4741977214724813309L;
     }

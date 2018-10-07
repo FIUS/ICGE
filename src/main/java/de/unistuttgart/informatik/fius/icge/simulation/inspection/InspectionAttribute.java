@@ -26,9 +26,9 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ FIELD, METHOD })
 public @interface InspectionAttribute {
-    /** The optional name of the attribute, to be displayed in the front end. */
+    /** @return The optional name of the attribute, to be displayed in the front end. */
     String name() default "";
-    
-    /** Optional argument setting this attribute to read only. */
+
+    /** @return Optional argument setting this attribute to read only. */
     boolean readOnly() default false;
 }

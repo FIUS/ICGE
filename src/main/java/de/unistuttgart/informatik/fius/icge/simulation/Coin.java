@@ -14,6 +14,11 @@ import de.unistuttgart.informatik.fius.icge.territory.EntityState;
  */
 public class Coin extends CollectableEntity {
 
+    /**
+     * The state of a coin.
+     * 
+     * @author haslersn
+     */
     public static class CoinState implements EntityState {
         @Override
         public Entity createEntity(Simulation sim) {
@@ -26,6 +31,12 @@ public class Coin extends CollectableEntity {
         }
     }
 
+    /**
+     * Creates a coin in the given simulation
+     * 
+     * @param sim
+     *            The simulation to create the coin in
+     */
     public Coin(Simulation sim) {
         super(sim);
     }

@@ -20,7 +20,16 @@ import de.unistuttgart.informatik.fius.icge.territory.EntityState;
  */
 public class Mario extends GreedyEntity {
 
+    /**
+     * The entity state of mario
+     */
     public static class MarioState extends GreedyEntityState {
+        /**
+         * Creates a new mario entity state with the given inventory
+         * 
+         * @param inventory
+         *            The inventory for this state.
+         */
         public MarioState(ArrayList<Entity> inventory) {
             super(inventory);
         }

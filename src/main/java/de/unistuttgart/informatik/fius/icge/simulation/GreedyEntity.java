@@ -24,8 +24,15 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * Entity State for greedy entitys managing basic inventory
      */
     public abstract static class GreedyEntityState implements EntityState {
+        /** The inventory of the greedy entity. */
         protected final ArrayList<Entity> inventory;
 
+        /**
+         * Creates a new greedy entity state with the given inventory.
+         * 
+         * @param inventory
+         *            The invetory for the state.
+         */
         public GreedyEntityState(ArrayList<Entity> inventory) {
             this.inventory = inventory;
         }
@@ -40,28 +47,41 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     @InspectionAttribute(readOnly = true, name = "Inventory")
     protected final ArrayList<Entity> _inventory;
 
+    /**
+     * Creates a new greedy entity in the given simulation with the given initial inventory
+     * 
+     * @param sim
+     *            The simulation to create the greedy entity in
+     * @param inventory
+     *            The initial inventory for the greedy entity.
+     */
     public GreedyEntity(Simulation sim, ArrayList<Entity> inventory) {
         super(sim);
         this._inventory = inventory;
     }
-    
+
     /**
      * Internal test if an entity can be collected by this greedy entity
      * 
-     * @param ent entity to test
-     * @return
+     * @param ent
+     *            entity to test
+     * @return Whether the entity can be collected
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
     protected boolean canCollectEntity(Entity ent) throws EntityNotAlive {
-        return (ent instanceof CollectableEntity) && canCollectType(ent.getClass()) && ent.worldObject().isSamePos(this.worldObject());
+        return (ent instanceof CollectableEntity) && canCollectType(ent.getClass())
+                && ent.worldObject().isSamePos(this.worldObject());
     }
 
     /**
      * Internal test if an entity can be dropped by this greedy entity
      * 
-     * @param ent entity to test
-     * @return
+     * @param ent
+     *            entity to test
+     * @return Whether the entity can be dropped
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
     protected boolean canDropEntity(Entity ent) throws EntityNotAlive {
         return canDropType(ent.getClass());
@@ -71,26 +91,29 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
      * Check if this greedy entity can collect entities of the given class
      * 
      * @param cls
+     *            The type of entity to check.
      * @return true iff class can be collected
      */
     protected abstract boolean canCollectType(Class<? extends Entity> cls);
-
 
     /**
      * Check if this greedy entity can drop entities of the given class
      * 
      * @param cls
+     *            The type of entity to check.
      * @return true iff class can be dropped
      */
     protected abstract boolean canDropType(Class<? extends Entity> cls);
-    
+
     /**
      * Internal entity collection logic of greedy entity
      * 
      * This method handles despawn of the collected entity and inventory management
      * 
      * @param ent
+     *            The entity to collect
      * @throws EntityNotAlive
+     *             When the entity is not alive
      */
     private void collectEntity(CollectableEntity ent) throws EntityNotAlive {
         ent.despawn();
@@ -107,7 +130,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         }
         return false;
     }
-    
+
     /**
      * Checks whether this entity can currently collect an entity.
      * 
@@ -124,7 +147,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         }
         return false;
     }
-    
+
     @Override
     public void collect(Class<? extends Entity> cls) throws CanNotCollectException, EntityNotAlive {
         this.delayed(() -> {
@@ -137,7 +160,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
             throw new CanNotCollectException("No such entity.");
         });
     }
-    
+
     @Override
     public void collect() throws CanNotCollectException, EntityNotAlive {
         this.delayed(() -> {
@@ -159,6 +182,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         }
         return false;
     }
+
     @Override
     public void drop(Class<? extends Entity> cls) throws CanNotDropException, EntityNotAlive {
         this.delayed(() -> {
@@ -174,7 +198,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
             throw new CanNotDropException();
         });
     }
-    
+
     /**
      * Informs the instance that a CollectableEntity has been collected. This method exists to be overriden.
      * 
@@ -186,7 +210,7 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
     void collected(Entity ent) {
         // default implementation: do nothing
     }
-    
+
     /**
      * Informs the instance that a CollectableEntity has been dropped. This method exists to be overriden.
      * 
