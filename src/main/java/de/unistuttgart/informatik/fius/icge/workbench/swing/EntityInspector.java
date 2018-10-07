@@ -9,6 +9,8 @@ package de.unistuttgart.informatik.fius.icge.workbench.swing;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -46,10 +48,10 @@ public class EntityInspector {
     private Entity _selectedEntity;
     
     private List<String> _attributeList;
-    private Map<String, JLabel> _attributeToLabel;
+    private Map<String, JTextArea> _attributeToLabel;
     
     private List<String> _methodList;
-    private Map<String, JLabel> _methodToLabel;
+    private Map<String, JTextArea> _methodToLabel;
     
     /**
      * Create new entity inspector which chooses from all available entities
@@ -155,24 +157,26 @@ public class EntityInspector {
         // attributePanel
         List<String> attributeList = new ArrayList<>(this._inspectionManager.getAttributeNamesOfEntity(this._selectedEntity));
         attributeList.sort((a1, a2) -> a1.compareToIgnoreCase(a2));
-        JPanel attributePanel = new JPanel(new GridLayout(attributeList.size(), 3));
+        JPanel attributePanel = new JPanel(new GridBagLayout());
         this._mainPanel.add(attributePanel);
-        Map<String, JLabel> attributeToLabel = new HashMap<>();
+        Map<String, JTextArea> attributeToLabel = new HashMap<>();
+        int y = 0;
         for (final String attr : attributeList) {
             Class<?> type = this._inspectionManager.getAttributeType(this._selectedEntity, attr);
-            attributePanel.add(new JLabel(attr + " (" + type.getSimpleName() + "):"));
-            JLabel valueLabel = new JLabel("", SwingConstants.CENTER);
+            attributePanel.add(new JLabel(attr + " (" + type.getSimpleName() + "):"), this.getCell(0, y, 0));
+            JTextArea valueLabel = new JTextArea();
+            valueLabel.setEditable(false);
+            valueLabel.setLineWrap(true);
             attributeToLabel.put(attr, valueLabel);
-            attributePanel.add(valueLabel);
+            attributePanel.add(valueLabel, this.getCell(1, y, 1));
             if (this._inspectionManager.isAttributeEditable(this._selectedEntity, attr) && this._editableTypes.contains(type)) {
                 JButton attrEditButton = new JButton("edit");
                 attrEditButton.addActionListener(l -> {
                     EventQueue.invokeLater(() -> this.editAttribute(attr));
                 });
-                attributePanel.add(attrEditButton);
-            } else {
-                attributePanel.add(new JPanel());
+                attributePanel.add(attrEditButton, this.getCell(2, y, 0));
             }
+            ++y;
         }
         this._attributePanel = attributePanel;
         this._attributeList = attributeList;
@@ -181,9 +185,10 @@ public class EntityInspector {
         // methodPanel
         List<String> methodList = new ArrayList<>(this._inspectionManager.getMethodNamesOfEntity(this._selectedEntity));
         methodList.sort((a1, a2) -> a1.compareToIgnoreCase(a2));
-        JPanel methodPanel = new JPanel(new GridLayout(methodList.size(), 3));
+        JPanel methodPanel = new JPanel(new GridBagLayout());
         this._mainPanel.add(methodPanel);
-        Map<String, JLabel> methodToLabel = new HashMap<>();
+        Map<String, JTextArea> methodToLabel = new HashMap<>();
+        y = 0;
         for (String method : methodList) {
             Method methodDetail = this._inspectionManager.getMethodDetail(this._selectedEntity, method);
             String methodName = method + "(";
@@ -198,29 +203,39 @@ public class EntityInspector {
             }
             methodName += String.join(", ", params);
             methodName += "): " + methodDetail.getReturnType().getSimpleName();
-            methodPanel.add(new JLabel(methodName));
+            methodPanel.add(new JLabel(methodName), this.getCell(0, y, 0));
             if (paramsArePrimitive) {
                 JButton methodCallButton = new JButton("call");
                 methodCallButton.addActionListener(l -> {
                     EventQueue.invokeLater(() -> this.callMethod(method));
                 });
-                methodPanel.add(methodCallButton);
-            } else {
-                methodPanel.add(new JPanel());
+                methodPanel.add(methodCallButton, this.getCell(1, y, 0));
             }
-            JLabel valueLabel = new JLabel("", SwingConstants.CENTER);
+            JTextArea valueLabel = new JTextArea();
+            valueLabel.setEditable(false);
+            valueLabel.setLineWrap(true);
             methodToLabel.put(method, valueLabel);
-            methodPanel.add(valueLabel);
+            methodPanel.add(valueLabel, this.getCell(2, y, 1));
+            ++y;
         }
         this._methodPanel = methodPanel;
         this._methodList = methodList;
         this._methodToLabel = methodToLabel;
     }
+
+    private GridBagConstraints getCell(int x, int y, double weight) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.weightx = weight;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        return gbc;
+    }
     
     /** Update UI on value changes in entity */
     private void updateEntityValues() {
         for (String attr : this._attributeList) {
-            JLabel valueLabel = this._attributeToLabel.get(attr);
+            JTextArea valueLabel = this._attributeToLabel.get(attr);
             if (valueLabel == null) continue;
             Object value = this._inspectionManager.getAttributeValue(this._selectedEntity, attr);
             valueLabel.setText(this.objectToString(value));
@@ -274,7 +289,7 @@ public class EntityInspector {
         new Thread(() -> {
             try {
                 Object result = this._inspectionManager.invokeMethod(this._selectedEntity, method, parameterValues);
-                JLabel valueLabel = this._methodToLabel.get(method);
+                JTextArea valueLabel = this._methodToLabel.get(method);
                 if (valueLabel != null) {
                     valueLabel.setText(this.objectToString(result));
                 }
@@ -293,6 +308,8 @@ public class EntityInspector {
         if (obj == null) return "null";
         if (obj instanceof String) {
             return "\"" + (String) obj + "\"";
+        } else if (obj instanceof Class<?>) {
+            return "<" + ((Class<?>) obj).getSimpleName() + ">";
         } else if (obj instanceof Array) {
             String result = "[";
             ArrayList<String> values = new ArrayList<>(((Object[]) obj).length);
