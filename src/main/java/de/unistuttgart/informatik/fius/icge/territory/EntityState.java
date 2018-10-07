@@ -16,9 +16,13 @@ public interface EntityState {
     /**
      * Checks wether the entity is considered  a solid entity.
      * 
+     * The default implementation always returns false.
+     * 
      * @return true if entity is solid
      */
-    public boolean isSolid();
+    public default boolean isSolid() {
+        return false;
+    };
 
     /**
      * Return the sprite id used to determine the sprite to render this Entity with.
