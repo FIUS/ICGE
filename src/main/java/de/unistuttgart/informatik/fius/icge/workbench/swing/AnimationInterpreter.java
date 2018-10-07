@@ -82,29 +82,36 @@ public class AnimationInterpreter {
     public boolean inAnimation() {
         return _inAnimation;
     }
-    
+
+    public static void addPlayerAnimations(EntityType type) {
+        AnimatedImages moveAnimations = _animatedImages.get(AnimationType.Move);
+        AnimatedImages turnLeftAnimations = _animatedImages.get(AnimationType.TurnLeft);
+        if (moveAnimations == null) moveAnimations = new AnimatedImages();
+        if (turnLeftAnimations == null) turnLeftAnimations = new AnimatedImages();
+
+        String name = type.toString().toLowerCase();
+        String prefix = name + '/' + name + '-';
+        moveAnimations.set(type, Direction.EAST, Arrays.asList(prefix + "east-0.png", prefix + "east-1.png"));
+        moveAnimations.set(type, Direction.NORTH, Arrays.asList(prefix + "north-0.png", prefix + "north-1.png"));
+        moveAnimations.set(type, Direction.WEST, Arrays.asList(prefix + "west-0.png", prefix + "west-1.png"));
+        moveAnimations.set(type, Direction.SOUTH, Arrays.asList(prefix + "south-0.png", prefix + "south-1.png"));
+        turnLeftAnimations.set(type, Direction.EAST, Arrays.asList(prefix + "south-0.png", prefix + "east-1.png"));
+        turnLeftAnimations.set(type, Direction.NORTH, Arrays.asList(prefix + "east-0.png", prefix + "north-1.png"));
+        turnLeftAnimations.set(type, Direction.WEST, Arrays.asList(prefix + "north-0.png", prefix + "west-1.png"));
+        turnLeftAnimations.set(type, Direction.SOUTH, Arrays.asList(prefix + "west-0.png", prefix + "south-1.png"));
+        _noneAnimations.set(type, Direction.EAST, prefix + "east-0.png");
+        _noneAnimations.set(type, Direction.NORTH, prefix + "north-0.png");
+        _noneAnimations.set(type, Direction.WEST, prefix + "west-0.png");
+        _noneAnimations.set(type, Direction.SOUTH, prefix + "south-0.png");
+
+        _animatedImages.put(AnimationType.Move, moveAnimations);
+        _animatedImages.put(AnimationType.TurnLeft, turnLeftAnimations);
+    }
+
     static {
-        {
-            AnimatedImages moveAnimations = new AnimatedImages();
-            moveAnimations.set(EntityType.MARIO, Direction.EAST, Arrays.asList("mario/mario-east-0.png", "mario/mario-east-1.png"));
-            moveAnimations.set(EntityType.MARIO, Direction.NORTH, Arrays.asList("mario/mario-north-0.png", "mario/mario-north-1.png"));
-            moveAnimations.set(EntityType.MARIO, Direction.WEST, Arrays.asList("mario/mario-west-0.png", "mario/mario-west-1.png"));
-            moveAnimations.set(EntityType.MARIO, Direction.SOUTH, Arrays.asList("mario/mario-south-0.png", "mario/mario-south-1.png"));
-            _animatedImages.put(AnimationType.Move, moveAnimations);
-        }
-        {
-            AnimatedImages turnLeftAnimations = new AnimatedImages();
-            turnLeftAnimations.set(EntityType.MARIO, Direction.EAST, Arrays.asList("mario/mario-south-0.png", "mario/mario-east-1.png"));
-            turnLeftAnimations.set(EntityType.MARIO, Direction.NORTH, Arrays.asList("mario/mario-east-0.png", "mario/mario-north-1.png"));
-            turnLeftAnimations.set(EntityType.MARIO, Direction.WEST, Arrays.asList("mario/mario-north-0.png", "mario/mario-west-1.png"));
-            turnLeftAnimations.set(EntityType.MARIO, Direction.SOUTH, Arrays.asList("mario/mario-west-0.png", "mario/mario-south-1.png"));
-            _animatedImages.put(AnimationType.TurnLeft, turnLeftAnimations);
-        }
-        
-        _noneAnimations.set(EntityType.MARIO, Direction.EAST, "mario/mario-east-0.png");
-        _noneAnimations.set(EntityType.MARIO, Direction.NORTH, "mario/mario-north-0.png");
-        _noneAnimations.set(EntityType.MARIO, Direction.WEST, "mario/mario-west-0.png");
-        _noneAnimations.set(EntityType.MARIO, Direction.SOUTH, "mario/mario-south-0.png");
+        addPlayerAnimations(EntityType.MARIO);
+        addPlayerAnimations(EntityType.LUIGI);
+
         _noneAnimations.set(EntityType.WALL, "wall/wall-default.png");
         _noneAnimations.set(EntityType.COIN, "coin/coin-default.png");
     }

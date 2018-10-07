@@ -40,6 +40,7 @@ public class ToolHandler {
         this.tb = toolBar;
         this.addTool(new SelectionTool());
         this.addTool(new SpawnMarioTool());
+        this.addTool(new SpawnLuigiTool());
         this.addTool(new SpawnCoinTool());
         this.addTool(new DespawnTool());
         this.addTool(new WallCreationTool());
