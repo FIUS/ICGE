@@ -15,6 +15,11 @@ public class Wall extends Entity {
         public Entity createEntity(Simulation sim) {
             return new Wall(sim);
         }
+
+        @Override
+        public boolean isSolid() {
+            return true;
+        }
     }
 
     public Wall(Simulation sim) {

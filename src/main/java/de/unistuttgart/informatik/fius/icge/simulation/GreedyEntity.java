@@ -26,6 +26,11 @@ public abstract class GreedyEntity extends MovableEntity implements EntityCollec
         public GreedyEntityState(ArrayList<Entity> inventory) {
             this.inventory = inventory;
         }
+
+        @Override
+        public boolean isSolid() {
+            return false;
+        }
     }
 
     

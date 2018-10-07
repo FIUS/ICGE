@@ -35,14 +35,14 @@ public class AnimationInterpreter {
         if (!animated.territory().contains(wob)) throw new IllegalArgumentException();
         this._column = wob.column;
         this._row = wob.row;
-        this._unanimatedImage = this._image = _noneAnimations.get(wob.state.getClass(), wob.direction);
+        this._unanimatedImage = this._image = _noneAnimations.get(wob.state.spriteId(), wob.direction);
         Animation animation = animated.animation(wob);
         if (animation != null && currentTick < animation.end) {
             if ((currentTick < animation.begin)) throw new IllegalArgumentException();
             this._inAnimation = true;
             float undone = (animation.end - currentTick) / (float) (animation.end - animation.begin);
             float progress = 1 - undone;
-            this._image = _animatedImages.get(animation.type).get(wob.state.getClass(), wob.direction, progress);
+            this._image = _animatedImages.get(animation.type).get(wob.state.spriteId(), wob.direction, progress);
             if (this._image != null) {
                 if (animation.type == AnimationType.Move) {
                     switch (wob.direction) {
