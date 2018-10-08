@@ -141,6 +141,15 @@ public abstract class Entity {
     }
 
     /**
+     * Get the direction in which this entity is currently facing
+     * 
+     * @return the direction
+     */
+    protected Direction getDirection() {
+        return this.worldObject().direction;
+    }
+
+    /**
      * @return The standard delay ticks for actions of this entity
      */
     protected int getStandardDelayTicks() {
