@@ -89,7 +89,7 @@ public class EntityInspector {
         this._frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this._frame.setLocationByPlatform(true);
         this._frame.setResizable(true);
-        this._frame.setSize(300, 500);
+        this._frame.setSize(350, 500);
         this._frame.setVisible(true);
         this.initMainPanel();
         this.initEntitySelector();
@@ -102,7 +102,7 @@ public class EntityInspector {
     }
 
     private void initEntitySelector() {
-        if ((this._entities != null) && (this._entities.size() < 1)) {
+        if (this._entities.isEmpty()) {
             this._frame.getContentPane().add(new JLabel("No Entities..."));
             return;
         }
