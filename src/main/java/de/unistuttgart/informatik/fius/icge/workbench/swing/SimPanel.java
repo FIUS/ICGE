@@ -204,6 +204,7 @@ public class SimPanel extends JPanel {
     
     private void drawWorldObjects() {
         ArrayList<WorldObject> wobs = this._animated.territory().worldObjects();
+        if (wobs.isEmpty()) return;
         WorldObject nextWob = wobs.get(0);
         int drawCount = 1;
         for (int i = 1; i <= wobs.size(); ++i) {
