@@ -30,8 +30,10 @@ public class SelectionTool extends AbstractTool {
      */
     @Override
     public void apply(Simulation sim, int row, int column) {
-        EntityInspector eInsp = new EntityInspector(sim, row, column);
-        eInsp.show();
+        if (!sim.entitiesWith(row, column).isEmpty()) {
+            EntityInspector eInsp = new EntityInspector(sim, row, column);
+            eInsp.show();
+        }
     }
     
 }
