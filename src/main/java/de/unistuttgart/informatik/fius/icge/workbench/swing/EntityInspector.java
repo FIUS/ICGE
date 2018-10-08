@@ -89,7 +89,7 @@ public class EntityInspector {
         this._frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         this._frame.setLocationByPlatform(true);
         this._frame.setResizable(true);
-        this._frame.setSize(400, 300);
+        this._frame.setSize(300, 500);
         this._frame.setVisible(true);
         this.initMainPanel();
         this.initEntitySelector();
