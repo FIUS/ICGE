@@ -114,12 +114,14 @@ public class EntityInspector {
             }
         });
         this._entityChooser.setToolTipText("Choos Entity");
-        this._entities.forEach(ent -> {
-            String name = ent.getClass().getSimpleName();
+        int nr = 1;
+        for (Entity ent: this._entities) {
+            String name = "(" + nr + ") " + ent.getClass().getSimpleName();
             WorldObject wob = ent.worldObject();
             name += " (" + wob.row + ", " + wob.column + ")";
             this._entityChooser.addItem(name);
-        });
+            ++nr;
+        }
         this._frame.getContentPane().add(BorderLayout.NORTH, this._entityChooser);
         this.setEntity(this._entities.get(0));
     }
