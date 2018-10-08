@@ -50,7 +50,7 @@ public class Wall extends Entity {
      */
     @Override
     public void spawn(int column, int row, Direction direction) throws EntityAlreadyAlive, CellBlockedBySolidEntity {
-        if (!this.simulation().entitiesWith(row, column).isEmpty()) {
+        if (!this.simulation().entitiesAt(column, row).isEmpty()) {
             throw new CellNotEmpty();
         }
 

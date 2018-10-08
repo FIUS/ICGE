@@ -72,16 +72,16 @@ public class ToolHandler {
      * 
      * @param sim
      *            The simulation the mouse was pressed in
-     * @param row
-     *            The row the mouse was pressed in
      * @param column
      *            The column the mouse was pressed in
+     * @param row
+     *            The row the mouse was pressed in
      */
-    public void onMousePressed(Simulation sim, int row, int column) {
+    public void onMousePressed(Simulation sim, int column, int row) {
         Tool t = this.tools.get(this.currentTool);
         if (!(t instanceof AreaTool)) {
             synchronized (sim) {
-                t.apply(sim, row, column);
+                t.apply(sim, column, row);
             }
         }
     }
@@ -100,12 +100,12 @@ public class ToolHandler {
      * @param endColumn
      *            The column the mouse was released in
      */
-    public void onMouseRealeased(Simulation sim, int startRow, int endRow, int startColumn, int endColumn) {
+    public void onMouseRealeased(Simulation sim, int startColumn, int endColumn, int startRow, int endRow) {
         Tool t = this.tools.get(this.currentTool);
         if (t instanceof AreaTool) {
             AreaTool at = (AreaTool) t;
             synchronized (sim) {
-                at.applyToAll(sim, startRow, endRow, startColumn, endColumn);
+                at.applyToAll(sim, startColumn, endColumn, startRow, endRow);
             }
         }
     }

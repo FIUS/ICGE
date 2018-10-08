@@ -31,7 +31,7 @@ public class WallCreationTool extends AbstractTool implements AreaTool {
      *      int, int)
      */
     @Override
-    public void apply(Simulation sim, int row, int column) {
+    public void apply(Simulation sim, int column, int row) {
         Territory tty = sim.territory();
         tty = internalApply(tty, column, row);
         sim.setTerritory(tty);
@@ -42,7 +42,7 @@ public class WallCreationTool extends AbstractTool implements AreaTool {
      *      int, int, int, int)
      */
     @Override
-    public void applyToAll(Simulation sim, int startRow, int endRow, int startColumn, int endColumn) {
+    public void applyToAll(Simulation sim, int startColumn, int endColumn, int startRow, int endRow) {
         Territory tty = sim.territory();
         for (int y = startRow; y <= endRow; ++y) {
             for (int x = startColumn; x <= endColumn; ++x) {

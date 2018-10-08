@@ -137,13 +137,13 @@ public class Simulation {
     /**
      * Get all entities in the given row and column
      * 
-     * @param row
-     *            The row the entity must be in
      * @param column
      *            The column the entity must be in
+     * @param row
+     *            The row the entity must be in
      * @return all entities in given cell
      */
-    public ArrayList<Entity> entitiesWith(int row, int column) {
+    public ArrayList<Entity> entitiesAt(int column, int row) {
         return this.entitiesWith(ent -> {
             WorldObject wob = this.worldObject(ent);
             return (wob.row == row) && (wob.column == column);

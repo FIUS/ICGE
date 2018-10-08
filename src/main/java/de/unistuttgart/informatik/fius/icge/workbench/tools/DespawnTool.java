@@ -29,8 +29,8 @@ public class DespawnTool extends AbstractTool {
      *      int, int)
      */
     @Override
-    public void apply(Simulation sim, int row, int column) {
-        for (Entity ent : sim.entitiesWith(row, column)) {
+    public void apply(Simulation sim, int column, int row) {
+        for (Entity ent : sim.entitiesAt(column, row)) {
             ent.forceDespawn();
         }
     }

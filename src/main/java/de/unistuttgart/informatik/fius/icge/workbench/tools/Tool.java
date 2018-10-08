@@ -22,12 +22,12 @@ public interface Tool {
      * 
      * @param sim
      *            The Simulation of the cell to modify
-     * @param row
-     *            The row of the cell to modify
      * @param column
      *            The column of the cell to modify
+     * @param row
+     *            The row of the cell to modify
      */
-    void apply(Simulation sim, int row, int column);
+    void apply(Simulation sim, int column, int row);
     
     /**
      * @return the button which corresponds to this tool.
