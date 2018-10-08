@@ -63,14 +63,16 @@ public class Engine {
                     TaskTemplate obj = task.newInstance();
                     this._workbench.setSimulation(obj.getSimulation());
                     Collection<WorldObject> wobs = obj.getSimulation().territory().worldObjects();
-                    Comparator<WorldObject> compCol = (a, b) -> a.column - b.column;
-                    Comparator<WorldObject> compRow = (a, b) -> a.row - b.row;
-                    int xMin = Collections.min(wobs, compCol).column;
-                    int xMax = Collections.max(wobs, compCol).column;
-                    int yMin = Collections.min(wobs, compRow).row;
-                    int yMax = Collections.max(wobs, compRow).row;
-                    this._workbench.setCenteredColumn(0.5f * (xMax + xMin));
-                    this._workbench.setCenteredRow(0.5f * (yMax + yMin));
+                    if (!wobs.isEmpty()) {
+                        Comparator<WorldObject> compCol = (a, b) -> a.column - b.column;
+                        Comparator<WorldObject> compRow = (a, b) -> a.row - b.row;
+                        int xMin = Collections.min(wobs, compCol).column;
+                        int xMax = Collections.max(wobs, compCol).column;
+                        int yMin = Collections.min(wobs, compRow).row;
+                        int yMax = Collections.max(wobs, compRow).row;
+                        this._workbench.setCenteredColumn(0.5f * (xMax + xMin));
+                        this._workbench.setCenteredRow(0.5f * (yMax + yMin));
+                    }
                     try {
                         obj.test();
                     } catch (AssertionError e) {
