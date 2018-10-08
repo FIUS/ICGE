@@ -113,7 +113,7 @@ public class EntityInspector {
                 this.setEntity(this._entities.get(index));
             }
         });
-        this._entityChooser.setToolTipText("Choos Entity");
+        this._entityChooser.setToolTipText("Choose Entity");
         int nr = 1;
         for (Entity ent: this._entities) {
             String name = "(" + nr + ") " + ent.getClass().getSimpleName();

@@ -65,7 +65,7 @@ public class SimulationController {
         if (stepImage != null) {
             this.stepButton.setIcon(new ImageIcon(stepImage));
         }
-        this.playButton.setToolTipText("Simulate unitl next event");
+        this.stepButton.setToolTipText("Simulate unitil next event");
         this.stepButton.setMargin(new Insets(0, 0, 0, 0));
         this.tb.addButton(this.stepButton, -1);
 
