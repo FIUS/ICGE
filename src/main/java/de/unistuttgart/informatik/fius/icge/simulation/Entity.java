@@ -71,7 +71,7 @@ public abstract class Entity {
     }
 
     /**
-     * Get the row of this entity.
+     * Get the row at which this entity is currently
      * 
      * @return the row
      */
@@ -93,7 +93,7 @@ public abstract class Entity {
     }
 
     /**
-     * Set the row of this entity.
+     * Set the row at which this entity is currently
      * 
      * @param row
      *            the row to set
@@ -106,7 +106,7 @@ public abstract class Entity {
     }
 
     /**
-     * Get the column of this entity.
+     * Get the column at which this entity is currently
      * 
      * @return the column
      */
@@ -116,7 +116,7 @@ public abstract class Entity {
     }
 
     /**
-     * Set the column of this entity.
+     * Set the column at which this entity is currently
      * 
      * @param column
      *            the column
@@ -448,7 +448,7 @@ public abstract class Entity {
      */
     protected void spawnInternal(int column, int row, Direction direction, boolean force)
             throws EntityAlreadyAlive, CellBlockedBySolidEntity {
-        for (Entity e : this.simulation().entitiesWith(row, column)) {
+        for (Entity e : this.simulation().entitiesAt(column, row)) {
             if (e.state().isSolid()) throw new CellBlockedBySolidEntity();
         }
 
@@ -600,10 +600,10 @@ public abstract class Entity {
      */
     public static class SpawnEvent extends EntityEvent {
 
-        /** The row the entity was spawned at. */
-        public final int row;
         /** The column the entity was spawned at. */
         public final int column;
+        /** The row the entity was spawned at. */
+        public final int row;
 
         /**
          * Creates a new spawn event in the given simulation for the given entity signaling the spawn at the given point.
@@ -612,12 +612,12 @@ public abstract class Entity {
          *            The simulation to create the event in.
          * @param entity
          *            The entity to create the event for.
-         * @param row
-         *            The row the entity spawned in
          * @param column
          *            The column the entity spawned in
+         * @param row
+         *            The row the entity spawned in
          */
-        SpawnEvent(Simulation sim, Entity entity, int row, int column) {
+        SpawnEvent(Simulation sim, Entity entity, int column, int row) {
             super(sim, entity);
             this.row = row;
             this.column = column;
@@ -637,8 +637,8 @@ public abstract class Entity {
          */
         SpawnEvent(Simulation sim, Entity entity, WorldObject wob) {
             super(sim, entity);
-            this.row = wob.row;
             this.column = wob.column;
+            this.row = wob.row;
         }
     }
 
@@ -646,10 +646,10 @@ public abstract class Entity {
      * Teleport event recording target coordinates of this teleport
      */
     public static class TeleportEvent extends EntityEvent {
-        /** The row the entity was teleported to. */
-        public final int row;
         /** The column the entity was teleported to. */
         public final int column;
+        /** The row the entity was teleported to. */
+        public final int row;
 
         /**
          * Creates a new teleport event in the given simulation for the given entity signaling the teleport to the given point.
@@ -663,10 +663,10 @@ public abstract class Entity {
          * @param column
          *            The column the entity was teleported to.
          */
-        TeleportEvent(Simulation sim, Entity entity, int row, int column) {
+        TeleportEvent(Simulation sim, Entity entity, int column, int row) {
             super(sim, entity);
-            this.row = row;
             this.column = column;
+            this.row = row;
         }
 
         /**
@@ -683,8 +683,8 @@ public abstract class Entity {
          */
         TeleportEvent(Simulation sim, Entity entity, WorldObject wob) {
             super(sim, entity);
-            this.row = wob.row;
             this.column = wob.column;
+            this.row = wob.row;
         }
     }
 

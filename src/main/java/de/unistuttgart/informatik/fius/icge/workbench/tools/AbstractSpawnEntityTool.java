@@ -38,7 +38,7 @@ public abstract class AbstractSpawnEntityTool extends AbstractTool {
      *      int, int)
      */
     @Override
-    public void apply(Simulation sim, int row, int column) {
+    public void apply(Simulation sim, int column, int row) {
         try {
             entityToSpawn(sim).forceSpawn(column, row);
         } catch(CellBlockedBySolidEntity e) {

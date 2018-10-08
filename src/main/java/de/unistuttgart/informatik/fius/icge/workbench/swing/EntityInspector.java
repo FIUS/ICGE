@@ -63,18 +63,18 @@ public class EntityInspector {
     }
 
     /**
-     * Create new entity inspector which chooses from all available entities in (row, column)
+     * Create new entity inspector which chooses from all available entities in (column, row)
      * 
      * @param sim
      *            The simulation the entity inspector is for
-     * @param row
-     *            The row to choose entities from
      * @param column
      *            The column to choose entities from
+     * @param row
+     *            The row to choose entities from
      */
-    public EntityInspector(Simulation sim, int row, int column) {
+    public EntityInspector(Simulation sim, int column, int row) {
         this._simulation = sim;
-        this._entities = sim.entitiesWith(row, column);
+        this._entities = sim.entitiesAt(column, row);
         this._inspectionManager = Engine.getEngine().getInspectionManager();
     }
 

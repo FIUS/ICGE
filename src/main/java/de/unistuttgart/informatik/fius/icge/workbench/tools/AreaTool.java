@@ -20,14 +20,14 @@ public interface AreaTool extends Tool {
      * 
      * @param sim
      *            The Simulation to modify
-     * @param startRow
-     *            The first row to modify
-     * @param endRow
-     *            The last row to modify
      * @param startColumn
      *            The first column to modify
      * @param endColumn
      *            The last column to modify
+     * @param startRow
+     *            The first row to modify
+     * @param endRow
+     *            The last row to modify
      */
-    void applyToAll(Simulation sim, int startRow, int endRow, int startColumn, int endColumn);
+    void applyToAll(Simulation sim, int startColumn, int endColumn, int startRow, int endRow);
 }
