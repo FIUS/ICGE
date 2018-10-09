@@ -217,7 +217,7 @@ public class Simulation {
      * 
      * @return true iff at least one alive `CollectableEntity` matches the specified predicate
      */
-    public boolean containsCollectableWith(Predicate<CollectableEntity> pred) {
+    public synchronized boolean containsCollectableWith(Predicate<CollectableEntity> pred) {
         return this._entityObjects.keySet().stream().filter(ent -> ent instanceof CollectableEntity)
                 .map(ent -> (CollectableEntity) ent).filter(pred).findFirst().isPresent();
     }
@@ -231,7 +231,7 @@ public class Simulation {
      *            The row of the cell
      * @return true iff at least one alive `CollectableEntity` is in the specified cell
      */
-    public boolean containsCollectableAt(int column, int row) {
+    public synchronized boolean containsCollectableAt(int column, int row) {
         return this._entityObjects.keySet().stream().filter(ent -> ent instanceof CollectableEntity)
                 .filter(Entity.predicateIsAt(column, row)).findFirst().isPresent();
     }
