@@ -262,8 +262,7 @@ public class Simulation {
                 if (!this.sem.tryAcquire()) {
                     this.cancel();
                 }
-                EventDispatcher.afterwards(this.sem::release);
-                Simulation.this.tick();
+                Simulation.this.tick(this.sem::release);
             }
         };
         new Timer().schedule(this._timerTask, 10, 10);
@@ -277,9 +276,9 @@ public class Simulation {
         this._timerTask = null;
     }
 
-    private synchronized void tick() {
+    private synchronized void tick(Runnable afterwards) {
         ++this._tickCount;
-        EventDispatcher.raise(new TickEvent(this, this._tickCount));
+        EventDispatcher.raise(new TickEvent(this, this._tickCount), afterwards);
     }
 
     // Events
