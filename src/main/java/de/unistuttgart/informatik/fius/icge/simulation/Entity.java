@@ -145,7 +145,7 @@ public abstract class Entity {
      * 
      * @return the direction
      */
-    protected Direction getDirection() {
+    public Direction getDirection() {
         return this.worldObject().direction;
     }
 
