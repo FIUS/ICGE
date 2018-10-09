@@ -7,9 +7,7 @@
 
 package de.unistuttgart.informatik.fius.icge.territory;
 
-import java.util.function.Function;
-
-import de.unistuttgart.informatik.fius.icge.simulation.*;
+import java.util.function.Predicate;
 
 public class WorldObject implements Comparable<WorldObject> {
 
@@ -18,6 +16,10 @@ public class WorldObject implements Comparable<WorldObject> {
     public final int row;
     public final Direction direction;
     public final float z;
+
+    public static Predicate<WorldObject> predicateIsAt(int column, int row) {
+        return wob -> (wob.column == column) && (wob.row == row);
+    }
 
     public WorldObject(EntityState state, int column, int row, float z, Direction direction) {
         this.column = column;

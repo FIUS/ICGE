@@ -8,6 +8,7 @@
 package de.unistuttgart.informatik.fius.icge.simulation;
 
 import java.util.concurrent.Semaphore;
+import java.util.function.Predicate;
 
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
@@ -26,6 +27,10 @@ public abstract class Entity {
     private final Simulation _sim;
     private int _delayTicks = 25;
     private int _blockedUntilTick = Integer.MIN_VALUE;
+
+    public static Predicate<Entity> predicateIsAt(int column, int row) {
+        return ent -> WorldObject.predicateIsAt(column, row).test(ent.worldObject());
+    }
 
     /**
      * Create a new entity in the given simulation
