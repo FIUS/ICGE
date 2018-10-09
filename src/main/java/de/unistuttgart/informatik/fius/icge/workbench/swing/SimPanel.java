@@ -181,7 +181,15 @@ public class SimPanel extends JPanel {
                 int t = (int) (this._y0 + (this._s.scale * (row - 0.5f)));
                 int b = (int) (this._y0 + (this._s.scale * (row + 0.5f)));
 
-                this._g.setColor(new Color(0, 40, 120, 50));
+                boolean highlighted;
+                if (this._mouseDown) {
+                    highlighted = this._toolHandler.canApply(this._s.animator.simulation(), this._startCol, this._endCol,
+                            this._startRow, this._endRow);
+                } else {
+                    highlighted = this._toolHandler.canApply(this._s.animator.simulation(), this._endCol, this._endRow);
+                }
+
+                this._g.setColor(highlighted ? new Color(0, 255, 40, 50) : new Color(0, 40, 120, 50));
                 this._g.fillRect(l, t, r - l, b - t);
             }
         }

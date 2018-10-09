@@ -17,17 +17,17 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
  * @author Tim Neumann
  */
 public class SpawnCoinTool extends AbstractSpawnEntityTool {
-    
+
     /**
      * Creates a new spawn coin tool.
      */
     public SpawnCoinTool() {
         super("Spawn Coin", "coin/coin-default.png");
     }
-    
+
     @Override
     protected Entity entityToSpawn(Simulation sim) {
         return new Coin(sim);
     }
-    
+
 }

@@ -41,9 +41,14 @@ public abstract class AbstractSpawnEntityTool extends AbstractTool {
     public void apply(Simulation sim, int column, int row) {
         try {
             entityToSpawn(sim).forceSpawn(column, row);
-        } catch(CellBlockedBySolidEntity e) {
+        } catch (CellBlockedBySolidEntity e) {
             // intentionally do nothing since this was attempted via the GUI
         }
+    }
+
+    @Override
+    public boolean canApply(Simulation sim, int column, int row) {
+        return !sim.entitiesAt(column, row).stream().filter(ent -> ent.state().isSolid()).findFirst().isPresent();
     }
 
 }

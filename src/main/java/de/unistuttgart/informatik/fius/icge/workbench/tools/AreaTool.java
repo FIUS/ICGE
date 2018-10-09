@@ -29,5 +29,24 @@ public interface AreaTool extends Tool {
      * @param endRow
      *            The last row to modify
      */
-    void applyToAll(Simulation sim, int startColumn, int endColumn, int startRow, int endRow);
+    public void applyToAll(Simulation sim, int startColumn, int endColumn, int startRow, int endRow);
+
+    /**
+     * Should return an indicator whether applying this tool right now would be successful. This
+     * is however not supposed to be binding and currently only used for better visualization.
+     * 
+     * @param sim
+     *            The Simulation that would be modified
+     * @param startColumn
+     *            The first column that would be modified
+     * @param endColumn
+     *            The last column that would be modified
+     * @param startRow
+     *            The first row that would be modified
+     * @param endRow
+     *            The last row that would be modified
+     * @return The described indicator
+     */
+    public boolean canApply(Simulation sim, int startColumn, int endColumn, int startRow, int endRow);
+
 }

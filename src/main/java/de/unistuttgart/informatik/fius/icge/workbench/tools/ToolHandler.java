@@ -118,4 +118,25 @@ public class ToolHandler {
         return (t instanceof AreaTool);
     }
 
+    /**
+     * Calls the `canApply()` method on the current tool
+     * 
+     * @return The result of the `canApply()` call on the current tool
+     */
+    public boolean canApply(Simulation sim, int column, int row) {
+        return this.tools.get(this.currentTool).canApply(sim, column, row);
+    }
+
+    /**
+     * Calls the `canApply()` method on the current area tool
+     * 
+     * @return false if the current tool is not an area tool and otherwise the result of the `canApply()` call on the current
+     *         tool
+     */
+    public boolean canApply(Simulation sim, int startColumn, int endColumn, int startRow, int endRow) {
+        Tool t = this.tools.get(this.currentTool);
+        if (!(t instanceof AreaTool)) return false;
+        return ((AreaTool) t).canApply(sim, startColumn, endColumn, startRow, endRow);
+    }
+
 }
