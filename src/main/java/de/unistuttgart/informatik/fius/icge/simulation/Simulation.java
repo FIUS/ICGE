@@ -49,8 +49,12 @@ public class Simulation {
      */
     public Simulation(Simulation sim) {
         synchronized (sim) {
-            this._running = sim._running;
             this.init(sim._tty);
+            this._running = sim._running;
+            this._tickCount = sim._tickCount;
+            if (this._running) {
+                this.startTimer();
+            }
         }
     }
 
