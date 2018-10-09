@@ -7,18 +7,39 @@
 
 package de.unistuttgart.informatik.fius.icge.workbench.swing;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
 
 import de.unistuttgart.informatik.fius.icge.Engine;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
+import de.unistuttgart.informatik.fius.icge.event.EventListener;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.DespawnEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionManager;
@@ -36,8 +57,6 @@ public class EntityInspector {
     private final Simulation _simulation;
     private JFrame _frame;
     private JPanel _mainPanel;
-    private JPanel _attributePanel;
-    private JPanel _methodPanel;
     private final List<Entity> _entities;
 
     private JComboBox<String> _entityChooser;
@@ -103,9 +122,11 @@ public class EntityInspector {
 
     private void initEntitySelector() {
         if (this._entities.isEmpty()) {
-            this._frame.getContentPane().add(new JLabel("No Entities..."));
+            this._frame.getContentPane().add(new JLabel("No entities..."));
             return;
         }
+
+        // init the entity chooser (drop down menu)
         this._entityChooser = new JComboBox<>();
         this._entityChooser.addActionListener(e -> {
             int index = this._entityChooser.getSelectedIndex();
@@ -115,7 +136,7 @@ public class EntityInspector {
         });
         this._entityChooser.setToolTipText("Choose Entity");
         int nr = 1;
-        for (Entity ent: this._entities) {
+        for (Entity ent : this._entities) {
             String name = "(" + nr + ") " + ent.getClass().getSimpleName();
             WorldObject wob = ent.worldObject();
             name += " (" + wob.row + ", " + wob.column + ")";
@@ -123,7 +144,31 @@ public class EntityInspector {
             ++nr;
         }
         this._frame.getContentPane().add(BorderLayout.NORTH, this._entityChooser);
+
+        // initially chose the first entity in the entity chooser (drop down menu)
         this.setEntity(this._entities.get(0));
+
+        // listener for entity events which updates the inspected values
+        EventListener listener = EventDispatcher.addListener(EntityEvent.class, ev -> {
+            EntityEvent eev = (EntityEvent) ev;
+            if (this._selectedEntity == eev.entity) {
+                if (eev instanceof DespawnEvent) {
+                    this.inspectEntity();
+                } else {
+                    this.updateEntityValues();
+                }
+            }
+            return true;
+        });
+
+        // remove listener when the inspector is closed
+        this._frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                EventDispatcher.removeListener(listener);
+            }
+        });
+
     }
 
     /**
@@ -135,27 +180,21 @@ public class EntityInspector {
     private void setEntity(Entity ent) {
         this._selectedEntity = ent;
         this.inspectEntity();
-        EventDispatcher.addListener(EntityEvent.class, event -> {
-            EntityEvent ev = (EntityEvent) event;
-            if (this._selectedEntity != ent) {
-                return false;
-            }
-            if (ev.entity == ent) {
-                this.updateEntityValues();
-            }
-            return true;
-        });
         this.updateEntityValues();
     }
 
     private void inspectEntity() {
         if (this._selectedEntity == null) throw new IllegalStateException("Must set entity before inspecting it.");
 
-        if (this._attributePanel != null) {
-            this._mainPanel.remove(this._attributePanel);
-        }
-        if (this._methodPanel != null) {
-            this._mainPanel.remove(this._methodPanel);
+        // remove the components that were added in the previous `inspectEntity()` call
+        this._mainPanel.removeAll();
+
+        // handle dead entities
+        if (!this._selectedEntity.alive()) {
+            this._mainPanel.add(new JLabel("Entity not alive..."));
+            this._mainPanel.validate();
+            this._mainPanel.repaint();
+            return;
         }
 
         // attributePanel
@@ -182,7 +221,6 @@ public class EntityInspector {
             }
             ++y;
         }
-        this._attributePanel = attributePanel;
         this._attributeList = attributeList;
         this._attributeToLabel = attributeToLabel;
 
@@ -222,7 +260,6 @@ public class EntityInspector {
             methodPanel.add(valueLabel, this.getCell(2, y, 1));
             ++y;
         }
-        this._methodPanel = methodPanel;
         this._methodList = methodList;
         this._methodToLabel = methodToLabel;
     }
@@ -238,6 +275,9 @@ public class EntityInspector {
 
     /** Update UI on value changes in entity */
     private void updateEntityValues() {
+        if (!this._selectedEntity.alive()) {
+            return;
+        }
         for (String attr : this._attributeList) {
             JTextArea valueLabel = this._attributeToLabel.get(attr);
             if (valueLabel == null) continue;
