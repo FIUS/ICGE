@@ -23,13 +23,13 @@ import de.unistuttgart.informatik.fius.icge.workbench.swing.ToolBar;
  */
 public class ToolHandler {
     private final ToolBar tb;
-    
+
     private final List<Tool> tools = new ArrayList<>();
-    
+
     private final List<JButton> buttons = new ArrayList<>();
-    
+
     private int currentTool = 0;
-    
+
     /**
      * Creates a tool handler.
      * 
@@ -47,7 +47,7 @@ public class ToolHandler {
         resetButtonBorders();
         this.buttons.get(0).setBorder(new BevelBorder(1));
     }
-    
+
     private void addTool(Tool t) {
         final int index = this.tools.size();
         this.tools.add(t);
@@ -60,13 +60,13 @@ public class ToolHandler {
         });
         this.tb.addButton(button, index);
     }
-    
+
     private void resetButtonBorders() {
         for (JButton b : this.buttons) {
             b.setBorder(new BevelBorder(0));
         }
     }
-    
+
     /**
      * Handle a mouse pressed event
      * 
@@ -85,7 +85,7 @@ public class ToolHandler {
             }
         }
     }
-    
+
     /**
      * Handle a mouse released event
      * 
@@ -100,7 +100,7 @@ public class ToolHandler {
      * @param endColumn
      *            The column the mouse was released in
      */
-    public void onMouseRealeased(Simulation sim, int startColumn, int endColumn, int startRow, int endRow) {
+    public void onMouseReleased(Simulation sim, int startColumn, int endColumn, int startRow, int endRow) {
         Tool t = this.tools.get(this.currentTool);
         if (t instanceof AreaTool) {
             AreaTool at = (AreaTool) t;
@@ -109,7 +109,7 @@ public class ToolHandler {
             }
         }
     }
-    
+
     /**
      * @return Whether the current tool is a area tool.
      */
@@ -117,5 +117,5 @@ public class ToolHandler {
         Tool t = this.tools.get(this.currentTool);
         return (t instanceof AreaTool);
     }
-    
+
 }
