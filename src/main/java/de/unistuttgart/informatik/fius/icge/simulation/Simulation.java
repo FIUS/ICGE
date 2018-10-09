@@ -32,20 +32,24 @@ public class Simulation {
     private Semaphore _timerTaskSem;
 
     /**
-     * Create simulation from territory.
+     * Creates a new `Simumlation` from a `Territory`
      *
      * @param tty
-     *            Territory
+     *            The `Territory` representing the initial state of the created `Simulation`
      */
     public Simulation(Territory tty) {
         this.init(tty);
     }
 
     /**
-     * Create new simulation from previous simulation state.
+     * Creates a new `Simulation` from the state of an existing `Simulation`. It does initially have the same `Territory`, tick
+     * count and is running if the other `Simulation` is running.
+     * 
+     * NOTE: All previously existing `Entity` objects will still be associated with the other `Simulation` and no `Entity`
+     * objects are shared between the two `Simulation`s
      *
      * @param sim
-     *            previous simulation state
+     *            The `Simulation` to obtain the state from
      */
     public Simulation(Simulation sim) {
         synchronized (sim) {
@@ -55,9 +59,9 @@ public class Simulation {
     }
 
     /**
-     * Pause simulation.
+     * Pauses this `Simulation` if it is running
      *
-     * @return true if simulation was running before
+     * @return true iff this `Simulation` was running before the method call
      */
     public synchronized boolean pause() {
         try {
@@ -70,9 +74,9 @@ public class Simulation {
     }
 
     /**
-     * Resume a paused simulation.
+     * Resumes this `Simulation` if it isn't running
      *
-     * @return true if simulation was paused before
+     * @return true iff the `Simulation` was not running before the method call
      */
     public synchronized boolean resume() {
         try {
@@ -86,7 +90,7 @@ public class Simulation {
     }
 
     /**
-     * @return true if simulation is running
+     * @return true iff this `Simulation` is currently running
      */
     public boolean running() {
         return this._running;
@@ -113,16 +117,18 @@ public class Simulation {
     }
 
     /**
-     * @return all entities within the simulation
+     * @return All alive `Entity`s within this `Simulation`
      */
     public synchronized ArrayList<Entity> entities() {
         return new ArrayList<>(this._entityObjects.keySet());
     }
 
     /**
+     * Gets all alive `Entity`s within this `Simulation` that match a certain predicate
+     * 
      * @param pred
-     *            test function to filter entities
-     * @return all entities within the simulation with the given predicate
+     *            The predicate that the `Entity`s are tested for
+     * @return The matching `Entity`s
      */
     public synchronized ArrayList<Entity> entitiesWith(Predicate<Entity> pred) {
         ArrayList<Entity> result = new ArrayList<>();
@@ -135,13 +141,13 @@ public class Simulation {
     }
 
     /**
-     * Get all entities in the given row and column
+     * Gets all alive `Entity`s within this `Simulation` that are in a certain cell
      * 
      * @param column
-     *            The column the entity must be in
+     *            The column of the cell
      * @param row
-     *            The row the entity must be in
-     * @return all entities in given cell
+     *            The row of the cell
+     * @return The `Entity`s that are in the specified cell
      */
     public ArrayList<Entity> entitiesAt(int column, int row) {
         return this.entitiesWith(Entity.predicateIsAt(column, row));
@@ -237,7 +243,12 @@ public class Simulation {
     }
 
     /**
-     * @return the current territory
+     * Gets the `Territory` that represents the current state of this `Simulation`.
+     * 
+     * NOTE: When this `Simulation` progresses or has its state changed by other means, the returned `Territory` is obsolete
+     * since `Territory` objects are immutable.
+     * 
+     * @return The current `Territory`
      */
     public Territory territory() {
         return this._tty;
@@ -245,20 +256,26 @@ public class Simulation {
 
     /**
      * @param ent
-     *            an entity of this simulation
-     * @return the associated WorldObject
+     *            An `Entity` that is alive within this `Simulation`
+     * @return The `WorldObject` that represents the current state of the specified `Entity`
      */
     public WorldObject worldObject(Entity ent) {
         return this._entityObjects.get(ent);
     }
 
     /**
+     * Sets the `WorldObject` that is currently representing the state of an `Entity`.
+     * 
+     * NOTE: `Entity`s without associated `WorldObject` are considered dead, as opposed to alive `Entity`s which have an
+     * associated `WorldObject`.
+     * 
      * @param ent
-     *            the source entity for the WorldObject
+     *            An `Entity` that is associated with this `Simulation` but not necessarily alive
      * @param newWob
-     *            the new WorldObject (use null to remove an old WorldObject)
+     *            The `WorldObject` that will from now represent the specified `Entity`s state. `null` is allowed and has the
+     *            effect that the specified `Entity` has no associated `WorldObject`.
      * @param ev
-     *            the simulation event to raise
+     *            An event that will be synchronously raised at the end of this method call
      */
     public synchronized void setWorldObject(Entity ent, WorldObject newWob, SimulationEvent ev) {
         if (newWob == null) {
@@ -272,7 +289,7 @@ public class Simulation {
     }
 
     /**
-     * @return current tick count of simulation
+     * @return The number of ticks that have happened in this `Simulation` since its creation
      */
     public int tickCount() {
         return this._tickCount;
@@ -335,7 +352,7 @@ public class Simulation {
     }
 
     /**
-     * A event for when the simulation is initialized
+     * An event for when the simulation is initialized
      */
     public static class InitEvent extends SimulationEvent {
         /**
@@ -350,7 +367,7 @@ public class Simulation {
     }
 
     /**
-     * A event for when the simulation is paused
+     * An event for when the simulation is paused
      */
     public static class PauseEvent extends SimulationEvent {
         /**
@@ -365,7 +382,7 @@ public class Simulation {
     }
 
     /**
-     * A event for when the simulation is resumed
+     * An event for when the simulation is resumed
      */
     public static class ResumeEvent extends SimulationEvent {
         /**
@@ -380,7 +397,7 @@ public class Simulation {
     }
 
     /**
-     * A event for when the simulation ticks
+     * An event for when the simulation ticks
      */
     public static class TickEvent extends SimulationEvent {
         /** The current tick count at the point of this event. */
@@ -401,7 +418,7 @@ public class Simulation {
     }
 
     /**
-     * A event for when a new territory is set in a simulation
+     * An event for when a new territory is set in a simulation
      */
     public static class SetTerritoryEvent extends SimulationEvent {
         /**
