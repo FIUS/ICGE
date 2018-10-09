@@ -263,7 +263,10 @@ public class SimPanel extends JPanel {
     }
 
     private void handleMouseRelease() {
-        this._toolHandler.onMouseRealeased(this._s.animator.simulation(), this._startCol, this._endCol, this._startRow,
+        this._toolHandler.onMouseReleased(this._s.animator.simulation(), this._startCol, this._endCol, this._startRow,
                 this._endRow);
+        this._pressX = this._currentX;
+        this._pressY = this._currentY;
+        this._view.update();
     }
 }
