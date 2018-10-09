@@ -55,8 +55,12 @@ public class Territory {
         return result._worldObjects.size() == this._worldObjects.size() ? this : result; // return this if nothing changed
     }
 
+    public Territory removeAt(int column, int row) {
+        return this.removeIf(WorldObject.predicateIsAt(column, row));
+    }
+
     public ArrayList<WorldObject> worldObjects() {
-        return new ArrayList<>(this._worldObjects);
+        return new ArrayList<>(this._worldObjects); // intentionally copy in order to prohibit write access
     }
 
     public ArrayList<WorldObject> worldObjectsWith(Predicate<WorldObject> pred) {
@@ -69,12 +73,20 @@ public class Territory {
         return result;
     }
 
+    public ArrayList<WorldObject> worldObjectsAt(int column, int row) {
+        return this.worldObjectsWith(WorldObject.predicateIsAt(column, row));
+    }
+
     public boolean contains(WorldObject wob) {
         return this._worldObjects.contains(wob);
     }
 
     public boolean containsWith(Predicate<WorldObject> pred) {
         return this._worldObjects.stream().filter(pred).findFirst().isPresent();
+    }
+
+    public boolean containsAt(int column, int row) {
+        return this._worldObjects.stream().filter(WorldObject.predicateIsAt(column, row)).findFirst().isPresent();
     }
 
     public void forEach(Consumer<WorldObject> consumer) {

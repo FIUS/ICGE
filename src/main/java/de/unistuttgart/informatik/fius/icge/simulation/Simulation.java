@@ -148,63 +148,96 @@ public class Simulation {
      * @return all entities in given cell
      */
     public ArrayList<Entity> entitiesAt(int column, int row) {
-        return this.entitiesWith(ent -> {
-            WorldObject wob = this.worldObject(ent);
-            return (wob.row == row) && (wob.column == column);
-        });
+        return this.entitiesWith(Entity.predicateIsAt(column, row));
     }
 
     /**
-     * @return All collectables in this simulation
+     * @return All alive `CollectableEntity`s within this `Simulation`
      */
-    public synchronized ArrayList<CollectableEntity> collectables() {
+    public ArrayList<CollectableEntity> collectables() {
+        return this.collectablesWith(ent -> true);
+    }
+
+    /**
+     * Gets all alive `CollectableEntity`s within this `Simulation` that match a certain predicate
+     * 
+     * @param pred
+     *            The predicate that the `CollectableEntity`s are tested for
+     * @return The matching `CollectableEntity`s
+     */
+    public synchronized ArrayList<CollectableEntity> collectablesWith(Predicate<CollectableEntity> pred) {
         ArrayList<CollectableEntity> result = new ArrayList<>();
-        this._entityObjects.keySet().forEach(ent -> {
-            WorldObject wob = this.worldObject(ent);
-            if ((ent instanceof CollectableEntity)) {
-                result.add((CollectableEntity) ent);
-            }
-        });
+        this._entityObjects.keySet().stream().filter(ent -> ent instanceof CollectableEntity)
+                .map(ent -> (CollectableEntity) ent).filter(pred).forEach(result::add);
         return result;
     }
 
     /**
-     * Get all collectables in the given row and column
-     * 
-     * @param row
-     *            The row the collectables must be in
+     * Gets all alive `CollectableEntity`s within this `Simulation` that are in a certain cell
      * 
      * @param column
-     *            The column the collectables must be in
-     * @return all collectable entities in given cell
+     *            The column of the cell
+     * @param row
+     *            The row of the cell
+     * @return The `CollectableEntity`s that are in the specified cell
      */
     public synchronized ArrayList<CollectableEntity> collectablesAt(int column, int row) {
         ArrayList<CollectableEntity> result = new ArrayList<>();
-        this._entityObjects.keySet().forEach(ent -> {
-            WorldObject wob = this.worldObject(ent);
-            if ((ent instanceof CollectableEntity) && (wob.row == row) && (wob.column == column)) {
-                result.add((CollectableEntity) ent);
-            }
-        });
+        this._entityObjects.keySet().stream().filter(ent -> ent instanceof CollectableEntity)
+                .filter(Entity.predicateIsAt(column, row)).map(ent -> (CollectableEntity) ent).forEach(result::add);
         return result;
     }
 
     /**
-     * @param ent
-     *            entity to test
-     * @return true if entity is part of this simulation
-     */
-    public boolean contains(Entity ent) {
-        return this._entityObjects.containsKey(ent);
-    }
-
-    /**
+     * Checks if this `Simulation` contains at least on alive `Entity` that matches a certain predicate
+     * 
      * @param pred
-     *            predicate to test entities
-     * @return true if at least one entity matches the given predicate
+     *            The predicate that the `Entity`s are tested for
+     * 
+     * @return true iff at least one alive `Entity` matches the specified predicate
      */
     public synchronized boolean containsWith(Predicate<Entity> pred) {
         return this._entityObjects.keySet().stream().filter(pred).findFirst().isPresent();
+    }
+
+    /**
+     * Checks if this `Simulation` contains at least one alive `Entity` that is in a certain cell
+     * 
+     * @param column
+     *            The column of the cell
+     * @param row
+     *            The row of the cell
+     * @return true iff at least one alive `Entity` is in the specified cell
+     */
+    public boolean containsAt(int column, int row) {
+        return this.containsWith(Entity.predicateIsAt(column, row));
+    }
+
+    /**
+     * Checks if this `Simulation` contains at least on alive `CollectableEntity` that matches a certain predicate
+     * 
+     * @param pred
+     *            The predicate that the `CollectableEntity`s are tested for
+     * 
+     * @return true iff at least one alive `CollectableEntity` matches the specified predicate
+     */
+    public synchronized boolean containsCollectableWith(Predicate<CollectableEntity> pred) {
+        return this._entityObjects.keySet().stream().filter(ent -> ent instanceof CollectableEntity)
+                .map(ent -> (CollectableEntity) ent).filter(pred).findFirst().isPresent();
+    }
+
+    /**
+     * Checks if this `Simulation` contains at least one alive `CollectableEntity` that is in a certain cell
+     * 
+     * @param column
+     *            The column of the cell
+     * @param row
+     *            The row of the cell
+     * @return true iff at least one alive `CollectableEntity` is in the specified cell
+     */
+    public synchronized boolean containsCollectableAt(int column, int row) {
+        return this._entityObjects.keySet().stream().filter(ent -> ent instanceof CollectableEntity)
+                .filter(Entity.predicateIsAt(column, row)).findFirst().isPresent();
     }
 
     /**
