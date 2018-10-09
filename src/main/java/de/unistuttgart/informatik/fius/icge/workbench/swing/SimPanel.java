@@ -29,7 +29,7 @@ import de.unistuttgart.informatik.fius.icge.workbench.tools.ToolHandler;
 
 public class SimPanel extends JPanel {
     private static final long serialVersionUID = 8651840223154690457L;
-    
+
     private final SwingView _view;
     private Graphics _g;
     private Settings _s;
@@ -41,14 +41,14 @@ public class SimPanel extends JPanel {
     private boolean _mouseInside = false;
     private AnimatedTerritory _animated;
     private ToolHandler _toolHandler;
-    
+
     public SimPanel(SwingView view, ToolHandler th) {
         this._toolHandler = th;
         this._view = view;
         this.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {}
-            
+
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
@@ -60,7 +60,7 @@ public class SimPanel extends JPanel {
                     SimPanel.this._view.update();
                 }
             }
-            
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
@@ -72,13 +72,13 @@ public class SimPanel extends JPanel {
                     SimPanel.this._view.update();
                 }
             }
-            
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 SimPanel.this._mouseInside = true;
                 SimPanel.this._view.update();
             }
-            
+
             @Override
             public void mouseExited(MouseEvent e) {
                 SimPanel.this._mouseInside = false;
@@ -92,7 +92,7 @@ public class SimPanel extends JPanel {
                 SimPanel.this._currentY = e.getY();
                 SimPanel.this._view.update();
             }
-            
+
             @Override
             public void mouseMoved(MouseEvent e) {
                 SimPanel.this._currentX = SimPanel.this._pressX = e.getX();
@@ -101,7 +101,7 @@ public class SimPanel extends JPanel {
             }
         });
     }
-    
+
     @Override
     public void paint(Graphics g) {
         this._g = g;
@@ -113,11 +113,11 @@ public class SimPanel extends JPanel {
             this.drawMouseOverlay();
         }
     }
-    
+
     private void updateSettings() {
         this._s = this._view.settings();
     }
-    
+
     private void updateExtents() {
         this._bounds = this._g.getClipBounds();
         this._x0 = (0.5 * this._bounds.width) - (this._s.centeredCol * this._s.scale);
@@ -128,15 +128,15 @@ public class SimPanel extends JPanel {
         this._endRow = this.convertToRow(Math.max(this._pressY, this._currentY));
         this._animated = this._s.animator == null ? null : this._s.animator.animated();
     }
-    
+
     private int convertToColumn(int x) {
         return (int) Math.round((x - this._x0) / this._s.scale);
     }
-    
+
     private int convertToRow(int y) {
         return (int) Math.round((y - this._y0) / this._s.scale);
     }
-    
+
     private Territory addConstruction(Territory tty) {
         for (int y = this._startRow; y <= this._endRow; ++y) {
             for (int x = this._startCol; x <= this._endCol; ++x) {
@@ -148,14 +148,15 @@ public class SimPanel extends JPanel {
         }
         return tty;
     }
-    
+
     private Territory addDemolishing(Territory tty) {
         Image img = Images.image("cross.png");
         for (int y = this._startRow; y <= this._endRow; ++y) {
             for (int x = this._startCol; x <= this._endCol; ++x) {
                 int captX = x, captY = y;
                 Territory oldTty = tty;
-                tty = oldTty.removeIf(wob -> (wob.column == captX) && (wob.row == captY) && (wob.state.getClass() == WallState.class));
+                tty = oldTty.removeIf(
+                        wob -> (wob.column == captX) && (wob.row == captY) && (wob.state.getClass() == WallState.class));
                 if (tty != oldTty) {
                     this.drawImage(x, y, img);
                 }
@@ -163,7 +164,7 @@ public class SimPanel extends JPanel {
         }
         return tty;
     }
-    
+
     private void drawMouseOverlay() {
         int startRow = this._startRow;
         int startCol = this._startCol;
@@ -177,13 +178,13 @@ public class SimPanel extends JPanel {
                 int r = (int) (this._x0 + (this._s.scale * (col + 0.5f)));
                 int t = (int) (this._y0 + (this._s.scale * (row - 0.5f)));
                 int b = (int) (this._y0 + (this._s.scale * (row + 0.5f)));
-                
+
                 this._g.setColor(new Color(0, 40, 120, 50));
                 this._g.fillRect(l, t, r - l, b - t);
             }
         }
     }
-    
+
     private void drawGrid() {
         double firstX = remainder(this._x0 - (0.5 * this._s.scale), this._s.scale);
         double firstY = remainder(this._y0 - (0.5 * this._s.scale), this._s.scale);
@@ -196,12 +197,12 @@ public class SimPanel extends JPanel {
             this._g.drawLine(0, iy, this._bounds.width, iy);
         }
     }
-    
+
     private static double remainder(double a, double b) {
         double q = a / b;
         return b * (q - Math.floor(q));
     }
-    
+
     private void drawWorldObjects() {
         ArrayList<WorldObject> wobs = this._animated.territory().worldObjects();
         if (wobs.isEmpty()) return;
@@ -221,14 +222,15 @@ public class SimPanel extends JPanel {
             drawCount = 1;
         }
     }
-    
+
     private void drawWorldObject(WorldObject wob) {
         int currentTick = this._s.animator.simulation().tickCount();
         AnimationInterpreter interpreter = new AnimationInterpreter(this._animated, wob, currentTick);
 
         if (interpreter.inAnimation() && !this._s.animator.simulation().running()) {
             BufferedImage unanimated = interpreter.unanimatedImage();
-            BufferedImage grayScale = new BufferedImage(unanimated.getWidth(), unanimated.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            BufferedImage grayScale = new BufferedImage(unanimated.getWidth(), unanimated.getHeight(),
+                    BufferedImage.TYPE_INT_ARGB);
             ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
             op.filter(unanimated, grayScale);
             this.drawImage(wob.column, wob.row, grayScale);
@@ -247,7 +249,7 @@ public class SimPanel extends JPanel {
             this._g.drawString(String.valueOf(count), x, y);
         }
     }
-    
+
     private void drawImage(float col, float row, Image img) {
         int l = (int) (this._x0 + (this._s.scale * (col - 0.5f)));
         int r = (int) (this._x0 + (this._s.scale * (col + 0.5f)));
@@ -255,13 +257,13 @@ public class SimPanel extends JPanel {
         int b = (int) (this._y0 + (this._s.scale * (row + 0.5f)));
         this._g.drawImage(img, l, t, r - l, b - t, null);
     }
-    
+
     private void handleMousePress() {
-        this._toolHandler.onMousePressed(this._s.animator.simulation(), this._startRow, this._startCol);
+        this._toolHandler.onMousePressed(this._s.animator.simulation(), this._startCol, this._startRow);
     }
-    
+
     private void handleMouseRelease() {
-        this._toolHandler.onMouseRealeased(this._s.animator.simulation(), this._startRow, this._endRow, this._startCol,
-                this._endCol);
+        this._toolHandler.onMouseRealeased(this._s.animator.simulation(), this._startCol, this._endCol, this._startRow,
+                this._endRow);
     }
 }
