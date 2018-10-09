@@ -166,9 +166,11 @@ public class SimPanel extends JPanel {
     }
 
     private void drawMouseOverlay() {
+        if (!this._mouseInside) return;
         int startRow = this._startRow;
         int startCol = this._startCol;
-        if (!this._toolHandler.isCurrentToolArea()) {
+        // When the current tool is not an area tool, we don't want to overlay an area
+        if (!this._toolHandler.currentToolIsAreaTool()) {
             startRow = this._endRow;
             startCol = this._endCol;
         }

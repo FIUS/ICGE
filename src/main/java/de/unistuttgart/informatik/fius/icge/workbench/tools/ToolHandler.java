@@ -113,7 +113,7 @@ public class ToolHandler {
     /**
      * @return Whether the current tool is a area tool.
      */
-    public boolean isCurrentToolArea() {
+    public boolean currentToolIsAreaTool() {
         Tool t = this.tools.get(this.currentTool);
         return (t instanceof AreaTool);
     }
