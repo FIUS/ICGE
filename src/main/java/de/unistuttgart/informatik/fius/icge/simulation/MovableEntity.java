@@ -61,7 +61,6 @@ public abstract class MovableEntity extends Entity {
      * @throws EntityNotAlive
      *             the entity is not spawned or already despawned
      */
-    @InspectionMethod
     public void move() throws IllegalMove, EntityNotAlive {
         this.delayed(() -> {
             WorldObject wobAfter = this.wobAfterMove();
@@ -75,6 +74,7 @@ public abstract class MovableEntity extends Entity {
      * 
      * @return true iff the entity can move
      */
+    @InspectionMethod
     public boolean canMove() {
         try {
             this.wobAfterMove();
@@ -89,6 +89,7 @@ public abstract class MovableEntity extends Entity {
      * 
      * @return true iff the entity has moved
      */
+    @InspectionMethod
     public boolean tryMove() {
         try {
             this.move();

@@ -145,6 +145,7 @@ public abstract class Entity {
      * 
      * @return the direction
      */
+    @InspectionAttribute
     public Direction getDirection() {
         return this.worldObject().direction;
     }

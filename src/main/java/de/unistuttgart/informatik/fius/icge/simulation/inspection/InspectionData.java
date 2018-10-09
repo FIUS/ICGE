@@ -204,7 +204,7 @@ public class InspectionData {
             Method setter = setters.remove(name);
             Method getter = entry.getValue();
             boolean readOnly = getter.getAnnotation(InspectionAttribute.class).readOnly();
-            if (readOnly) {
+            if (readOnly || setter == null) {
                 if (setter != null)
                     throw new InspectionPointException("Getter specifies read only, but setter found! : " + name);
                 this.validateReadOnlyGetter(getter);
@@ -212,7 +212,6 @@ public class InspectionData {
                 this.inspectableAttributes.put(name, new AttributeInspectionPoint(getter));
                 
             } else {
-                if (setter == null) throw new InspectionPointException("No setter for getter! : " + name);
                 this.validateMethodPair(getter, setter);
                 getter.setAccessible(true);
                 setter.setAccessible(true);
