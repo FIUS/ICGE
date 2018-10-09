@@ -115,6 +115,7 @@ public class Mario extends GreedyEntity {
      * 
      * @return Whether mario can collect a coin.
      */
+    @InspectionMethod
     public boolean canCollectCoin() {
         return this.canCollect(Coin.class);
     }
@@ -131,7 +132,7 @@ public class Mario extends GreedyEntity {
      * 
      * @return Whether it worked.
      */
-    @InspectionMethod(name = "collectCoin")
+    @InspectionMethod
     public boolean tryCollectCoin() {
         return this.tryCollect(Coin.class);
     }
@@ -141,6 +142,7 @@ public class Mario extends GreedyEntity {
      * 
      * @return Whether mario can collect a coin.
      */
+    @InspectionMethod
     public boolean canDropCoin() {
         return this.canDrop(Coin.class);
     }
@@ -157,7 +159,7 @@ public class Mario extends GreedyEntity {
      * 
      * @return Whether it worked.
      */
-    @InspectionMethod(name = "dropCoin")
+    @InspectionMethod
     public boolean tryDropCoin() {
         return this.tryDrop(Coin.class);
     }
