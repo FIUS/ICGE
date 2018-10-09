@@ -21,12 +21,12 @@ import de.unistuttgart.informatik.fius.icge.workbench.swing.Images;
  * @author Tim Neumann
  */
 public abstract class AbstractTool implements Tool {
-    
+
     /** The description of the tool. */
     private String toolTip;
     /** The name of the image for the tool. */
     private String imgName;
-    
+
     /**
      * Creates a new abstract tool with the given description and image name
      * 
@@ -39,16 +39,16 @@ public abstract class AbstractTool implements Tool {
         this.toolTip = dToolTip;
         this.imgName = dImgName;
     }
-    
+
     @Override
     public JButton getToolBarButton() {
         JButton button = new JButton();
-        
+
         Image img = this.imgName == null ? null : Images.image(this.imgName);
         if (img != null) {
             button.setIcon(new ImageIcon(img));
         }
-        
+
         button.setMargin(new Insets(0, 0, 0, 0));
         button.setToolTipText(this.toolTip);
         return button;

@@ -16,14 +16,14 @@ import de.unistuttgart.informatik.fius.icge.workbench.swing.EntityInspector;
  * @author Tim Neumann
  */
 public class SelectionTool extends AbstractTool {
-    
+
     /**
      * Creates a selection tool.
      */
     public SelectionTool() {
         super("Selection tool", "arrow.png");
     }
-    
+
     /**
      * @see de.unistuttgart.informatik.fius.icge.workbench.tools.Tool#apply(de.unistuttgart.informatik.fius.icge.simulation.Simulation,
      *      int, int)
@@ -35,5 +35,10 @@ public class SelectionTool extends AbstractTool {
             eInsp.show();
         }
     }
-    
+
+    @Override
+    public boolean canApply(Simulation sim, int column, int row) {
+        return !sim.entitiesAt(column, row).isEmpty();
+    }
+
 }

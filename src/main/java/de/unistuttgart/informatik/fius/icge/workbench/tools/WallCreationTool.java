@@ -18,14 +18,14 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
  * @author Tim Neumann
  */
 public class WallCreationTool extends AbstractTool implements AreaTool {
-    
+
     /**
      * Creates a wall creation tool
      */
     public WallCreationTool() {
         super("Construct wall", "wall/wall-default.png");
     }
-    
+
     /**
      * @see de.unistuttgart.informatik.fius.icge.workbench.tools.Tool#apply(de.unistuttgart.informatik.fius.icge.simulation.Simulation,
      *      int, int)
@@ -36,7 +36,7 @@ public class WallCreationTool extends AbstractTool implements AreaTool {
         tty = internalApply(tty, column, row);
         sim.setTerritory(tty);
     }
-    
+
     /**
      * @see de.unistuttgart.informatik.fius.icge.workbench.tools.AreaTool#applyToAll(de.unistuttgart.informatik.fius.icge.simulation.Simulation,
      *      int, int, int, int)
@@ -49,9 +49,10 @@ public class WallCreationTool extends AbstractTool implements AreaTool {
                 tty = internalApply(tty, x, y);
             }
         }
-        sim.setTerritory(tty);
+        // check that we don't set the territory if it didn't change
+        if (tty != sim.territory()) sim.setTerritory(tty);
     }
-    
+
     private Territory internalApply(Territory tty, int x, int y) {
         final int captX = x;
         final int captY = y;
@@ -60,5 +61,22 @@ public class WallCreationTool extends AbstractTool implements AreaTool {
         }
         return tty;
     }
-    
+
+    @Override
+    public boolean canApply(Simulation sim, int column, int row) {
+        return sim.entitiesAt(column, row).isEmpty();
+    }
+
+    @Override
+    public boolean canApply(Simulation sim, int startColumn, int endColumn, int startRow, int endRow) {
+        for (int col = startColumn; col <= endColumn; ++col) {
+            for (int row = startRow; row <= endRow; ++row) {
+                if (sim.entitiesAt(col, row).isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }
