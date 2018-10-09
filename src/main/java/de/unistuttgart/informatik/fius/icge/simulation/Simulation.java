@@ -151,6 +151,20 @@ public class Simulation {
     }
 
     /**
+     * @return All collectables in this simulation
+     */
+    public synchronized ArrayList<CollectableEntity> collectables() {
+        ArrayList<CollectableEntity> result = new ArrayList<>();
+        this._entityObjects.keySet().forEach(ent -> {
+            WorldObject wob = this.worldObject(ent);
+            if ((ent instanceof CollectableEntity)) {
+                result.add((CollectableEntity) ent);
+            }
+        });
+        return result;
+    }
+
+    /**
      * Get all collectables in the given row and column
      * 
      * @param row
@@ -160,7 +174,7 @@ public class Simulation {
      *            The column the collectables must be in
      * @return all collectable entities in given cell
      */
-    public synchronized ArrayList<CollectableEntity> collectablesWith(int row, int column) {
+    public synchronized ArrayList<CollectableEntity> collectablesAt(int column, int row) {
         ArrayList<CollectableEntity> result = new ArrayList<>();
         this._entityObjects.keySet().forEach(ent -> {
             WorldObject wob = this.worldObject(ent);
