@@ -33,3 +33,7 @@ hs_err_pid*
 # .classpath and .project should be generated automatically
 .classpath
 .project
+
+# added IntelliJ rules
+*.iml
+.idea
