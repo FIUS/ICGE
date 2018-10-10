@@ -14,7 +14,7 @@ public class Animation {
     public final AnimationType type;
 
     public static enum AnimationType {
-        Move, TurnLeft;
+        MOVE, TURN_LEFT;
     }
 
     public Animation(int begin, int end, AnimationType type) {
