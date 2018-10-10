@@ -78,8 +78,8 @@ public class SimulationAnimator {
     }
     
     private static AnimationType animationType(MovableEntityEvent mee) {
-        if (mee instanceof MoveEvent) return AnimationType.Move;
+        if (mee instanceof MoveEvent) return AnimationType.MOVE;
         // TurnLeftEvent is the only other subclass of abstract MovableEntityEvent
-        return AnimationType.TurnLeft;
+        return AnimationType.TURN_LEFT;
     }
 }

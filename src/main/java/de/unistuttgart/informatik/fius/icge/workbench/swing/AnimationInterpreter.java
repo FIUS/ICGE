@@ -44,7 +44,7 @@ public class AnimationInterpreter {
             float progress = 1 - undone;
             this._image = _animatedImages.get(animation.type).get(wob.state.spriteId(), wob.direction, progress);
             if (this._image != null) {
-                if (animation.type == AnimationType.Move) {
+                if (animation.type == AnimationType.MOVE) {
                     switch (wob.direction) {
                         default:
                         case EAST:
@@ -84,30 +84,42 @@ public class AnimationInterpreter {
     public boolean inAnimation() {
         return _inAnimation;
     }
-    
+
+    public static AnimatedImages accessNoneAnimations() {
+        return _noneAnimations;
+    }
+
+    public static AnimatedImages accessAnimations(AnimationType type) {
+        return _animatedImages.get(type);
+    }
+
     static {
-        {
-            AnimatedImages moveAnimations = new AnimatedImages();
-            moveAnimations.set(MarioState.class, Direction.EAST, Arrays.asList("mario/mario-east-0.png", "mario/mario-east-1.png"));
-            moveAnimations.set(MarioState.class, Direction.NORTH, Arrays.asList("mario/mario-north-0.png", "mario/mario-north-1.png"));
-            moveAnimations.set(MarioState.class, Direction.WEST, Arrays.asList("mario/mario-west-0.png", "mario/mario-west-1.png"));
-            moveAnimations.set(MarioState.class, Direction.SOUTH, Arrays.asList("mario/mario-south-0.png", "mario/mario-south-1.png"));
-            _animatedImages.put(AnimationType.Move, moveAnimations);
-        }
-        {
-            AnimatedImages turnLeftAnimations = new AnimatedImages();
-            turnLeftAnimations.set(MarioState.class, Direction.EAST, Arrays.asList("mario/mario-south-0.png", "mario/mario-east-1.png"));
-            turnLeftAnimations.set(MarioState.class, Direction.NORTH, Arrays.asList("mario/mario-east-0.png", "mario/mario-north-1.png"));
-            turnLeftAnimations.set(MarioState.class, Direction.WEST, Arrays.asList("mario/mario-north-0.png", "mario/mario-west-1.png"));
-            turnLeftAnimations.set(MarioState.class, Direction.SOUTH, Arrays.asList("mario/mario-west-0.png", "mario/mario-south-1.png"));
-            _animatedImages.put(AnimationType.TurnLeft, turnLeftAnimations);
-        }
-        
-        _noneAnimations.set(MarioState.class, Direction.EAST, "mario/mario-east-0.png");
-        _noneAnimations.set(MarioState.class, Direction.NORTH, "mario/mario-north-0.png");
-        _noneAnimations.set(MarioState.class, Direction.WEST, "mario/mario-west-0.png");
-        _noneAnimations.set(MarioState.class, Direction.SOUTH, "mario/mario-south-0.png");
-        _noneAnimations.set(WallState.class, "wall/wall-default.png");
-        _noneAnimations.set(CoinState.class, "coin/coin-default.png");
+        _animatedImages.put(AnimationType.MOVE, new AnimatedImages());
+        _animatedImages.put(AnimationType.TURN_LEFT, new AnimatedImages());
+
+        accessAnimations(AnimationType.MOVE).set(MarioState.class, Direction.EAST,
+                Arrays.asList("mario/mario-east-0.png", "mario/mario-east-1.png"));
+        accessAnimations(AnimationType.MOVE).set(MarioState.class, Direction.NORTH,
+                Arrays.asList("mario/mario-north-0.png", "mario/mario-north-1.png"));
+        accessAnimations(AnimationType.MOVE).set(MarioState.class, Direction.WEST,
+                Arrays.asList("mario/mario-west-0.png", "mario/mario-west-1.png"));
+        accessAnimations(AnimationType.MOVE).set(MarioState.class, Direction.SOUTH,
+                Arrays.asList("mario/mario-south-0.png", "mario/mario-south-1.png"));
+
+        accessAnimations(AnimationType.TURN_LEFT).set(MarioState.class, Direction.EAST,
+                Arrays.asList("mario/mario-south-0.png", "mario/mario-east-1.png"));
+        accessAnimations(AnimationType.TURN_LEFT).set(MarioState.class, Direction.NORTH,
+                Arrays.asList("mario/mario-east-0.png", "mario/mario-north-1.png"));
+        accessAnimations(AnimationType.TURN_LEFT).set(MarioState.class, Direction.WEST,
+                Arrays.asList("mario/mario-north-0.png", "mario/mario-west-1.png"));
+        accessAnimations(AnimationType.TURN_LEFT).set(MarioState.class, Direction.SOUTH,
+                Arrays.asList("mario/mario-west-0.png", "mario/mario-south-1.png"));
+
+        accessNoneAnimations().set(MarioState.class, Direction.EAST, "mario/mario-east-0.png");
+        accessNoneAnimations().set(MarioState.class, Direction.NORTH, "mario/mario-north-0.png");
+        accessNoneAnimations().set(MarioState.class, Direction.WEST, "mario/mario-west-0.png");
+        accessNoneAnimations().set(MarioState.class, Direction.SOUTH, "mario/mario-south-0.png");
+        accessNoneAnimations().set(WallState.class, "wall/wall-default.png");
+        accessNoneAnimations().set(CoinState.class, "coin/coin-default.png");
     }
 }
