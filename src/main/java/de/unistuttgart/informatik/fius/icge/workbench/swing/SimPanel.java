@@ -237,18 +237,19 @@ public class SimPanel extends JPanel {
         int currentTick = this._s.animator.simulation().tickCount();
         AnimationInterpreter interpreter = new AnimationInterpreter(this._animated, wob, currentTick);
 
+        BufferedImage img = interpreter.image();
+        if (img != null) {
+            this.drawImage(interpreter.column(), interpreter.row(), img);
+        }
+
         if (interpreter.inAnimation() && !this._s.animator.simulation().running()) {
+            // render the shadow now such that it's over the (animated) image
             BufferedImage unanimated = interpreter.unanimatedImage();
             BufferedImage grayScale = new BufferedImage(unanimated.getWidth(), unanimated.getHeight(),
                     BufferedImage.TYPE_INT_ARGB);
             ColorConvertOp op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
             op.filter(unanimated, grayScale);
             this.drawImage(wob.column, wob.row, grayScale);
-        }
-
-        BufferedImage img = interpreter.image();
-        if (img != null) {
-            this.drawImage(interpreter.column(), interpreter.row(), img);
         }
     }
 
