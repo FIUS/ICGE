@@ -362,7 +362,7 @@ public abstract class Entity {
      *            The message to print
      */
     @InspectionMethod
-    public void printLn(String message) {
+    public void println(String message) {
         this.print(message + "\n");
     }
 
@@ -373,8 +373,8 @@ public abstract class Entity {
      * @param message
      *            The message to print
      */
-    public void printLn(boolean message) {
-        this.printLn(String.valueOf(message));
+    public void println(boolean message) {
+        this.println(String.valueOf(message));
     }
 
     /**
@@ -384,8 +384,8 @@ public abstract class Entity {
      * @param message
      *            The message to print
      */
-    public void printLn(byte message) {
-        this.printLn(String.valueOf(message));
+    public void println(byte message) {
+        this.println(String.valueOf(message));
     }
 
     /**
@@ -395,8 +395,8 @@ public abstract class Entity {
      * @param message
      *            The message to print
      */
-    public void printLn(short message) {
-        this.printLn(String.valueOf(message));
+    public void println(short message) {
+        this.println(String.valueOf(message));
     }
 
     /**
@@ -406,8 +406,8 @@ public abstract class Entity {
      * @param message
      *            The message to print
      */
-    public void printLn(int message) {
-        this.printLn(String.valueOf(message));
+    public void println(int message) {
+        this.println(String.valueOf(message));
     }
 
     /**
@@ -417,8 +417,8 @@ public abstract class Entity {
      * @param message
      *            The message to print
      */
-    public void printLn(long message) {
-        this.printLn(String.valueOf(message));
+    public void println(long message) {
+        this.println(String.valueOf(message));
     }
 
     /**
@@ -428,8 +428,8 @@ public abstract class Entity {
      * @param message
      *            The message to print
      */
-    public void printLn(float message) {
-        this.printLn(String.valueOf(message));
+    public void println(float message) {
+        this.println(String.valueOf(message));
     }
 
     /**
@@ -439,8 +439,8 @@ public abstract class Entity {
      * @param message
      *            The message to print
      */
-    public void printLn(double message) {
-        this.printLn(String.valueOf(message));
+    public void println(double message) {
+        this.println(String.valueOf(message));
     }
 
     // protected
