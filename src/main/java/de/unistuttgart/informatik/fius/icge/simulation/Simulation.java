@@ -442,24 +442,9 @@ public class Simulation {
         }
     }
 
-    /**
-     * Return entities from HashMap
-     */
-    private ArrayList<Entity> getEntities() {
-        ArrayList<Entity> e = new ArrayList<>();
-        for(Map.Entry<Entity, WorldObject> entry : this._entityObjects.entrySet())
-            e.add(entry.getKey());
-        return e;
-    }
-
     public void setDelay(int delay) {
         this._delay = delay;
         if (_running)
             changeTimer(delay);
     }
-
-    public int getDelay() {
-        return this._delay;
-    }
-
 }
