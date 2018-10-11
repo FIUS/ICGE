@@ -7,10 +7,7 @@
 
 package de.unistuttgart.informatik.fius.icge.simulation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.function.Predicate;
 
@@ -18,6 +15,7 @@ import de.unistuttgart.informatik.fius.icge.event.Event;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.territory.Territory;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
+import sun.util.locale.StringTokenIterator;
 
 /**
  * Simulation managing Entities and Territory.
@@ -30,6 +28,7 @@ public class Simulation {
     private int _tickCount = 0;
     private TimerTask _timerTask;
     private Semaphore _timerTaskSem;
+    private ArrayList<Entity> _entities = new ArrayList<>();
 
     /**
      * Creates a new `Simumlation` from a `Territory`
@@ -435,4 +434,20 @@ public class Simulation {
             super(sim);
         }
     }
+
+    /**
+     * Add an enity to the list
+     * @param entity
+     */
+    public void addEntity (Entity entity) {
+        this._entities.add(entity);
+    }
+
+    /**
+     * Return entities
+     */
+    public ArrayList<Entity> getEntities() {
+        return this._entities;
+    }
+
 }

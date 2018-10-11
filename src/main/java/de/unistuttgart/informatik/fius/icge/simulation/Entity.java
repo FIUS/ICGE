@@ -41,6 +41,8 @@ public abstract class Entity {
     protected Entity(Simulation sim) {
         this._sim = sim;
         this._delayTicks = this.getStandardDelayTicks();
+        // add entity to entities list of simulation
+        this._sim.addEntity(this);
     }
 
     /**

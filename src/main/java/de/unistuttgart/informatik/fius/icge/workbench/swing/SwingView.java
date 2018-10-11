@@ -11,10 +11,15 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import de.unistuttgart.informatik.fius.icge.animations.SimulationAnimator;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
 import de.unistuttgart.informatik.fius.icge.workbench.tools.SimulationController;
@@ -28,6 +33,8 @@ public class SwingView implements WorkbenchView {
     private ToolHandler _toolHandler;
     private SimulationController _simulationController;
     private SimPanel _simPanel;
+    private Simulation _simulation;
+    private JSlider speedSlider;
     private Settings _settings = new Settings(true, null, 60.f, 0, 0);
     
     public SwingView(String name) {
@@ -51,6 +58,8 @@ public class SwingView implements WorkbenchView {
             this._settings = this._settings.setAnimator(null);
         } else {
             this._settings = this._settings.setAnimator(new SimulationAnimator(sim));
+            this._simulation = sim;
+            speedSlider.addChangeListener(new SliderListener(this._simulation));
         }
         this.update();
     }
@@ -196,7 +205,48 @@ public class SwingView implements WorkbenchView {
         JButton clearLogButton = new JButton("clear log");
         clearLogButton.addActionListener(e -> this.clearLog());
         logPanel.add(BorderLayout.SOUTH, clearLogButton);
-        
-        main.add(BorderLayout.EAST, logPanel);
+
+        JPanel subPanel = new JPanel(new BorderLayout());
+        subPanel.add(logPanel);
+
+        subPanel.add(BorderLayout.PAGE_END, initSpeedSlider());
+
+        main.add(BorderLayout.EAST, subPanel);
     }
+
+    private JSlider initSpeedSlider() {
+        speedSlider = new JSlider(JSlider.HORIZONTAL, 0, 30, 25);
+
+        speedSlider.setMajorTickSpacing(5);
+        speedSlider.setMinorTickSpacing(1);
+        speedSlider.setSnapToTicks(true);
+        speedSlider.setPaintTicks(true);
+        speedSlider.setPaintLabels(true);
+        speedSlider.setInverted(true);
+        return speedSlider;
+    }
+
+    /**
+     * Listener for the speed changing slider and setting the speed for each entity
+     * @param Simulation
+     */
+    class SliderListener implements ChangeListener {
+        private Simulation simulation;
+        public SliderListener (Simulation sim)
+        {
+            this.simulation = sim;
+        }
+        public void stateChanged(ChangeEvent e) {
+            JSlider source = (JSlider)e.getSource();
+            if (!source.getValueIsAdjusting()) {
+                int currentTickCount = source.getValue();
+                if (currentTickCount == 0) // can not be 0, but is available due to nicer layout
+                    currentTickCount = 1;
+                for (Entity entity : this.simulation.getEntities()) {
+                    entity.setDelay(currentTickCount);
+                }
+            }
+        }
+    }
+
 }
