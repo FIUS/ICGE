@@ -30,6 +30,7 @@ public class Simulation {
     private int _tickCount = 0;
     private TimerTask _timerTask;
     private Semaphore _timerTaskSem;
+    private int _tickMillis = 10;
 
     /**
      * Creates a new `Simumlation` from a `Territory`
@@ -56,6 +57,7 @@ public class Simulation {
             this.init(sim._tty);
             this._running = sim._running;
             this._tickCount = sim._tickCount;
+            this._tickMillis = sim._tickMillis;
             if (this._running) {
                 this.startTimer();
             }
@@ -319,7 +321,16 @@ public class Simulation {
                 Simulation.this.tick(this.sem::release);
             }
         };
-        new Timer().schedule(this._timerTask, 10, 10);
+        new Timer().schedule(this._timerTask, this._tickMillis, this._tickMillis);
+    }
+
+    public synchronized void setTickMillis(int millis) {
+        if (millis <= 0) throw new IllegalArgumentException();
+        this._tickMillis = millis;
+        if (this._running) {
+            stopTimer();
+            startTimer();
+        }
     }
 
     private void stopTimer() {
