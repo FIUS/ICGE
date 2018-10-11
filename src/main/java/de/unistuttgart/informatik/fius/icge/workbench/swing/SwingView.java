@@ -13,6 +13,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import de.unistuttgart.informatik.fius.icge.animations.SimulationAnimator;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
@@ -28,6 +30,7 @@ public class SwingView implements WorkbenchView {
     private ToolHandler _toolHandler;
     private SimulationController _simulationController;
     private SimPanel _simPanel;
+    private JSlider speedSlider;
     private Settings _settings = new Settings(true, null, 60.f, 0, 0);
     
     public SwingView(String name) {
@@ -51,6 +54,7 @@ public class SwingView implements WorkbenchView {
             this._settings = this._settings.setAnimator(null);
         } else {
             this._settings = this._settings.setAnimator(new SimulationAnimator(sim));
+            this._toolBar.getSpeedSlider().addChangeListener(new SliderListener(this.simulation()));
         }
         this.update();
     }
@@ -196,7 +200,24 @@ public class SwingView implements WorkbenchView {
         JButton clearLogButton = new JButton("clear log");
         clearLogButton.addActionListener(e -> this.clearLog());
         logPanel.add(BorderLayout.SOUTH, clearLogButton);
-        
+
         main.add(BorderLayout.EAST, logPanel);
     }
+
+    /**
+     * Listener for the speed changing slider and setting the speed for each entity
+     * @param Simulation
+     */
+    class SliderListener implements ChangeListener {
+        private Simulation _sim;
+        public SliderListener (Simulation sim){this._sim = sim;}
+
+        public void stateChanged(ChangeEvent e) {
+            JSlider source = (JSlider)e.getSource();
+            if (!source.getValueIsAdjusting()) {
+                _sim.setDelay(source.getValue());
+            }
+        }
+    }
+
 }

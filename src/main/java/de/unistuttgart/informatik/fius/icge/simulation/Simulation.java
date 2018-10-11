@@ -7,10 +7,7 @@
 
 package de.unistuttgart.informatik.fius.icge.simulation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.function.Predicate;
 
@@ -18,6 +15,7 @@ import de.unistuttgart.informatik.fius.icge.event.Event;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
 import de.unistuttgart.informatik.fius.icge.territory.Territory;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
+import sun.util.locale.StringTokenIterator;
 
 /**
  * Simulation managing Entities and Territory.
@@ -30,6 +28,7 @@ public class Simulation {
     private int _tickCount = 0;
     private TimerTask _timerTask;
     private Semaphore _timerTaskSem;
+    private int _delay = 10;
 
     /**
      * Creates a new `Simumlation` from a `Territory`
@@ -306,7 +305,7 @@ public class Simulation {
         EventDispatcher.raise(new InitEvent(this));
     }
 
-    private void startTimer() {
+    private void startTimerWithDelay(int delay) {
         this._timerTaskSem = new Semaphore(1);
         this._timerTask = new TimerTask() {
             private final Semaphore sem = Simulation.this._timerTaskSem;
@@ -319,7 +318,14 @@ public class Simulation {
                 Simulation.this.tick(this.sem::release);
             }
         };
-        new Timer().schedule(this._timerTask, 10, 10);
+        new Timer().schedule(this._timerTask, delay, delay);
+    }
+
+    private void startTimer() {startTimerWithDelay(this._delay);}
+
+    public void changeTimer(int delay) {
+        this.stopTimer();
+        this.startTimerWithDelay(delay);
     }
 
     private void stopTimer() {
@@ -434,5 +440,13 @@ public class Simulation {
         SetTerritoryEvent(Simulation sim) {
             super(sim);
         }
+    }
+
+    public void setDelay(int delay) {
+        if (delay < 1) // should not be less than 1
+            delay = 1;
+        this._delay = delay;
+        if (_running)
+            changeTimer(delay);
     }
 }
