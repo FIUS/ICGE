@@ -25,52 +25,44 @@ import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEven
 import de.unistuttgart.informatik.fius.icge.workbench.Workbench.SetSimulationEvent;
 import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
 import de.unistuttgart.informatik.fius.icge.workbench.swing.Images;
-import de.unistuttgart.informatik.fius.icge.workbench.swing.ToolBar;
 
 /**
  * This class controls simulation playback
  * 
  */
 public class SimulationController {
-    private final ToolBar tb;
     private final WeakReference<WorkbenchView> _view;
 
-    private final JButton playButton;
-
-    private final JButton stepButton;
+    private final JButton _playButton;
+    private final JButton _stepButton;
     private int _pendingSteps = 0;
 
-    private final Image playImage;
-    private final Image pauseImage;
+    private final Image _playImage;
+    private final Image _pauseImage;
 
     /**
      * Creates a tool handler.
      * 
-     * @param toolBar
-     *            The ToolBar to use.
      * @param view
      *            The view to use.
      */
-    public SimulationController(ToolBar toolBar, WorkbenchView view) {
-        this.tb = toolBar;
+    public SimulationController(WorkbenchView view) {
         this._view = new WeakReference<>(view);
-        this.playButton = new JButton();
-        this.playButton.addActionListener(this::playButtonPressed);
-        this.playButton.setMargin(new Insets(0, 0, 0, 0));
+        this._playButton = new JButton();
+        this._playButton.addActionListener(this::playButtonPressed);
+        this._playButton.setMargin(new Insets(0, 0, 0, 0));
         Image stepImage = Images.image("step.png");
-        this.tb.addButton(this.playButton, -1);
 
-        this.stepButton = new JButton();
-        this.stepButton.addActionListener(this::stepButtonPressed);
+        this._stepButton = new JButton();
+        this._stepButton.addActionListener(this::stepButtonPressed);
         if (stepImage != null) {
-            this.stepButton.setIcon(new ImageIcon(stepImage));
+            this._stepButton.setIcon(new ImageIcon(stepImage));
         }
-        this.stepButton.setToolTipText("Simulate unitil next event");
-        this.stepButton.setMargin(new Insets(0, 0, 0, 0));
-        this.tb.addButton(this.stepButton, -1);
+        this._stepButton.setToolTipText("Simulate unitil next event");
+        this._stepButton.setMargin(new Insets(0, 0, 0, 0));
 
-        this.playImage = Images.image("play.png");
-        this.pauseImage = Images.image("pause.png");
+        this._playImage = Images.image("play.png");
+        this._pauseImage = Images.image("pause.png");
 
         this.updatePlayButton(false);
 
@@ -78,6 +70,14 @@ public class SimulationController {
         EventDispatcher.addListener(EntityEvent.class, this::handleEntityEvent);
         EventDispatcher.addListener(PauseEvent.class, this::handlePause);
         EventDispatcher.addListener(ResumeEvent.class, this::handleResume);
+    }
+
+    public JButton playButton() {
+        return this._playButton;
+    }
+
+    public JButton stepButton() {
+        return this._stepButton;
     }
 
     private boolean handleSetSimulation(Event ev) {
@@ -128,16 +128,16 @@ public class SimulationController {
 
     private synchronized void updatePlayButton(boolean isRunning) {
         if (isRunning) {
-            if (this.pauseImage != null) {
-                this.playButton.setIcon(new ImageIcon(this.pauseImage));
+            if (this._pauseImage != null) {
+                this._playButton.setIcon(new ImageIcon(this._pauseImage));
             }
-            this.playButton.setToolTipText("Pause simulation");
+            this._playButton.setToolTipText("Pause simulation");
         } else {
             this._pendingSteps = 0; // if something pauses the simulation, we wanna drop pending steps
-            if (this.playImage != null) {
-                this.playButton.setIcon(new ImageIcon(this.playImage));
+            if (this._playImage != null) {
+                this._playButton.setIcon(new ImageIcon(this._playImage));
             }
-            this.playButton.setToolTipText("Start simulation");
+            this._playButton.setToolTipText("Start simulation");
         }
     }
 

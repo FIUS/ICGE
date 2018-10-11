@@ -14,14 +14,18 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JToolBar;
 
+import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
+import de.unistuttgart.informatik.fius.icge.workbench.tools.SimulationController;
+import de.unistuttgart.informatik.fius.icge.workbench.tools.ToolHandler;
+
 public class ToolBar extends JToolBar {
     private static final long serialVersionUID = 224051849272358057L;
     
     private final SwingView _view;
     private final JComboBox<String> _dropDown = new JComboBox<>();
     private final ArrayList<Runnable> _dropDownActions = new ArrayList<>();
-    
-    public ToolBar(SwingView view) {
+
+    public ToolBar(SwingView view, ToolHandler toolHandler) {
         this._view = view;
         this.setMargin(new Insets(1, 1, 0, 0));
         this.setFloatable(false);
@@ -32,7 +36,17 @@ public class ToolBar extends JToolBar {
                 this._dropDownActions.get(index).run();
             }
         });
+        for (JButton button : toolHandler.buttons()) {
+            this.add(button, -1);
+        }
         this.add(this._dropDown, -1);
+        SimulationController sc = new SimulationController(view);
+        this.add(sc.playButton(), -1);
+        this.add(sc.stepButton(), -1);
+    }
+
+    public WorkbenchView view() {
+        return this._view;
     }
     
     public void setDropDownToolTip(String text) {
