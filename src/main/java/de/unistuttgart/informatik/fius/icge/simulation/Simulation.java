@@ -28,8 +28,7 @@ public class Simulation {
     private int _tickCount = 0;
     private TimerTask _timerTask;
     private Semaphore _timerTaskSem;
-    private ArrayList<Entity> _entities = new ArrayList<>();
-    private int _delay = 25;
+    private int _delay = 10;
 
     /**
      * Creates a new `Simumlation` from a `Territory`
@@ -306,7 +305,7 @@ public class Simulation {
         EventDispatcher.raise(new InitEvent(this));
     }
 
-    private void startTimer() {
+    private void startTimerWithDelay(int delay) {
         this._timerTaskSem = new Semaphore(1);
         this._timerTask = new TimerTask() {
             private final Semaphore sem = Simulation.this._timerTaskSem;
@@ -319,7 +318,14 @@ public class Simulation {
                 Simulation.this.tick(this.sem::release);
             }
         };
-        new Timer().schedule(this._timerTask, 10, 10);
+        new Timer().schedule(this._timerTask, delay, delay);
+    }
+
+    private void startTimer() {startTimerWithDelay(this._delay);}
+
+    public void changeTimer(int delay) {
+        this.stopTimer();
+        this.startTimerWithDelay(delay);
     }
 
     private void stopTimer() {
@@ -437,29 +443,19 @@ public class Simulation {
     }
 
     /**
-     * Add an enity to the list
-     * @param entity
-     */
-    public void addEntity (Entity entity) {
-        this._entities.add(entity);
-    }
-
-    /**
-     * Return entities
+     * Return entities from HashMap
      */
     private ArrayList<Entity> getEntities() {
-        return this._entities;
+        ArrayList<Entity> e = new ArrayList<>();
+        for(Map.Entry<Entity, WorldObject> entry : this._entityObjects.entrySet())
+            e.add(entry.getKey());
+        return e;
     }
 
     public void setDelay(int delay) {
-        if (delay < 1) // can not be less than 1, but is available due to nicer layout
-            delay = 1;
         this._delay = delay;
-
-        // apply delay to each entity
-        for (Entity entity : this.getEntities()) {
-            entity.setDelay(delay);
-        }
+        if (_running)
+            changeTimer(delay);
     }
 
     public int getDelay() {

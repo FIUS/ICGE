@@ -10,16 +10,14 @@ package de.unistuttgart.informatik.fius.icge.workbench.swing;
 import java.awt.Insets;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JToolBar;
-
+import javax.swing.*;
 public class ToolBar extends JToolBar {
     private static final long serialVersionUID = 224051849272358057L;
     
     private final SwingView _view;
     private final JComboBox<String> _dropDown = new JComboBox<>();
     private final ArrayList<Runnable> _dropDownActions = new ArrayList<>();
+    private JSlider speedSlider;
     
     public ToolBar(SwingView view) {
         this._view = view;
@@ -30,9 +28,11 @@ public class ToolBar extends JToolBar {
             int index = this._dropDown.getSelectedIndex();
             if (index < this._dropDownActions.size()) {
                 this._dropDownActions.get(index).run();
+                this.speedSlider.setValue(10);
             }
         });
         this.add(this._dropDown, -1);
+        this.add(this.initSpeedSlider(), 1);
     }
     
     public void setDropDownToolTip(String text) {
@@ -56,4 +56,18 @@ public class ToolBar extends JToolBar {
     public void addButton(JButton button, int position) {
         this.add(button, position);
     }
+
+    private JSlider initSpeedSlider() {
+        speedSlider = new JSlider(JSlider.HORIZONTAL, 0, 50, 10);
+
+        speedSlider.setMajorTickSpacing(10);
+        speedSlider.setMinorTickSpacing(1);
+        speedSlider.setSnapToTicks(false);
+        speedSlider.setPaintTicks(true);
+        speedSlider.setPaintLabels(true);
+        speedSlider.setInverted(false);
+        return speedSlider;
+    }
+
+    public JSlider getSpeedSlider() {return this.speedSlider;}
 }

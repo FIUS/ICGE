@@ -16,7 +16,7 @@ class Settings {
     public final double scale;
     public final double centeredCol;
     public final double centeredRow;
-    
+
     public Settings(boolean opened, SimulationAnimator animator, double scale, double centeredCol, double centeredRow) {
         this.opened = opened;
         this.animator = animator;

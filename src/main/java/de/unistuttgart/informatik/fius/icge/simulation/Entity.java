@@ -40,9 +40,7 @@ public abstract class Entity {
      */
     protected Entity(Simulation sim) {
         this._sim = sim;
-        this._delayTicks = this._sim.getDelay();
-        // add entity to entities list of simulation
-        this._sim.addEntity(this);
+        this._delayTicks = getStandardDelayTicks();
     }
 
     /**
@@ -258,6 +256,7 @@ public abstract class Entity {
      * @param delay
      *            The amount of ticks
      */
+
     public void setDelay(int delay) {
         this._delayTicks = delay;
     }
