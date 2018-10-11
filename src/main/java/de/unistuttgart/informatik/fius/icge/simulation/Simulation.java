@@ -29,6 +29,7 @@ public class Simulation {
     private TimerTask _timerTask;
     private Semaphore _timerTaskSem;
     private ArrayList<Entity> _entities = new ArrayList<>();
+    private int _delay = 25;
 
     /**
      * Creates a new `Simumlation` from a `Territory`
@@ -446,8 +447,23 @@ public class Simulation {
     /**
      * Return entities
      */
-    public ArrayList<Entity> getEntities() {
+    private ArrayList<Entity> getEntities() {
         return this._entities;
+    }
+
+    public void setDelay(int delay) {
+        if (delay < 1) // can not be less than 1, but is available due to nicer layout
+            delay = 1;
+        this._delay = delay;
+
+        // apply delay to each entity
+        for (Entity entity : this.getEntities()) {
+            entity.setDelay(delay);
+        }
+    }
+
+    public int getDelay() {
+        return this._delay;
     }
 
 }

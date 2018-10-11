@@ -219,7 +219,7 @@ public class SwingView implements WorkbenchView {
 
         speedSlider.setMajorTickSpacing(5);
         speedSlider.setMinorTickSpacing(1);
-        speedSlider.setSnapToTicks(true);
+        speedSlider.setSnapToTicks(false);
         speedSlider.setPaintTicks(true);
         speedSlider.setPaintLabels(true);
         speedSlider.setInverted(true);
@@ -231,20 +231,13 @@ public class SwingView implements WorkbenchView {
      * @param Simulation
      */
     class SliderListener implements ChangeListener {
-        private Simulation simulation;
-        public SliderListener (Simulation sim)
-        {
-            this.simulation = sim;
-        }
+        private Simulation _sim;
+        public SliderListener (Simulation sim){this._sim = sim;}
+
         public void stateChanged(ChangeEvent e) {
             JSlider source = (JSlider)e.getSource();
             if (!source.getValueIsAdjusting()) {
-                int currentTickCount = source.getValue();
-                if (currentTickCount == 0) // can not be 0, but is available due to nicer layout
-                    currentTickCount = 1;
-                for (Entity entity : this.simulation.getEntities()) {
-                    entity.setDelay(currentTickCount);
-                }
+                _sim.setDelay(source.getValue());
             }
         }
     }
