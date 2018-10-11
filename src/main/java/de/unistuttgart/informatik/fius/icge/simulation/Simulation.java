@@ -443,6 +443,8 @@ public class Simulation {
     }
 
     public void setDelay(int delay) {
+        if (delay < 1) // should not be less than 1
+            delay = 1;
         this._delay = delay;
         if (_running)
             changeTimer(delay);
