@@ -36,7 +36,8 @@ public class Simulation {
      * Creates a new `Simumlation` from a `Territory`
      *
      * @param tty
-     *            The `Territory` representing the initial state of the created `Simulation`
+     *            The `Territory` representing the initial state of the created
+     *            `Simulation`
      */
     public Simulation(Territory tty) {
         this.init(tty);
@@ -44,7 +45,7 @@ public class Simulation {
 
     /**
      * Creates a new `Simulation` from the state of an existing `Simulation`. It does initially have the same `Territory`, tick
-     * count and is running if the other `Simulation` is running.
+     * count, number of milliseconds per tick and is running if the other `Simulation` is running.
      * 
      * NOTE: All previously existing `Entity` objects will still be associated with the other `Simulation` and no `Entity`
      * objects are shared between the two `Simulation`s
@@ -301,6 +302,22 @@ public class Simulation {
         return this._tickCount;
     }
 
+    /**
+     * Sets the number of milliseconds per tick. Prior to the first call of this method, the number of milliseconds per tick has
+     * a default value of `10`.
+     * 
+     * @param millis
+     *            The number of milliseconds per tick
+     */
+    public synchronized void setTickMillis(int millis) {
+        if (millis <= 0) throw new IllegalArgumentException();
+        this._tickMillis = millis;
+        if (this._running) {
+            stopTimer();
+            startTimer();
+        }
+    }
+
     // private
 
     private void init(Territory tty) {
@@ -322,15 +339,6 @@ public class Simulation {
             }
         };
         new Timer().schedule(this._timerTask, this._tickMillis, this._tickMillis);
-    }
-
-    public synchronized void setTickMillis(int millis) {
-        if (millis <= 0) throw new IllegalArgumentException();
-        this._tickMillis = millis;
-        if (this._running) {
-            stopTimer();
-            startTimer();
-        }
     }
 
     private void stopTimer() {
