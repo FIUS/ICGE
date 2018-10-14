@@ -332,10 +332,12 @@ public class Simulation {
 
             @Override
             public void run() {
-                if (!this.sem.tryAcquire()) {
-                    this.cancel();
+                synchronized (Simulation.this) {
+                    if (!this.sem.tryAcquire()) {
+                        this.cancel();
+                    }
+                    Simulation.this.tick(this.sem::release);
                 }
-                Simulation.this.tick(this.sem::release);
             }
         };
         new Timer().schedule(this._timerTask, this._tickMillis, this._tickMillis);
