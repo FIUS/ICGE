@@ -443,7 +443,7 @@ public abstract class Entity {
         this.println(String.valueOf(message));
     }
 
-    // protected
+    // private
 
     /**
      * Internal spawn logic for entities
@@ -461,7 +461,7 @@ public abstract class Entity {
      * @throws CellBlockedBySolidEntity
      *             When the cell the entity is trying to be spawned in is blocked by a solid entity like a wall
      */
-    protected void spawnInternal(int column, int row, Direction direction, boolean force)
+    private void spawnInternal(int column, int row, Direction direction, boolean force)
             throws EntityAlreadyAlive, CellBlockedBySolidEntity {
         for (Entity e : this.simulation().entitiesAt(column, row)) {
             if (e.state().isSolid()) throw new CellBlockedBySolidEntity();
@@ -481,13 +481,15 @@ public abstract class Entity {
      * @param force
      *            if true perform despawn with delay set to 0
      */
-    protected void despawnInternal(boolean force) {
+    private void despawnInternal(boolean force) {
         SimulationEvent ev = new DespawnEvent(this.simulation(), this);
         this.delayed(() -> {
             if (!this.alive()) throw new EntityNotAlive();
             this.simulation().setWorldObject(this, null, ev);
         }, force ? 0 : this._delayTicks);
     }
+
+    // protected
 
     /**
      * Runs the given runnable after this entity is free
