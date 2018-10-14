@@ -16,6 +16,8 @@ import javax.swing.JSlider;
 import javax.swing.JToolBar;
 
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
+import de.unistuttgart.informatik.fius.icge.event.EventHandler;
+import de.unistuttgart.informatik.fius.icge.event.EventListener;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.workbench.Workbench.SetSimulationEvent;
 import de.unistuttgart.informatik.fius.icge.workbench.WorkbenchView;
@@ -28,6 +30,7 @@ public class ToolBar extends JToolBar {
     private final WorkbenchView _view;
     private final JComboBox<String> _dropDown = new JComboBox<>();
     private final ArrayList<Runnable> _dropDownActions = new ArrayList<>();
+    private EventHandler _eventHandler = new EventHandler();
 
     public ToolBar(SwingView view, ToolHandler toolHandler) {
         this._view = view;
@@ -99,7 +102,7 @@ public class ToolBar extends JToolBar {
             }
         });
 
-        EventDispatcher.addListener(SetSimulationEvent.class, ev -> {
+        this._eventHandler.addListener(SetSimulationEvent.class, ev -> {
             if (this._view == ((SetSimulationEvent) ev).view) {
                 updater.run();
             }

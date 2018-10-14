@@ -11,6 +11,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
+import de.unistuttgart.informatik.fius.icge.event.EventHandler;
+import de.unistuttgart.informatik.fius.icge.event.EventListener;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionMethod;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
@@ -22,6 +24,7 @@ import de.unistuttgart.informatik.fius.icge.territory.WorldObject.Direction;
 public abstract class MovableEntity extends Entity {
 
     private final Deque<MoveEvent> _positionStack = new ArrayDeque<>(100);
+    private final EventHandler _eventHandler = new EventHandler();
 
     /**
      * Creates a new movable entity in the given simulation
@@ -32,14 +35,14 @@ public abstract class MovableEntity extends Entity {
     protected MovableEntity(Simulation sim) {
         super(sim);
 
-        EventDispatcher.addListener(SpawnEvent.class, ev -> {
+        this._eventHandler.addListener(SpawnEvent.class, ev -> {
             SpawnEvent se = (SpawnEvent) ev;
             if ((se.simulation == this.simulation()) && (se.entity == this)) {
                 this._positionStack.add(new MoveEvent(this.simulation(), this, se.row, se.column));
             }
             return true;
         });
-        EventDispatcher.addListener(MoveEvent.class, ev -> {
+        this._eventHandler.addListener(MoveEvent.class, ev -> {
             MoveEvent me = (MoveEvent) ev;
             if ((me.simulation == this.simulation()) && (me.entity == this)) {
                 this._positionStack.add(me);
