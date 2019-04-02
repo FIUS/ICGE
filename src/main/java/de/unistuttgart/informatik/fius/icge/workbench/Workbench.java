@@ -9,11 +9,21 @@ package de.unistuttgart.informatik.fius.icge.workbench;
 
 import de.unistuttgart.informatik.fius.icge.event.Event;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
-import de.unistuttgart.informatik.fius.icge.simulation.Entity.*;
+import de.unistuttgart.informatik.fius.icge.event.EventHandler;
+import de.unistuttgart.informatik.fius.icge.event.EventListener;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.DespawnEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.MessageEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.SpawnEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Entity.TeleportEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.MovableEntity.MoveEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.MovableEntity.TurnLeftEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
-import de.unistuttgart.informatik.fius.icge.simulation.Simulation.*;
+import de.unistuttgart.informatik.fius.icge.simulation.Simulation.PauseEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Simulation.ResumeEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SetTerritoryEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
+import de.unistuttgart.informatik.fius.icge.simulation.Simulation.TickEvent;
 import de.unistuttgart.informatik.fius.icge.territory.WorldObject;
 import de.unistuttgart.informatik.fius.icge.workbench.swing.SwingView;
 
@@ -21,12 +31,13 @@ public class Workbench {
     
     private final String _name;
     private final WorkbenchView _view;
-    
+    private EventHandler _eventHandler = new EventHandler();
+
     public Workbench(String name) {
         this._name = name;
         this._view = new SwingView(name);
-        
-        EventDispatcher.addListener(SimulationEvent.class, this::handle);
+
+        this._eventHandler.addListener(SimulationEvent.class, this::handle);
     }
     
     public boolean opened() {

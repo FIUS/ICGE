@@ -7,10 +7,8 @@
 
 package de.unistuttgart.informatik.fius.icge.animations;
 
-import java.lang.ref.WeakReference;
-
 import de.unistuttgart.informatik.fius.icge.animations.Animation.AnimationType;
-import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
+import de.unistuttgart.informatik.fius.icge.event.EventHandler;
 import de.unistuttgart.informatik.fius.icge.simulation.MovableEntity.MovableEntityEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.MovableEntity.MoveEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
@@ -23,12 +21,13 @@ public class SimulationAnimator {
     private final Simulation _sim;
     private AnimatedTerritory _animated;
     private int _delay = 25; // delay is in simulation ticks
-    
+    private EventHandler _eventHandler = new EventHandler();
+
     public SimulationAnimator(Simulation sim) {
         if (sim == null) throw new IllegalArgumentException();
         this._sim = sim;
         this._animated = new AnimatedTerritory(sim.territory());
-        initListener(new WeakReference<>(this));
+        this.initListener();
     }
     
     public Simulation simulation() {
@@ -48,19 +47,17 @@ public class SimulationAnimator {
     public void setDelay(int delay) {
         this._delay = delay;
     }
-    
-    private static void initListener(WeakReference<SimulationAnimator> animRef) {
-        EventDispatcher.addListener(SimulationEvent.class, ev -> {
-            SimulationAnimator sima = animRef.get();
-            if (sima == null) return false; // unregister this listener
+
+    private void initListener() {
+        this._eventHandler.addListener(SimulationEvent.class, ev -> {
             if (!(ev instanceof SimulationEvent)) return true;
             SimulationEvent se = (SimulationEvent) ev;
-            if (se.simulation != sima._sim) return true;
+            if (se.simulation != this._sim) return true;
             if (se instanceof TickEvent) {
-                sima._animated = sima._animated.removeFinished(se.simulation.tickCount());
+                this._animated = this._animated.removeFinished(se.simulation.tickCount());
             }
-            if (se.simulation.territory() == sima._animated.territory()) return true;
-            AnimatedTerritory nextAnimated = sima._animated.setTerritory(se.simulation.territory());
+            if (se.simulation.territory() == this._animated.territory()) return true;
+            AnimatedTerritory nextAnimated = this._animated.setTerritory(se.simulation.territory());
             if (se instanceof MovableEntityEvent) {
                 MovableEntityEvent mee = (MovableEntityEvent) se;
                 int begin = mee.simulation.tickCount();
@@ -72,7 +69,7 @@ public class SimulationAnimator {
                 Animation anim = new Animation(begin, end, animationType(mee));
                 nextAnimated.setAnimation(wob, anim);
             }
-            sima._animated = nextAnimated;
+            this._animated = nextAnimated;
             return true;
         });
     }

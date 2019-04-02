@@ -37,6 +37,7 @@ import javax.swing.WindowConstants;
 
 import de.unistuttgart.informatik.fius.icge.Engine;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
+import de.unistuttgart.informatik.fius.icge.event.EventHandler;
 import de.unistuttgart.informatik.fius.icge.event.EventListener;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.DespawnEvent;
@@ -68,6 +69,8 @@ public class EntityInspector {
 
     private List<String> _methodList;
     private Map<String, JTextArea> _methodToLabel;
+
+    private EventHandler _eventHandler = new EventHandler();
 
     /**
      * Create new entity inspector which chooses from all available entities
@@ -149,7 +152,7 @@ public class EntityInspector {
         this.setEntity(this._entities.get(0));
 
         // listener for entity events which updates the inspected values
-        EventListener listener = EventDispatcher.addListener(EntityEvent.class, ev -> {
+        this._eventHandler.addListener(EntityEvent.class, ev -> {
             EntityEvent eev = (EntityEvent) ev;
             if (this._selectedEntity == eev.entity) {
                 if (eev instanceof DespawnEvent) {
@@ -159,14 +162,6 @@ public class EntityInspector {
                 }
             }
             return true;
-        });
-
-        // remove listener when the inspector is closed
-        this._frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                EventDispatcher.removeListener(listener);
-            }
         });
 
     }

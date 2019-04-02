@@ -11,6 +11,8 @@ import java.util.concurrent.Semaphore;
 import java.util.function.Predicate;
 
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
+import de.unistuttgart.informatik.fius.icge.event.EventHandler;
+import de.unistuttgart.informatik.fius.icge.event.EventListener;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.SimulationEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.TickEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.inspection.InspectionAttribute;
@@ -521,7 +523,9 @@ public abstract class Entity {
             int thisMoveTick = this._blockedUntilTick;
             if (this.simulation().tickCount() < thisMoveTick) {
                 Semaphore sem = new Semaphore(0);
-                EventDispatcher.addListener(TickEvent.class, ev -> {
+                // we have this `handler` variable such that the handler doesn't get garbage collected
+                EventHandler handler = new EventHandler();
+                handler.addListener(TickEvent.class, ev -> {
                     TickEvent te = (TickEvent) ev;
                     if ((te.simulation == this.simulation()) && (te.tickCount >= thisMoveTick)) {
                         sem.release();
@@ -529,7 +533,7 @@ public abstract class Entity {
                     }
                     return true;
                 });
-                sem.acquireUninterruptibly();
+                sem.acquireUninterruptibly(); // after this line, the `handler` may safely be garbage collected
             }
         }
         synchronized (this.simulation()) {

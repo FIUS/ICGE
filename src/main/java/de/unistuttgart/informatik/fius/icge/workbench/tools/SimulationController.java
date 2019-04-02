@@ -17,6 +17,7 @@ import javax.swing.JButton;
 
 import de.unistuttgart.informatik.fius.icge.event.Event;
 import de.unistuttgart.informatik.fius.icge.event.EventDispatcher;
+import de.unistuttgart.informatik.fius.icge.event.EventHandler;
 import de.unistuttgart.informatik.fius.icge.simulation.Entity.EntityEvent;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation;
 import de.unistuttgart.informatik.fius.icge.simulation.Simulation.PauseEvent;
@@ -39,6 +40,8 @@ public class SimulationController {
 
     private final Image _playImage;
     private final Image _pauseImage;
+
+    private EventHandler _eventHandler = new EventHandler();
 
     /**
      * Creates a tool handler.
@@ -66,10 +69,10 @@ public class SimulationController {
 
         this.updatePlayButton(false);
 
-        EventDispatcher.addListener(SetSimulationEvent.class, this::handleSetSimulation);
-        EventDispatcher.addListener(EntityEvent.class, this::handleEntityEvent);
-        EventDispatcher.addListener(PauseEvent.class, this::handlePause);
-        EventDispatcher.addListener(ResumeEvent.class, this::handleResume);
+        this._eventHandler.addListener(SetSimulationEvent.class, this::handleSetSimulation);
+        this._eventHandler.addListener(EntityEvent.class, this::handleEntityEvent);
+        this._eventHandler.addListener(PauseEvent.class, this::handlePause);
+        this._eventHandler.addListener(ResumeEvent.class, this::handleResume);
     }
 
     public JButton playButton() {
